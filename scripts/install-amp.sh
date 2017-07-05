@@ -129,10 +129,10 @@ sudo -u postgres psql -c "CREATE ROLE $BOX_DBUSER LOGIN UNENCRYPTED PASSWORD '$B
 sudo -u postgres /usr/bin/createdb --echo --owner=${BOX_DBUSER} ${BOX_DBNAME}
 service postgresql restart
 
-# Configure MySQLDialect Password Lifetime
+# Configure MySQL Password Lifetime
 echo "default_password_lifetime = 0" >> /etc/mysql/mysql.conf.d/mysqld.cnf
 
-# Configure MySQLDialect Remote Access
+# Configure MySQL Remote Access
 sed -i '/^bind-address/s/bind-address.*=.*/bind-address = 0.0.0.0/' /etc/mysql/mysql.conf.d/mysqld.cnf
 mysql --user="root" --password="$BOX_DBPASS" -e "GRANT ALL ON *.* TO root@'0.0.0.0' IDENTIFIED BY '$BOX_DBPASS' WITH GRANT OPTION;"
 service mysql restart
@@ -147,7 +147,7 @@ service mysql restart
 MY_ODBC="mysql-connector-odbc-5.3.8-linux-ubuntu16.04-x86-64bit"
 wget -nv http://ftp.gwdg.de/pub/misc/mysql/Downloads/Connector-ODBC/5.3/${MY_ODBC}.tar.gz
 tar -xf ${MY_ODBC}.tar.gz && cd ${MY_ODBC}
-cp bin/* /usr/local/bin && cp lib/* /usr/local/lib && myodbc-installer -d -a -n "MySQLDialect" -t "DRIVER=/usr/local/lib/libmyodbc5w.so;"
+cp bin/* /usr/local/bin && cp lib/* /usr/local/lib && myodbc-installer -d -a -n "MySQL" -t "DRIVER=/usr/local/lib/libmyodbc5w.so;"
 cd /home/vagrant && rm -rf ${MY_ODBC} && rm ${MY_ODBC}.tar.gz
 
 # PHPMyAdmin
