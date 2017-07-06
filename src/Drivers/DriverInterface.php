@@ -12,11 +12,18 @@
 
 namespace chillerlan\Database\Drivers;
 
-/**
- * @property string   $dialect
- * @property string[] $quotes
- */
+use \chillerlan\Database\Options;
+use \Psr\SimpleCache\CacheInterface;
+
 interface DriverInterface{
+
+	/**
+	 * Constructor.
+	 *
+	 * @param \chillerlan\Database\Options         $options
+	 * @param \Psr\SimpleCache\CacheInterface|null $cache
+	 */
+	public function __construct(Options $options, CacheInterface $cache = null);
 
 	/**
 	 * Establishes a database connection and returns the connection object
