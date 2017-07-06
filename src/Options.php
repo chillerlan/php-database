@@ -166,22 +166,6 @@ class Options{
 	protected $pgsql_charset = 'UTF8';
 
 	/**
-	 * Optional flags used to determine how to open the SQLite database.
-	 *
-	 * @var int
-	 */
-	protected $sqlite_flags = SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE;
-
-	/**
-	 * An optional encryption key used when encrypting and decrypting an SQLite database.
-	 *
-	 * @link http://php.net/manual/sqlite3.construct.php
-	 *
-	 * @var string
-	 */
-	protected $sqlite_encryption_key;
-
-	/**
 	 * The driver name to use for an ODBC connection
 	 *
 	 * @var string
