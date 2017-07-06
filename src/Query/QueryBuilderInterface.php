@@ -12,9 +12,10 @@
 
 namespace chillerlan\Database\Query;
 
+use chillerlan\Database\Options;
+use chillerlan\Database\Drivers\DriverInterface;
 use chillerlan\Database\Query\Statements\{
-	Alter, Create, Delete, Drop,
-	Insert, Select, Update
+	Alter, Create, Delete, Drop, Insert, Select, Update
 };
 
 /**
@@ -28,12 +29,47 @@ use chillerlan\Database\Query\Statements\{
  */
 interface QueryBuilderInterface{
 
+	/**
+	 * QueryBuilderAbstract constructor.
+	 *
+	 * @param \chillerlan\Database\Drivers\DriverInterface $db
+	 * @param \chillerlan\Database\Options                 $options
+	 */
+	public function __construct(DriverInterface $db, Options $options);
+
+	/**
+	 * @return \chillerlan\Database\Query\Statements\Select
+	 */
 	public function select():Select;
+
+	/**
+	 * @return \chillerlan\Database\Query\Statements\Insert
+	 */
 	public function insert():Insert;
+
+	/**
+	 * @return \chillerlan\Database\Query\Statements\Update
+	 */
 	public function update():Update;
+
+	/**
+	 * @return \chillerlan\Database\Query\Statements\Delete
+	 */
 	public function delete():Delete;
+
+	/**
+	 * @return \chillerlan\Database\Query\Statements\Create
+	 */
 	public function create():Create;
+
+	/**
+	 * @return \chillerlan\Database\Query\Statements\Alter
+	 */
 	public function alter():Alter;
+
+	/**
+	 * @return \chillerlan\Database\Query\Statements\Drop
+	 */
 	public function drop():Drop;
 
 }
