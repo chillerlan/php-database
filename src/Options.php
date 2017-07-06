@@ -101,7 +101,7 @@ class Options{
 	protected $password;
 
 	/**
-	 * Indicates wether the connection should use SSL or not
+	 * Indicates whether the connection should use SSL or not
 	 *
 	 * @var bool
 	 */
@@ -150,9 +150,9 @@ class Options{
 	protected $mysqli_timeout = 1;
 
 	/**
-	 * MySQLStatement connection character set
+	 * MySQL connection character set
 	 *
-	 * @link https://mathiasbynens.be/notes/mysql-utf8mb4 How to support full Unicode in MySQLStatement
+	 * @link https://mathiasbynens.be/notes/mysql-utf8mb4 How to support full Unicode in MySQL
 	 *
 	 * @var string
 	 */
