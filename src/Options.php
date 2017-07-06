@@ -147,7 +147,7 @@ class Options{
 	 *
 	 * @var int
 	 */
-	protected $mysqli_timeout = 1;
+	protected $mysqli_timeout = 3;
 
 	/**
 	 * MySQL connection character set
@@ -189,7 +189,7 @@ class Options{
 	 *
 	 * @var int
 	 */
-	protected $mssql_timeout = 1;
+	protected $mssql_timeout = 3;
 
 	/**
 	 * MS SQL Server connection character set
