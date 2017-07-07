@@ -32,4 +32,16 @@ interface Delete extends Statement{
 	 */
 	public function where($val1, $val2, $operator = '=', $bind = true, $join = 'AND'):Delete;
 
+	/**
+	 * @param null $join
+	 *
+	 * @return \chillerlan\Database\Query\Statements\Delete
+	 */
+	public function openBracket($join = null):Delete;
+
+	/**
+	 * @return \chillerlan\Database\Query\Statements\Delete
+	 */
+	public function closeBracket():Delete;
+
 }
