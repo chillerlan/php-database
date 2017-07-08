@@ -34,7 +34,7 @@ debconf-set-selections <<< "mysql-server mysql-server/root_password password $BO
 debconf-set-selections <<< "mysql-server mysql-server/root_password_again password $BOX_DBPASS"
 
 # @todo: apache-http2
-#apt-add-repository ppa:ondrej/apache2 -y
+apt-add-repository ppa:ondrej/apache2 -y
 apt-add-repository ppa:ondrej/php -y
 apt-add-repository ppa:chris-lea/redis-server -y
 apt-add-repository ppa:chris-lea/libsodium -y
@@ -61,11 +61,16 @@ php7.1-interbase firebird2.5-superclassic \
 php7.1-imagick imagemagick \
 redis-server libsodium-dev
 
-# Setup Some PHP-FPM Options
-echo "xdebug.remote_enable = 1" >> /etc/php/7.1/mods-available/xdebug.ini
-echo "xdebug.remote_connect_back = 1" >> /etc/php/7.1/mods-available/xdebug.ini
-echo "xdebug.remote_port = 9000" >> /etc/php/7.1/mods-available/xdebug.ini
-echo "xdebug.max_nesting_level = 512" >> /etc/php/7.1/mods-available/xdebug.ini
+# Setup Some PHP Options
+
+XDEBUG_INI="
+xdebug.remote_enable = 1
+xdebug.remote_connect_back = 1
+xdebug.remote_port = 9000
+xdebug.max_nesting_level = 512
+"
+echo "${XDEBUG_INI}" >> /etc/php/7.1/mods-available/xdebug.ini
+
 echo "opcache.revalidate_freq = 0" >> /etc/php/7.1/mods-available/opcache.ini
 
 sed -i "s/error_reporting = .*/error_reporting = E_ALL/" /etc/php/7.1/apache2/php.ini
@@ -115,9 +120,13 @@ ln -sf /etc/php/7.1/mods-available/redis.ini /etc/php/7.1/cli/conf.d/20-redis.in
 # APCU
 pecl install apcu
 
-echo "extension=apcu.so" > /etc/php/7.1/mods-available/apcu.ini
-echo "apc.enable=1" >> /etc/php/7.1/mods-available/apcu.ini
-echo "apc.enable_cli=1" >> /etc/php/7.1/mods-available/apcu.ini
+APCU_INI="
+extension=apcu.so
+apc.enable=1
+apc.enable_cli=1
+"
+
+echo "${APCU_INI}" >> /etc/php/7.1/mods-available/apcu.ini
 
 ln -sf /etc/php/7.1/mods-available/apcu.ini /etc/php/7.1/apache2/conf.d/20-apcu.ini
 ln -sf /etc/php/7.1/mods-available/apcu.ini /etc/php/7.1/cli/conf.d/20-apcu.ini
@@ -150,6 +159,8 @@ tar -xf ${MY_ODBC}.tar.gz && cd ${MY_ODBC}
 cp bin/* /usr/local/bin && cp lib/* /usr/local/lib && myodbc-installer -d -a -n "MySQL" -t "DRIVER=/usr/local/lib/libmyodbc5w.so;"
 cd /home/vagrant && rm -rf ${MY_ODBC} && rm ${MY_ODBC}.tar.gz
 
+ln -s /var/lib/mysql/mysql.sock /tmp/mysql.sock
+
 # PHPMyAdmin
 PMA="phpMyAdmin-4.7.1-all-languages"
 wget -nv https://files.phpmyadmin.net/phpMyAdmin/4.7.1/${PMA}.tar.gz
@@ -175,7 +186,7 @@ CONFIG_PHPMYADMIN="<?php
 
 "
 
-echo ${CONFIG_PHPMYADMIN} > "/usr/share/phpmyadmin/config.inc.php"
+echo "${CONFIG_PHPMYADMIN}" > /usr/share/phpmyadmin/config.inc.php
 
 ALIAS_PHPMYADMIN="Alias /phpmyadmin "/usr/share/phpmyadmin/"
 <Directory "/usr/share/phpmyadmin/">
@@ -185,7 +196,7 @@ ALIAS_PHPMYADMIN="Alias /phpmyadmin "/usr/share/phpmyadmin/"
 </Directory>
 "
 
-echo ${ALIAS_PHPMYADMIN} >> "/etc/apache2/conf-available/$BOX_NAME-aliases.conf"
+echo "${ALIAS_PHPMYADMIN}" >> "/etc/apache2/conf-available/$BOX_NAME-aliases.conf"
 
 # Configure Firebird
 CONFIG_FIREBIRD="
@@ -194,7 +205,9 @@ DatabaseAccess = Full
 ExternalFileAccess = Full
 UdfAccess = Full
 "
-echo ${CONFIG_FIREBIRD} >> "/etc/firebird/2.5/firebird.conf"
+
+echo "${CONFIG_FIREBIRD}" >> /etc/firebird/2.5/firebird.conf
+echo "${CONFIG_FIREBIRD}" >> /etc/firebird/3.0/firebird.conf
 
 #MSSQL
 ACCEPT_EULA=Y apt-get install -y mssql-server mssql-server-fts mssql-server-agent mssql-tools msodbcsql
@@ -214,6 +227,15 @@ ln -sf /etc/php/7.1/mods-available/sqlsrv.ini /etc/php/7.1/cli/conf.d/20-sqlsrv.
 
 ln -sf /etc/php/7.1/mods-available/pdo_sqlsrv.ini /etc/php/7.1/apache2/conf.d/20-pdo_sqlsrv.ini
 ln -sf /etc/php/7.1/mods-available/pdo_sqlsrv.ini /etc/php/7.1/cli/conf.d/20-pdo_sqlsrv.ini
+
+
+ODBC_INI="
+[MSSQLTest]
+Driver = ODBC Driver 13 for SQL Server
+Server = localhost,1433
+"
+echo "${ODBC_INI}" >> /etc/odbc.ini
+
 
 # Apache
 sed -i "s/www-data/vagrant/" /etc/apache2/envvars
@@ -263,6 +285,7 @@ openssl req -new -x509 -config ${PATH_CNF} -out${PATH_CRT} -days 365 2>/dev/null
 BOX_DEFAULT_HOST="<VirtualHost *:80>
     ServerAdmin webmaster@localhost
     DocumentRoot $BOX_DOCROOT
+    Protocols h2c http/1.1
 
     <Directory $BOX_DOCROOT>
         AllowOverride All
@@ -276,13 +299,14 @@ BOX_DEFAULT_HOST="<VirtualHost *:80>
 </VirtualHost>
 "
 
-echo ${BOX_DEFAULT_HOST} > "/etc/apache2/sites-available/$BOX_NAME.conf"
+echo "${BOX_DEFAULT_HOST}" > "/etc/apache2/sites-available/$BOX_NAME.conf"
 ln -fs "/etc/apache2/sites-available/$BOX_NAME.conf" "/etc/apache2/sites-enabled/$BOX_NAME.conf"
 
 BOX_SSL="<IfModule mod_ssl.c>
     <VirtualHost *:443>
         ServerAdmin webmaster@localhost
         DocumentRoot $BOX_DOCROOT
+        Protocols h2 http/1.1
 
         <Directory $BOX_DOCROOT>
             AllowOverride All
@@ -309,11 +333,12 @@ BOX_SSL="<IfModule mod_ssl.c>
 </IfModule>
 "
 
-echo ${BOX_SSL} > "/etc/apache2/sites-available/$BOX_NAME-ssl.conf"
+echo "${BOX_SSL}" > "/etc/apache2/sites-available/$BOX_NAME-ssl.conf"
 ln -fs "/etc/apache2/sites-available/$BOX_NAME-ssl.conf" "/etc/apache2/sites-enabled/$BOX_NAME-ssl.conf"
 
 a2dissite 000-default
 a2enmod ssl
+a2enmod http2
 
 ps auxw | grep apache2 | grep -v grep > /dev/null
 
