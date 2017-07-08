@@ -153,6 +153,7 @@ class PostgresQueryBuilder extends QueryBuilderAbstract{
 
 				/**
 				 * @link https://www.postgresql.org/docs/current/static/sql-createtable.html
+				 * @link https://www.postgresql.org/docs/current/static/datatype.html
 				 */
 				return (new class($this->db, $this->options, $this->quotes) extends CreateTableAbstract{
 
@@ -196,7 +197,7 @@ class PostgresQueryBuilder extends QueryBuilderAbstract{
 						$name = trim($name);
 						$type = strtoupper(trim($type));
 
-						$field = ['"'.$name.'"'];
+						$field = [$this->quote($name)];
 
 						$type_translation = [
 							'TINYINT'    => 'SMALLINT',
