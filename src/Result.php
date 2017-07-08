@@ -107,8 +107,8 @@ class Result implements Iterator, ArrayAccess, Countable{
 	public function __toArray():array {
 		$arr = [];
 
-		foreach($this->array as $item){
-			$arr[] = $item->__toArray();
+		foreach($this->array as $key => $item){
+			$arr[$key] = $item->__toArray();
 		}
 
 		return $arr;
