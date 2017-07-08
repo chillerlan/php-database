@@ -1,0 +1,26 @@
+language: php
+
+php:
+  - 7.0
+  - 7.1
+
+services:
+  - mysql
+  - postgresql
+  - sqlite3
+
+before_install:
+  - pip install --user codecov
+
+install:
+  - travis_retry composer install --no-interaction --prefer-source
+
+before_script:
+  - mysql -e 'create database dbtest;'
+  - psql -c 'create database dbtest;' -U postgres
+
+script:
+  - vendor/bin/phpunit --configuration phpunit.xml --coverage-clover clover.xml
+
+after_success:
+  - codecov

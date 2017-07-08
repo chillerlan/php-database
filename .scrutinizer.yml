@@ -1,0 +1,9 @@
+filter:
+  excluded_paths:
+    - config/*
+    - examples/*
+    - public/*
+    - scripts/*
+    - storage/*
+    - tests/*
+    - vendor/*
