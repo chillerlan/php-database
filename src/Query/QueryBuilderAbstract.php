@@ -75,6 +75,7 @@ abstract class QueryBuilderAbstract implements QueryBuilderInterface{
 
 		/**
 		 * @link https://www.sqlite.org/lang_insert.html
+		 * @link https://msdn.microsoft.com/library/ms174335(v=sql.110).aspx
 		 */
 		return new class($this->db, $this->options, $this->quotes) extends InsertAbstract{};
 
@@ -89,6 +90,7 @@ abstract class QueryBuilderAbstract implements QueryBuilderInterface{
 		 * @link https://www.sqlite.org/lang_update.html
 		 * @link https://dev.mysql.com/doc/refman/5.7/en/update.html
 		 * @link https://www.postgresql.org/docs/current/static/sql-update.html
+		 * @link https://msdn.microsoft.com/library/ms177523(v=sql.110).aspx
 		 */
 		return new class($this->db, $this->options, $this->quotes) extends UpdateAbstract{};
 
@@ -103,6 +105,7 @@ abstract class QueryBuilderAbstract implements QueryBuilderInterface{
 		 * @link https://www.sqlite.org/lang_delete.html
 		 * @link https://dev.mysql.com/doc/refman/5.7/en/delete.html
 		 * @link https://www.postgresql.org/docs/current/static/sql-delete.html
+		 * @link https://msdn.microsoft.com/de-de/library/ms189835(v=sql.110).aspx
 		 */
 		return new class($this->db, $this->options, $this->quotes) extends DeleteAbstract{};
 
