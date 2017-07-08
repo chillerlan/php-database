@@ -48,7 +48,7 @@ abstract class QueryTestAbstract extends ConnectionTestAbstract{
 		$this->assertInstanceOf(Statement::class, $createdb);
 		$this->assertInstanceOf(CreateDatabase::class, $createdb);
 
-		return $createdb->name(self::TEST_DBNAME)->charset('utf8');
+		return $createdb->name(self::TEST_DBNAME);
 	}
 
 	/**

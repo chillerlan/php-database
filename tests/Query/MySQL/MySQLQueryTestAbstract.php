@@ -22,7 +22,7 @@ abstract class MySQLQueryTestAbstract extends QueryTestAbstract{
 
 	public function testCreateDatabase(){
 		$this->assertSame(
-			'CREATE DATABASE `vagrant` CHARACTER SET utf8',
+			'CREATE DATABASE `vagrant` CHARACTER SET utf8mb4 COLLATE utf8mb4_bin',
 			$this->createDatabase()->sql()
 		);
 
