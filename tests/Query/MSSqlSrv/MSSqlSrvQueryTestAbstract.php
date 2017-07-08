@@ -20,6 +20,10 @@ abstract class MSSqlSrvQueryTestAbstract extends QueryTestAbstract{
 	protected $querydriver = MSSqlSrvQueryBuilder::class;
 	protected $envVar      = 'DB_MSSQL_';
 
+	public function setUp(){
+		$this->markTestSkipped('use the vagrant box...');
+	}
+
 	public function testCreateDatabase(){
 		$this->assertSame(
 			'CREATE DATABASE [vagrant] COLLATE utf8',

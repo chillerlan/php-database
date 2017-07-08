@@ -27,6 +27,10 @@ class InterbaseDriverTest extends DriverTestAbstract{
 	protected $SQL_RAW_INSERT      = 'INSERT INTO "test" ("id", "hash") VALUES (%1$d, \'%2$s\')';
 	protected $SQL_PREPARED_INSERT = 'INSERT INTO "test" ("id", "hash") VALUES (?, ?)';
 
+	public function setUp(){
+		$this->markTestSkipped('use the vagrant box...');
+	}
+
 	public function testTruncate(){
 		$this->markTestSkipped('Dynamic SQL Error SQL error code = -204 Table unknown test At line 1, column 10');
 	}

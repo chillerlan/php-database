@@ -20,9 +20,9 @@ abstract class FirebirdQueryTestAbstract extends QueryTestAbstract{
 	protected $querydriver = FirebirdQueryBuilder::class;
 	protected $envVar = 'DB_FIREBIRD_';
 
-#	public function setUp(){
-#		$this->markTestSkipped('use the vagrant box...');
-#	}
+	public function setUp(){
+		$this->markTestSkipped('use the vagrant box...');
+	}
 
 	public function testCreateDatabase(){
 		$this->assertSame(
