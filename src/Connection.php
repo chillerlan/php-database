@@ -13,8 +13,7 @@
 namespace chillerlan\Database;
 
 use chillerlan\Database\Drivers\DriverInterface;
-use chillerlan\Database\Query\QueryBuilderInterface;
-use chillerlan\Database\Query\QueryException;
+use chillerlan\Database\Query\{QueryBuilderInterface, QueryException};
 use chillerlan\Database\Traits\ClassLoader;
 use Psr\SimpleCache\CacheInterface;
 
@@ -78,7 +77,7 @@ class Connection implements DriverInterface{
 	public function __get($name){
 		$name = strtolower($name);
 
-		if(in_array($name, ['select', 'insert', 'update', 'delete', 'create', 'alter', 'drop'])){
+		if(in_array($name, QueryBuilderInterface::STATEMENTS)){
 			return $this->query->{$name}();
 		}
 
@@ -102,7 +101,7 @@ class Connection implements DriverInterface{
 	}
 
 	/**
-	 * @return \chillerlan\Database\Query\QueryBuilderInterface
+	 * @return \chillerlan\Database\Query\QueryBuilderInterface|null
 	 */
 	public function getQueryBuilder(){
 		return $this->query;

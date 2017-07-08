@@ -17,8 +17,7 @@ use chillerlan\Database\Query\{
 };
 
 use chillerlan\Database\Query\Statements\{
-	Alter, Create, CreateDatabase, CreateTable, Delete,
-	Drop, Insert, Select, Update
+	Create, CreateDatabase, CreateTable, Delete, Insert, Select, Update
 };
 
 class FirebirdQueryBuilder extends QueryBuilderAbstract{
@@ -290,20 +289,6 @@ class FirebirdQueryBuilder extends QueryBuilderAbstract{
 
 		};
 
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public function alter():Alter{
-		return new class($this->db, $this->options, $this->quotes) extends StatementAbstract implements Alter{};
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public function drop():Drop{
-		return new class($this->db, $this->options, $this->quotes) extends StatementAbstract implements Drop{};
 	}
 
 }

@@ -17,8 +17,7 @@ use chillerlan\Database\Query\{
 };
 
 use chillerlan\Database\Query\Statements\{
-	Alter, Create, CreateDatabase, CreateTable, Delete,
-	Drop, Insert, Select, Update
+	Create, CreateDatabase, CreateTable, Select
 };
 
 class SQLiteQueryBuilder extends QueryBuilderAbstract{
@@ -62,42 +61,6 @@ class SQLiteQueryBuilder extends QueryBuilderAbstract{
 			}
 
 		};
-
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public function insert():Insert{
-
-		/**
-		 * @link https://www.sqlite.org/lang_insert.html
-		 */
-		return new class($this->db, $this->options, $this->quotes) extends InsertAbstract{};
-
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public function update():Update{
-
-		/**
-		 * @link https://www.sqlite.org/lang_update.html
-		 */
-		return new class($this->db, $this->options, $this->quotes) extends UpdateAbstract{};
-
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public function delete():Delete{
-
-		/**
-		 * @link https://www.sqlite.org/lang_delete.html
-		 */
-		return new class($this->db, $this->options, $this->quotes) extends DeleteAbstract{};
 
 	}
 
@@ -250,24 +213,6 @@ class SQLiteQueryBuilder extends QueryBuilderAbstract{
 			}
 
 		};
-
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public function alter():Alter{
-
-		return new class($this->db, $this->options, $this->quotes) extends StatementAbstract implements Alter{};
-
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public function drop():Drop{
-
-		return new class($this->db, $this->options, $this->quotes) extends StatementAbstract implements Drop{};
 
 	}
 

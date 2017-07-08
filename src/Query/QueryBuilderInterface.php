@@ -29,6 +29,8 @@ use chillerlan\Database\Query\Statements\{
  */
 interface QueryBuilderInterface{
 
+	const STATEMENTS = ['select', 'insert', 'update', 'delete', 'create', 'alter', 'drop'];
+
 	/**
 	 * QueryBuilderAbstract constructor.
 	 *

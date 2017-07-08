@@ -17,8 +17,7 @@ use chillerlan\Database\Query\{
 };
 
 use chillerlan\Database\Query\Statements\{
-	Alter, Create, CreateDatabase, CreateTable, Delete,
-	Drop, Insert, Select, Update
+	Create, CreateDatabase, CreateTable, Insert, Select
 };
 
 class MySQLQueryBuilder extends QueryBuilderAbstract{
@@ -88,30 +87,6 @@ class MySQLQueryBuilder extends QueryBuilderAbstract{
 			}
 
 		};
-
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public function update():Update{
-
-		/**
-		 * https://dev.mysql.com/doc/refman/5.7/en/update.html
-		 */
-		return new class($this->db, $this->options, $this->quotes) extends UpdateAbstract{};
-
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public function delete():Delete{
-
-		/**
-		 * @link https://dev.mysql.com/doc/refman/5.7/en/delete.html
-		 */
-		return new class($this->db, $this->options, $this->quotes) extends DeleteAbstract{};
 
 	}
 
@@ -294,22 +269,9 @@ class MySQLQueryBuilder extends QueryBuilderAbstract{
 				})->name($tablename); // new class end
 
 			}
+
 		};
 
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public function alter():Alter{
-		return new class($this->db, $this->options, $this->quotes) extends StatementAbstract implements Alter{};
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public function drop():Drop{
-		return new class($this->db, $this->options, $this->quotes) extends StatementAbstract implements Drop{};
 	}
 
 }
