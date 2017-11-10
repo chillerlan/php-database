@@ -74,6 +74,8 @@ class MySQLQueryBuilder extends QueryBuilderAbstract{
 		 */
 		return new class($this->db, $this->options, $this->quotes) extends InsertAbstract{
 
+			protected $on_conflict;
+
 			/**
 			 * @param string      $table
 			 * @param string|null $on_conflict
@@ -81,9 +83,35 @@ class MySQLQueryBuilder extends QueryBuilderAbstract{
 			 * @return \chillerlan\Database\Query\Statements\Insert
 			 */
 			public function into(string $table, string $on_conflict = null):Insert{
-				$this->table = trim($table);
+				$this->table       = trim($table);
+				$this->on_conflict = strtoupper($on_conflict);
 
 				return $this;
+			}
+
+			/**
+			 * @return string
+			 * @throws \chillerlan\Database\Query\QueryException
+			 */
+			public function sql():string{
+
+				if(empty($this->table)){
+					throw new QueryException('no table specified');
+				}
+
+				if(empty($this->bindValues)){
+					throw new QueryException('no values given');
+				}
+
+				$fields = $this->multi ? array_keys($this->bindValues[0]) : array_keys($this->bindValues);
+
+				$sql  = 'INSERT ';
+				$sql .= in_array($this->on_conflict, ['IGNORE']) ? $this->on_conflict.' ' : '';
+				$sql .= 'INTO '.$this->quote($this->table);
+				$sql .= ' ('.$this->quotes[0].implode($this->quotes[1].', '.$this->quotes[0], $fields).$this->quotes[1].')';
+				$sql .= ' VALUES ('.implode(',', array_fill(0, count($fields), '?')).')';
+
+				return $sql;
 			}
 
 		};
