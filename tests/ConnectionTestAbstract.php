@@ -52,7 +52,7 @@ abstract class ConnectionTestAbstract extends TestCase{
 	protected $envVar;
 
 	protected function setUp(){
-		$env = (new DotEnv(__DIR__.'/../config', '.env'))->load();
+		$env = (new DotEnv(__DIR__.'/../config', file_exists(__DIR__.'/../config/.env') ? '.env' : '.env_travis'))->load();
 
 		$this->cache = new Cache(new MemoryCacheDriver);
 
