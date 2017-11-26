@@ -15,7 +15,7 @@ namespace chillerlan\DatabaseTest;
 use chillerlan\Database\{Connection, Options};
 use chillerlan\SimpleCache\Cache;
 use chillerlan\SimpleCache\Drivers\MemoryCacheDriver;
-use Dotenv\Dotenv;
+use chillerlan\Traits\DotEnv;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass, ReflectionMethod;
 
@@ -52,20 +52,20 @@ abstract class ConnectionTestAbstract extends TestCase{
 	protected $envVar;
 
 	protected function setUp(){
-		(new Dotenv(__DIR__.'/../config', '.env_travis'))->load();
+		$env = (new DotEnv(__DIR__.'/../config', '.env'))->load();
 
 		$this->cache = new Cache(new MemoryCacheDriver);
 
 		$this->options = new Options([
 			'driver'       => $this->driver,
 			'querybuilder' => $this->querydriver,
-			'odbc_driver'  => getenv($this->envVar.'ODBC_DRIVER'),
-			'host'         => getenv($this->envVar.'HOST'),
-			'port'         => getenv($this->envVar.'PORT'),
-			'socket'       => getenv($this->envVar.'SOCKET'),
-			'database'     => getenv($this->envVar.'DATABASE'),
-			'username'     => getenv($this->envVar.'USERNAME'),
-			'password'     => getenv($this->envVar.'PASSWORD'),
+			'odbc_driver'  => $env->get($this->envVar.'ODBC_DRIVER'),
+			'host'         => $env->get($this->envVar.'HOST'),
+			'port'         => $env->get($this->envVar.'PORT'),
+			'socket'       => $env->get($this->envVar.'SOCKET'),
+			'database'     => $env->get($this->envVar.'DATABASE'),
+			'username'     => $env->get($this->envVar.'USERNAME'),
+			'password'     => $env->get($this->envVar.'PASSWORD'),
 		]);
 
 		$this->connection = new Connection($this->options, $this->cache);
