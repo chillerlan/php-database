@@ -1,5 +1,7 @@
 # chillerlan/database
 
+A PHP7 SQL client and querybuilder for the most common databases.
+
 [![version][packagist-badge]][packagist]
 [![license][license-badge]][license]
 [![Travis][travis-badge]][travis]
@@ -20,10 +22,13 @@
 [codeclimate-badge]: https://img.shields.io/codeclimate/github/codemasher/php-database.svg
 [codeclimate]: https://codeclimate.com/github/codemasher/php-database
 
-# Requirements
-- PHP 7+
+# Documentation
 
-# Supported databases
+## Requirements
+- PHP 7+
+- one of the supported databases, set up to work with PHP
+
+## Supported databases
 - MySQL/MariaDB (native, PDO, ODBC)
 - PostgreSQL (native, PDO, ODBC)
 - Microsoft SQL Server (native, PDO, ODBC)
@@ -31,16 +36,11 @@
 - Firebird (PDO)
 - any other database supported via PDO, ODBC or native PHP extension
 
-# Documentation
 ## Installation
-### Using [composer](https://getcomposer.org)
+**requires [composer](https://getcomposer.org)**
 
-*Terminal*
-```sh
-composer require chillerlan/database:dev-master
-```
-
-*composer.json*
+### *composer.json*
+ (note: replace `dev-master` with a [version boundary](https://getcomposer.org/doc/articles/versions.md#summary))
 ```json
 {
 	"require": {
@@ -52,8 +52,9 @@ composer require chillerlan/database:dev-master
 
 ### Manual installation
 Download the desired version of the package from [master](https://github.com/codemasher/php-database/archive/master.zip) or 
-[release](https://github.com/codemasher/php-database/releases) and extract the contents to your project folder. 
-Point the namespace `chillerlan/Database` to the folder `src` of the package.
+[release](https://github.com/codemasher/php-database/releases) and extract the contents to your project folder. After that:
+- run `composer install` to install the required dependencies and generate `/vendor/autoload.php`.
+- if you use a custom autoloader, point the namespace `chillerlan\Database` to the folder `src` of the package 
 
 Profit!
 
