@@ -103,11 +103,11 @@ abstract class SelectAbstract extends StatementAbstract implements Select{
 		// @todo: quotes
 		switch(true){
 			case  $expr2 && $func:
-				$col = sprintf('%s(%s) AS %s', strtoupper($func), $this->quote($expr1), $this->quote($expr2)); break;
+				$col = sprintf('%s(%s) AS %s', strtoupper($func), $expr1, $this->quote($expr2)); break;
 			case  $expr2 && !$func:
 				$col = sprintf('%s AS %s', $this->quote($expr1), $this->quote($expr2)); break;
 			case !$expr2 && $func:
-				$col = sprintf('%s(%s)', strtoupper($func), $this->quote($expr1)); break;
+				$col = sprintf('%s(%s)', strtoupper($func), $expr1); break;
 			case !$expr2 && !$func:
 			default:
 				$col = $this->quote($expr1);
