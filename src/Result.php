@@ -12,16 +12,18 @@
 
 namespace chillerlan\Database;
 
-use ArrayAccess, Countable, Iterator;
-use chillerlan\Database\Traits\{Enumerable, Magic};
+use ArrayAccess, Countable, SeekableIterator;
+use chillerlan\Traits\{
+	Enumerable, Magic, Interfaces\ArrayAccessTrait, SPL\SeekableIteratorTrait, SPL\CountableTrait
+};
 
 /**
  * @property int $length
  *
  * each($func [, $fieldname)
  */
-class Result implements Iterator, ArrayAccess, Countable{
-	use Enumerable, Magic;
+class Result implements SeekableIterator, ArrayAccess, Countable{
+	use ArrayAccessTrait, SeekableIteratorTrait, CountableTrait, Magic, Enumerable;
 
 	/**
 	 * @var \chillerlan\Database\ResultRow[]
@@ -52,11 +54,11 @@ class Result implements Iterator, ArrayAccess, Countable{
 	 *
 	 * @throws \chillerlan\Database\ConnectionException
 	 */
-	public function __construct($data = null, $sourceEncoding = null, $destEncoding = 'UTF-8'){
+	public function __construct($data = null, string $sourceEncoding = null, string $destEncoding = null){
 		$this->sourceEncoding = $sourceEncoding;
-		$this->destEncoding   = $destEncoding;
+		$this->destEncoding   = $destEncoding ?? 'UTF-8';
 
-		if(is_null($data)){
+		if($data === null){
 			$data = [];
 		}
 		else if($data instanceof \Traversable){
@@ -131,24 +133,6 @@ class Result implements Iterator, ArrayAccess, Countable{
 	 ***************/
 
 	/**
-	 * @param int|string $offset
-	 *
-	 * @return bool
-	 */
-	public function offsetExists($offset):bool{
-		return isset($this->array[$offset]);
-	}
-
-	/**
-	 * @param int|string $offset
-	 *
-	 * @return \chillerlan\Database\ResultRow|mixed|null
-	 */
-	public function offsetGet($offset){
-		return $this->array[$offset] ?? null;
-	}
-
-	/**
 	 * @param int|string   $offset
 	 * @param array        $value
 	 *
@@ -163,67 +147,6 @@ class Result implements Iterator, ArrayAccess, Countable{
 			$this->array[$offset] = new ResultRow($value, $this->sourceEncoding, $this->destEncoding);
 		}
 
-	}
-
-	/**
-	 * @param int|string $offset
-	 *
-	 * @return void
-	 */
-	public function offsetUnset($offset){
-		unset($this->array[$offset]);
-	}
-
-
-	/*************
-	 * Countable *
-	 *************/
-
-	/**
-	 * @return int
-	 */
-	public function count():int{
-		return count($this->array);
-	}
-
-
-	/************
-	 * Iterator *
-	 ************/
-
-	/**
-	 * @return \chillerlan\Database\ResultRow|mixed
-	 */
-	public function current(){
-		return $this->offsetGet($this->offset);
-	}
-
-	/**
-	 * @return int
-	 */
-	public function key():int{
-		return $this->offset;
-	}
-
-	/**
-	 * @return bool
-	 */
-	public function valid():bool{
-		return $this->offsetExists($this->offset);
-	}
-
-	/**
-	 *  @return void
-	 */
-	public function next(){
-		$this->offset++;
-	}
-
-	/**
-	 * @return void
-	 */
-	public function rewind(){
-		$this->offset = 0;
 	}
 
 }

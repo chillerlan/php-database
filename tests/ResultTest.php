@@ -92,7 +92,7 @@ class ResultTest extends TestCase{
 	}
 
 	/**
-	 * @expectedException \chillerlan\Database\ConnectionException
+	 * @expectedException \chillerlan\Traits\TraitException
 	 * @expectedExceptionMessage invalid callback
 	 */
 	public function testEachInvalidCallback(){
