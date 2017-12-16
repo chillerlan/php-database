@@ -12,7 +12,7 @@
 
 namespace chillerlan\Database;
 
-use chillerlan\Database\Traits\Container;
+use chillerlan\Traits\Container;
 
 /**
  * @property string $driver
