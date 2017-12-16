@@ -14,7 +14,7 @@ namespace chillerlan\Database;
 
 use chillerlan\Database\Drivers\DriverInterface;
 use chillerlan\Database\Query\{QueryBuilderInterface, QueryException};
-use chillerlan\Database\Traits\ClassLoader;
+use chillerlan\Traits\ClassLoader;
 use Psr\SimpleCache\CacheInterface;
 
 /**
@@ -54,8 +54,6 @@ class Connection implements DriverInterface{
 	 *
 	 * @param \chillerlan\Database\Options         $options
 	 * @param \Psr\SimpleCache\CacheInterface|null $cache
-	 *
-	 * @throws \chillerlan\Database\ConnectionException
 	 */
 	public function __construct(Options $options, CacheInterface $cache = null){
 		$this->options = $options;
