@@ -19,6 +19,8 @@ class PDOFirebirdQueryTest extends QueryTestAbstract{
 	protected $driver = FirebirdPDO::class;
 	protected $envVar = 'DB_FIREBIRD_';
 
+	public function setUp(){$this->markTestSkipped('use the vagrant box...');}
+
 	/**
 	 * @expectedException \chillerlan\Database\Query\QueryException
 	 * @expectedExceptionMessage not supported
