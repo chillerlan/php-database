@@ -12,11 +12,13 @@
 
 namespace chillerlan\Database\Query;
 
-use chillerlan\Database\Options;
-use chillerlan\Database\Drivers\DriverInterface;
+use chillerlan\Database\{
+	DatabaseOptions, Drivers\DriverInterface
+};
 use chillerlan\Database\Query\Statements\{
 	Alter, Create, Delete, Drop, Insert, Select, Update
 };
+use Psr\Log\LoggerAwareInterface;
 
 /**
  * @property \chillerlan\Database\Query\Statements\Select $select
@@ -27,17 +29,17 @@ use chillerlan\Database\Query\Statements\{
  * @property \chillerlan\Database\Query\Statements\Drop   $drop
  * @property \chillerlan\Database\Query\Statements\Alter  $alter
  */
-interface QueryBuilderInterface{
+interface QueryBuilderInterface extends LoggerAwareInterface{
 
-	const STATEMENTS = ['select', 'insert', 'update', 'delete', 'create', 'alter', 'drop'];
+	public const STATEMENTS = ['select', 'insert', 'update', 'delete', 'create', 'alter', 'drop'];
 
 	/**
 	 * QueryBuilderAbstract constructor.
 	 *
 	 * @param \chillerlan\Database\Drivers\DriverInterface $db
-	 * @param \chillerlan\Database\Options                 $options
+	 * @param \chillerlan\Database\DatabaseOptions         $options
 	 */
-	public function __construct(DriverInterface $db, Options $options);
+	public function __construct(DriverInterface $db, DatabaseOptions $options);
 
 	/**
 	 * @return \chillerlan\Database\Query\Statements\Select

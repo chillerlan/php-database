@@ -12,17 +12,15 @@
 
 namespace chillerlan\DatabaseTest\Query;
 
-use chillerlan\Database\Query\Statements\{
-	CreateDatabase, CreateTable, Delete, Insert,
-	Select, Statement, Update
-};
-
 use chillerlan\Database\Drivers\DriverException;
 use chillerlan\Database\Query\QueryBuilderInterface;
+use chillerlan\Database\Query\Statements\{
+	CreateDatabase, CreateTable, Delete, Insert, Select, Statement, Update
+};
 use chillerlan\Database\Result;
-use chillerlan\DatabaseTest\ConnectionTestAbstract;
+use chillerlan\DatabaseTest\DatabaseTestAbstract;
 
-abstract class QueryTestAbstract extends ConnectionTestAbstract{
+abstract class QueryTestAbstract extends DatabaseTestAbstract{
 
 	const TEST_DBNAME = 'vagrant';
 	const TEST_TABLENAME = 'querytest';
@@ -34,12 +32,10 @@ abstract class QueryTestAbstract extends ConnectionTestAbstract{
 
 	protected function setUp(){
 		parent::setUp();
-
-		$this->query = $this->connection->getQueryBuilder();
+		$this->query = $this->connection->getQueryBuilderInterface();
 	}
 
 	public function testQueryBuilderInstance(){
-		$this->assertInstanceOf($this->querydriver, $this->query);
 		$this->assertInstanceOf(QueryBuilderInterface::class, $this->query);
 	}
 
@@ -56,19 +52,27 @@ abstract class QueryTestAbstract extends ConnectionTestAbstract{
 	 * @expectedExceptionMessage no name specified
 	 */
 	public function testCreateDatabaseNoName(){
-		$this->query->create->database()->sql();
+		$this->query->create->database('')->sql();
+	}
+
+	/**
+	 * @expectedException \chillerlan\Database\Query\QueryException
+	 * @expectedExceptionMessage no name specified
+	 */
+	public function testCreateTableNoName(){
+		$this->query->create->table('')->sql();
 	}
 
 	public function testCreateTable(){
 
 		try{
-			$this->connection->raw('DROP TABLE '.self::TEST_TABLENAME);
+			$this->query->drop->table(self::TEST_TABLENAME)->query();
 		}
 		catch(DriverException $e){
-			var_dump('cannot drop "'.self::TEST_TABLENAME.'", table does not exist');
+			var_dump('cannot drop table: '.$e->getMessage());
 		}
 
-		$createTable = $this->query->create->table(self::TEST_DBNAME.'.'.self::TEST_TABLENAME);
+		$createTable = $this->query->create->table(self::TEST_TABLENAME);
 
 		$this->assertInstanceOf(Statement::class, $createTable);
 		$this->assertInstanceOf(CreateTable::class, $createTable);
@@ -88,16 +92,9 @@ abstract class QueryTestAbstract extends ConnectionTestAbstract{
 
 #		print_r(PHP_EOL.$createTable->sql().PHP_EOL);
 
-		$this->assertTrue($createTable->execute());
+		$this->assertTrue($createTable->query());
 	}
 
-	/**
-	 * @expectedException \chillerlan\Database\Query\QueryException
-	 * @expectedExceptionMessage no name specified
-	 */
-	public function testCreateTableNoName(){
-		$this->query->create->table()->sql();
-	}
 
 	public function testInsert(){
 		$insert = $this->query->insert;
@@ -112,7 +109,7 @@ abstract class QueryTestAbstract extends ConnectionTestAbstract{
 
 #		print_r(PHP_EOL.$insert->sql().PHP_EOL);
 
-		$this->assertTrue($insert->execute());
+		$this->assertTrue($insert->query());
 	}
 
 	public function testInsertMulti(){
@@ -127,12 +124,12 @@ abstract class QueryTestAbstract extends ConnectionTestAbstract{
 			])
 		;
 
-		$this->assertTrue($insert->execute());
+		$this->assertTrue($insert->multi());
 	}
 
 	/**
 	 * @expectedException \chillerlan\Database\Query\QueryException
-	 * @expectedExceptionMessage no table specified
+	 * @expectedExceptionMessage no name specified
 	 */
 	public function testInsertNoTable(){
 		$this->query->insert->into('')->sql();
@@ -154,13 +151,13 @@ abstract class QueryTestAbstract extends ConnectionTestAbstract{
 		$select
 			->cols([
 				'id'   => 't1.id',
-				'hash' => ['t1.hash', 'upper'],
+				'hash' => ['t1.hash'],
 			])
 			->from(['t1' => self::TEST_TABLENAME])
 			->offset(1)
 			->limit(2);
 #		print_r(PHP_EOL.$select->sql().PHP_EOL);
-		$result = $select->execute();
+		$result = $select->query();
 		$this->assertInstanceOf(Result::class, $result);
 		$this->assertCount(2, $result);
 #		print_r($result);
@@ -171,7 +168,7 @@ abstract class QueryTestAbstract extends ConnectionTestAbstract{
 			->from([self::TEST_TABLENAME])
 			->where('active', 1);
 #		print_r(PHP_EOL.$select->sql().PHP_EOL);
-		$result = $select->execute();
+		$result = $select->query();
 		$this->assertInstanceOf(Result::class, $result);
 		$this->assertCount(2, $result);
 #		print_r($result);
@@ -182,7 +179,7 @@ abstract class QueryTestAbstract extends ConnectionTestAbstract{
 			->where('id', [1,2,3], 'in')
 			->orderBy(['hash' => ['desc', 'lower']]);
 #		print_r(PHP_EOL.$select->sql().PHP_EOL);
-		$result = $select->execute();
+		$result = $select->query();
 #		print_r($result);
 
 		if((bool)$result[0]->active){
@@ -219,9 +216,9 @@ abstract class QueryTestAbstract extends ConnectionTestAbstract{
 		;
 
 #		print_r(PHP_EOL.$update->sql().PHP_EOL);
-		$this->assertTrue($update->execute());
+		$this->assertTrue($update->query());
 
-		$r = $this->query->select->from([self::TEST_TABLENAME])->where('id' ,1)->execute();
+		$r = $this->query->select->from([self::TEST_TABLENAME])->where('id' ,1)->query();
 
 		$this->assertSame('bar', $r[0]->data);
 		$this->assertSame(42.42, (float)$r[0]->value);
@@ -230,7 +227,7 @@ abstract class QueryTestAbstract extends ConnectionTestAbstract{
 
 	/**
 	 * @expectedException \chillerlan\Database\Query\QueryException
-	 * @expectedExceptionMessage no table specified
+	 * @expectedExceptionMessage no name specified
 	 */
 	public function testUpdateNoTable(){
 		$this->query->update->table('')->sql();
@@ -252,15 +249,15 @@ abstract class QueryTestAbstract extends ConnectionTestAbstract{
 		$delete->from(self::TEST_TABLENAME)->where('id', 2);
 
 #		print_r(PHP_EOL.$delete->sql().PHP_EOL);
-		$this->assertTrue($delete->execute());
+		$this->assertTrue($delete->query());
 
-		$r = $this->query->select->from([self::TEST_TABLENAME])->execute();
+		$r = $this->query->select->from([self::TEST_TABLENAME])->query();
 		$this->assertCount(3,  $r);
 	}
 
 	/**
 	 * @expectedException \chillerlan\Database\Query\QueryException
-	 * @expectedExceptionMessage no table specified
+	 * @expectedExceptionMessage no name specified
 	 */
 	public function testDeleteNoTable(){
 		$this->query->delete->from('')->sql();

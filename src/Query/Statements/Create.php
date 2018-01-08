@@ -21,14 +21,14 @@ interface Create extends Statement{
 	 *
 	 * @return \chillerlan\Database\Query\Statements\CreateDatabase
 	 */
-	public function database(string $dbname = null):CreateDatabase;
+	public function database(string $dbname):CreateDatabase;
 
 	/**
-	 * @param string|null $tablename
+	 * @param string $tablename
 	 *
 	 * @return \chillerlan\Database\Query\Statements\CreateTable
 	 */
-	public function table(string $tablename = null):CreateTable;
+	public function table(string $tablename):CreateTable;
 
 #	public function index():Create;
 #	public function view():Create;

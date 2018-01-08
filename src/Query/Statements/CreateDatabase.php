@@ -20,11 +20,11 @@ interface CreateDatabase extends Statement{
 	public function ifNotExists():CreateDatabase;
 
 	/**
-	 * @param string|null $dbname
+	 * @param string $dbname
 	 *
 	 * @return \chillerlan\Database\Query\Statements\CreateDatabase
 	 */
-	public function name(string $dbname = null):CreateDatabase;
+	public function name(string $dbname):CreateDatabase;
 
 	/**
 	 * @param string $collation

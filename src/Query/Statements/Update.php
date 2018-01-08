@@ -27,7 +27,7 @@ interface Update extends Statement{
 	 *
 	 * @return \chillerlan\Database\Query\Statements\Update
 	 */
-	public function set(array $set, bool $bind = true):Update;
+	public function set(array $set, bool $bind = null):Update;
 
 	/**
 	 * @param        $val1
@@ -38,14 +38,14 @@ interface Update extends Statement{
 	 *
 	 * @return \chillerlan\Database\Query\Statements\Update
 	 */
-	public function where($val1, $val2, $operator = '=', $bind = true, $join = 'AND'):Update;
+	public function where($val1, $val2, string $operator = null, bool $bind = null, string $join = null):Update;
 
 	/**
-	 * @param null $join
+	 * @param string $join
 	 *
 	 * @return \chillerlan\Database\Query\Statements\Update
 	 */
-	public function openBracket($join = null):Update;
+	public function openBracket(string $join = null):Update;
 
 	/**
 	 * @return \chillerlan\Database\Query\Statements\Update

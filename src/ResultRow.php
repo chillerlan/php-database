@@ -68,7 +68,7 @@ class ResultRow extends Result{
 	 *
 	 * @return void
 	 */
-	public function offsetSet($offset, $value){
+	public function offsetSet($offset, $value):void{
 
 		$value = !is_null($this->sourceEncoding) && is_string($value)
 			? mb_convert_encoding($value, $this->destEncoding, $this->sourceEncoding)

@@ -30,14 +30,14 @@ interface Delete extends Statement{
 	 *
 	 * @return \chillerlan\Database\Query\Statements\Delete
 	 */
-	public function where($val1, $val2, $operator = '=', $bind = true, $join = 'AND'):Delete;
+	public function where($val1, $val2, string $operator = null, bool $bind = null, string $join = null):Delete;
 
 	/**
-	 * @param null $join
+	 * @param string $join
 	 *
 	 * @return \chillerlan\Database\Query\Statements\Delete
 	 */
-	public function openBracket($join = null):Delete;
+	public function openBracket(string $join = null):Delete;
 
 	/**
 	 * @return \chillerlan\Database\Query\Statements\Delete

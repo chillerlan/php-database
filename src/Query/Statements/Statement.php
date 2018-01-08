@@ -12,7 +12,10 @@
 
 namespace chillerlan\Database\Query\Statements;
 
-interface Statement{
+use Closure;
+use Psr\Log\LoggerAwareInterface;
+
+interface Statement extends LoggerAwareInterface{
 
 	/**
 	 * @return string
@@ -25,12 +28,26 @@ interface Statement{
 	public function bindValues():array;
 
 	/**
-	 * @param string|null   $index
-	 * @param array|null    $values
-	 * @param callable|null $callback
+	 * @param string|null $index
 	 *
-	 * @return bool|\chillerlan\Database\Result
+	 * @return \chillerlan\Database\Result|bool
 	 */
-	public function execute(string $index = null, array $values = null, $callback = null);
+	public function query(string $index = null);
+
+	/**
+	 * @param iterable|null $values
+	 *
+	 * @return mixed
+	 */
+	public function multi(iterable $values = null);
+
+	/**
+	 * @param iterable $values
+	 * @param \Closure $callback
+	 *
+	 * @return mixed
+	 * @throws \chillerlan\Database\Query\Statements\StatementException
+	 */
+	public function callback(iterable $values, Closure $callback);
 
 }

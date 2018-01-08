@@ -12,6 +12,6 @@
 
 namespace chillerlan\Database\Drivers;
 
-use chillerlan\Database\ConnectionException;
+use chillerlan\Database\DatabaseException;
 
-class DriverException extends ConnectionException{}
+class DriverException extends DatabaseException{}

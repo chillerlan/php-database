@@ -25,11 +25,11 @@ interface CreateTable extends Statement{
 	public function ifNotExists():CreateTable;
 
 	/**
-	 * @param string|null $tablename
+	 * @param string $tablename
 	 *
 	 * @return \chillerlan\Database\Query\Statements\CreateTable
 	 */
-	public function name(string $tablename = null):CreateTable;
+	public function name(string $tablename):CreateTable;
 
 	/**
 	 * @param string $field
@@ -53,22 +53,12 @@ interface CreateTable extends Statement{
 	 * @param string|null $collation
 	 * @param bool|null   $isNull
 	 * @param string|null $defaultType
-	 * @param null        $defaultValue
+	 * @param mixed|null  $defaultValue
 	 * @param string|null $extra
 	 *
 	 * @return \chillerlan\Database\Query\Statements\CreateTable
 	 */
-	public function field(
-		string $name,
-		string $type,
-		$length = null,
-		string $attribute = null,
-		string $collation = null,
-		bool $isNull = null,
-		string $defaultType = null,
-		$defaultValue = null,
-		string $extra = null
-	):CreateTable;
+	public function field(string $name, string $type, $length = null, string $attribute = null, string $collation = null, bool $isNull = null, string $defaultType = null, $defaultValue = null, string $extra = null):CreateTable;
 
 	/**
 	 * @param $name
@@ -76,15 +66,74 @@ interface CreateTable extends Statement{
 	 * @return \chillerlan\Database\Query\Statements\CreateTable
 	 */
 #	public function index($name):CreateTable;
+	/**
+	 * @param string      $name
+	 * @param int|null    $length
+	 * @param null        $defaultValue
+	 * @param bool|null   $isNull
+	 * @param string|null $attribute
+	 *
+	 * @return \chillerlan\Database\Query\Statements\CreateTable
+	 */
+	public function tinyint(string $name, int $length = null, $defaultValue = null, bool $isNull = null, string $attribute = null):CreateTable;
 
-	public function tinyint(string $name, int $length = null,  $defaultValue = null , bool $isNull = null, string $attribute = null):CreateTable;
-	public function int(string $name, int $length = null,  $defaultValue = null , bool $isNull = null, string $attribute = null):CreateTable;
+	/**
+	 * @param string      $name
+	 * @param int|null    $length
+	 * @param null        $defaultValue
+	 * @param bool|null   $isNull
+	 * @param string|null $attribute
+	 *
+	 * @return \chillerlan\Database\Query\Statements\CreateTable
+	 */
+	public function int(string $name, int $length = null, $defaultValue = null, bool $isNull = null, string $attribute = null):CreateTable;
 
-	public function tinytext(string $name,  $defaultValue = null , bool $isNull = true):CreateTable;
-	public function text(string $name,  $defaultValue = null , bool $isNull = true):CreateTable;
+	/**
+	 * @param string    $name
+	 * @param null      $defaultValue
+	 * @param bool|null $isNull
+	 *
+	 * @return \chillerlan\Database\Query\Statements\CreateTable
+	 */
+	public function tinytext(string $name, $defaultValue = null, bool $isNull = null):CreateTable;
 
-	public function varchar(string $name, int $length,  $defaultValue = null , bool $isNull = null):CreateTable;
-	public function decimal(string $name, string $length,  $defaultValue = null , bool $isNull = null):CreateTable;
-	public function enum(string $name, array $values, $defaultValue = null , bool $isNull = null):CreateTable;
+	/**
+	 * @param string    $name
+	 * @param null      $defaultValue
+	 * @param bool|null $isNull
+	 *
+	 * @return \chillerlan\Database\Query\Statements\CreateTable
+	 */
+	public function text(string $name, $defaultValue = null, bool $isNull = null):CreateTable;
+
+	/**
+	 * @param string    $name
+	 * @param int       $length
+	 * @param null      $defaultValue
+	 * @param bool|null $isNull
+	 *
+	 * @return \chillerlan\Database\Query\Statements\CreateTable
+	 */
+	public function varchar(string $name, int $length, $defaultValue = null, bool $isNull = null):CreateTable;
+
+	/**
+	 * @param string    $name
+	 * @param string    $length
+	 * @param null      $defaultValue
+	 * @param bool|null $isNull
+	 *
+	 * @return \chillerlan\Database\Query\Statements\CreateTable
+	 */
+	public function decimal(string $name, string $length, $defaultValue = null, bool $isNull = null):CreateTable;
+
+	/**
+	 * @param string    $name
+	 * @param array     $values
+	 * @param null      $defaultValue
+	 * @param bool|null $isNull
+	 *
+	 * @return \chillerlan\Database\Query\Statements\CreateTable
+	 */
+	public function enum(string $name, array $values, $defaultValue = null, bool $isNull = null):CreateTable;
 
 }

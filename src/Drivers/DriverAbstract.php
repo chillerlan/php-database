@@ -12,12 +12,16 @@
 
 namespace chillerlan\Database\Drivers;
 
-use chillerlan\Database\{Options, Result};
+use chillerlan\Database\{
+	DatabaseOptions, Result
+};
+use chillerlan\Logger\LogTrait;
 use Psr\SimpleCache\CacheInterface;
 
 abstract class DriverAbstract implements DriverInterface{
+	use LogTrait;
 
-	const CACHEKEY_HASH_ALGO = 'sha256';
+	protected const CACHEKEY_HASH_ALGO = 'sha256';
 
 	/**
 	 * Holds the database resource object
@@ -29,7 +33,7 @@ abstract class DriverAbstract implements DriverInterface{
 	/**
 	 * Holds the settings
 	 *
-	 * @var \chillerlan\Database\Options
+	 * @var \chillerlan\Database\DatabaseOptions
 	 */
 	protected $options;
 
@@ -39,14 +43,30 @@ abstract class DriverAbstract implements DriverInterface{
 	protected $cache;
 
 	/**
+	 * The query builder to use (FQCN)
+	 *
+	 * @var string
+	 */
+	protected $querybuilder;
+
+	/**
 	 * Constructor.
 	 *
-	 * @param \chillerlan\Database\Options         $options
+	 * @param \chillerlan\Database\DatabaseOptions $options
 	 * @param \Psr\SimpleCache\CacheInterface|null $cache
 	 */
-	public function __construct(Options $options, CacheInterface $cache = null){
+	public function __construct(DatabaseOptions $options, CacheInterface $cache = null){
 		$this->options = $options;
 		$this->cache   = $cache;
+	}
+
+	/**
+	 * @return void
+	 *
+	 * @codeCoverageIgnore
+	 */
+	public function __destruct(){
+		$this->disconnect();
 	}
 
 	/**
@@ -56,7 +76,7 @@ abstract class DriverAbstract implements DriverInterface{
 	 *
 	 * @return bool|\chillerlan\Database\Result
 	 */
-	abstract protected function raw_query(string $sql, string $index = null, bool $assoc = true);
+	abstract protected function raw_query(string $sql, ?string $index, ?bool $assoc);
 
 	/**
 	 * @param string      $sql
@@ -66,7 +86,7 @@ abstract class DriverAbstract implements DriverInterface{
 	 *
 	 * @return bool|\chillerlan\Database\Result
 	 */
-	abstract protected function prepared_query(string $sql, array $values = [], string $index = null, bool $assoc = true);
+	abstract protected function prepared_query(string $sql, ?array $values, ?string $index, ?bool $assoc);
 
 	/**
 	 * @param string $sql
@@ -95,7 +115,15 @@ abstract class DriverAbstract implements DriverInterface{
 	/**
 	 * @inheritdoc
 	 */
-	public function raw(string $sql, string $index = null, bool $assoc = true){
+	public function getQueryBuilderFQCN():string {
+		return $this->querybuilder;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function raw(string $sql, string $index = null, bool $assoc = null){
+		$assoc = $assoc !== null ? $assoc : true;
 
 		try{
 			return $this->raw_query($sql, $index, $assoc);
@@ -109,7 +137,9 @@ abstract class DriverAbstract implements DriverInterface{
 	/**
 	 * @inheritdoc
 	 */
-	public function prepared(string $sql, array $values = [], string $index = null, bool $assoc = true){
+	public function prepared(string $sql, array $values = null, string $index = null, bool $assoc = null){
+		$values = $values !== null ? $values : [];
+		$assoc  = $assoc  !== null ? $assoc  : true;
 
 		try{
 			return $this->prepared_query($sql, $values, $index, $assoc);
@@ -165,13 +195,13 @@ abstract class DriverAbstract implements DriverInterface{
 	/**
 	 * @inheritdoc
 	 */
-	public function rawCached(string $sql, string $index = null, bool $assoc = true, int $ttl = null){
+	public function rawCached(string $sql, string $index = null, bool $assoc = null, int $ttl = null){
 		$result = $this->cacheGet($sql, [], $index);
 
 		if(!$result){
-			$result = $this->raw($sql, $index, $assoc);
+			$result = $this->raw($sql, $index, $assoc !== null ? $assoc : true);
 
-			$this->cacheSet($sql, [], $index, $result, $ttl);
+			$this->cacheSet($sql, $result, [], $index, $ttl);
 		}
 
 		return $result;
@@ -180,13 +210,13 @@ abstract class DriverAbstract implements DriverInterface{
 	/**
 	 * @inheritdoc
 	 */
-	public function preparedCached(string $sql, array $values = [], string $index = null, bool $assoc = true, int $ttl = null){
+	public function preparedCached(string $sql, array $values = null, string $index = null, bool $assoc = null, int $ttl = null){
 		$result = $this->cacheGet($sql, $values, $index);
 
 		if(!$result){
 			$result = $this->prepared($sql, $values, $index, $assoc);
 
-			$this->cacheSet($sql, $values, $index, $result, $ttl);
+			$this->cacheSet($sql, $result, $values, $index, $ttl);
 		}
 
 		return $result;
@@ -200,7 +230,7 @@ abstract class DriverAbstract implements DriverInterface{
 	 *
 	 * @return bool|\chillerlan\Database\Result
 	 */
-	protected function getResult($callable, array $args, string $index = null, bool $assoc){
+	protected function getResult($callable, array $args, string $index = null, bool $assoc = null){
 		$out = new Result(null, $this->options->convert_encoding_src, $this->options->convert_encoding_dest);
 		$i   = 0;
 
@@ -221,8 +251,8 @@ abstract class DriverAbstract implements DriverInterface{
 	 *
 	 * @return string
 	 */
-	protected function cacheKey(string $sql, array $values = [], string $index = null):string{
-		return hash(self::CACHEKEY_HASH_ALGO, serialize([$sql, $values, $index]));
+	protected function cacheKey(string $sql, array $values = null, string $index = null):string{
+		return hash($this::CACHEKEY_HASH_ALGO, serialize([$sql, $values, $index]));
 	}
 
 	/**
@@ -232,7 +262,7 @@ abstract class DriverAbstract implements DriverInterface{
 	 *
 	 * @return bool|mixed
 	 */
-	protected function cacheGet(string $sql, array $values = [], string $index = null){
+	protected function cacheGet(string $sql, array $values = null, string $index = null){
 
 		if($this->cache){
 			return $this->cache->get($this->cacheKey($sql, $values, $index));
@@ -243,17 +273,17 @@ abstract class DriverAbstract implements DriverInterface{
 
 	/**
 	 * @param string      $sql
-	 * @param array       $values
+	 * @param             $result
+	 * @param array|null  $values
 	 * @param string|null $index
-	 * @param             $response
 	 * @param int|null    $ttl
 	 *
 	 * @return bool
 	 */
-	protected function cacheSet(string $sql, array $values = [], string $index = null, $response, int $ttl = null):bool{
+	protected function cacheSet(string $sql, $result, array $values = null, string $index = null, int $ttl = null):bool{
 
 		if($this->cache){
-			return $this->cache->set($this->cacheKey($sql, $values, $index), $response, $ttl);
+			return $this->cache->set($this->cacheKey($sql, $values, $index), $result, $ttl);
 		}
 
 		return false; // @codeCoverageIgnore

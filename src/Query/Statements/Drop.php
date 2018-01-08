@@ -14,4 +14,18 @@ namespace chillerlan\Database\Query\Statements;
 
 interface Drop extends Statement{
 
+	/**
+	 * @param string $tablename
+	 *
+	 * @return \chillerlan\Database\Query\Statements\DropTable
+	 */
+	public function table(string $tablename):DropTable;
+
+	/**
+	 * @param string $dbname
+	 *
+	 * @return \chillerlan\Database\Query\Statements\DropDatabase
+	 */
+	public function database(string $dbname):DropDatabase;
+
 }

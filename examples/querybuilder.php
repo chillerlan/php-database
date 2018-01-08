@@ -9,7 +9,7 @@
 
 namespace chillerlan\DatabaseExample;
 
-/** @var \chillerlan\Database\Connection $db */
+/** @var \chillerlan\Database\Database $db */
 $db = null;
 
 require_once __DIR__.'/common.php';
@@ -24,7 +24,7 @@ $db->create
 	->decimal('weight', '8,3')
 	->int('added', 10, 0, null, 'UNSIGNED')
 	->primaryKey('id')
-	->execute();
+	->query();
 
 $db->raw('TRUNCATE TABLE products');
 
@@ -33,7 +33,7 @@ $db->raw('TRUNCATE TABLE products');
 $db->insert
 	->into('products')
 	->values(['name' => 'product1', 'type' => 'a', 'price' => 3.99, 'weight' => 0.1, 'added' => time()])
-	->execute();
+	->query();
 
 
 // multi insert
@@ -45,7 +45,7 @@ $values = [
 $db->insert
 	->into('products')
 	->values($values)
-	->execute();
+	->multi();
 
 
 // multi insert with callback
@@ -58,7 +58,7 @@ $values = [
 $db->insert
 	->into('products')
 	->values(['name' => '?', 'type' => '?', 'price' => '?', 'weight' => '?', 'added' => '?'])
-	->execute(null, $values, function($row){
+	->callback($values, function($row){
 		return [
 			$row[0],
 			$row[1],
@@ -80,7 +80,7 @@ $result = $db->select
 	->from(['t1' => 'products'])
 	->where('t1.type', 'a')
 	->orderBy(['t1.price' => 'asc'])
-	->execute('uid')
+	->query('uid')
 	->__toArray();
 
 var_dump($result);

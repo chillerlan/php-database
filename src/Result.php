@@ -12,10 +12,10 @@
 
 namespace chillerlan\Database;
 
-use ArrayAccess, Countable, SeekableIterator;
 use chillerlan\Traits\{
-	Enumerable, Magic, Interfaces\ArrayAccessTrait, SPL\SeekableIteratorTrait, SPL\CountableTrait
+	Enumerable, Interfaces\ArrayAccessTrait, Magic, SPL\CountableTrait, SPL\SeekableIteratorTrait
 };
+use ArrayAccess, Countable, SeekableIterator, stdClass, Traversable;
 
 /**
  * @property int $length
@@ -52,7 +52,7 @@ class Result implements SeekableIterator, ArrayAccess, Countable{
 	 * @param string|null                       $sourceEncoding
 	 * @param string                            $destEncoding
 	 *
-	 * @throws \chillerlan\Database\ConnectionException
+	 * @throws \chillerlan\Database\DatabaseException
 	 */
 	public function __construct($data = null, string $sourceEncoding = null, string $destEncoding = null){
 		$this->sourceEncoding = $sourceEncoding;
@@ -61,11 +61,11 @@ class Result implements SeekableIterator, ArrayAccess, Countable{
 		if($data === null){
 			$data = [];
 		}
-		else if($data instanceof \Traversable){
+		else if($data instanceof Traversable){
 			$data = iterator_to_array($data);
 		}
-		else if(!$data instanceof \stdClass && !is_array($data)){
-			throw new ConnectionException('invalid data');
+		else if(!$data instanceof stdClass && !is_array($data)){
+			throw new DatabaseException('invalid data');
 		}
 
 		foreach($data as $k => $v){
@@ -75,12 +75,16 @@ class Result implements SeekableIterator, ArrayAccess, Countable{
 		$this->offset = 0;
 	}
 
+	public function __toString():string {
+		return json_encode($this->__toArray());
+	}
+
 	/**
 	 * @param \chillerlan\Database\Result $DBResult
 	 *
 	 * @return \chillerlan\Database\Result
 	 */
-	public function __merge(Result $DBResult){
+	public function __merge(Result $DBResult):Result{
 		$arr = [];
 
 		foreach($DBResult as $row){
@@ -138,7 +142,7 @@ class Result implements SeekableIterator, ArrayAccess, Countable{
 	 *
 	 * @return void
 	 */
-	public function offsetSet($offset, $value){
+	public function offsetSet($offset, $value):void{
 
 		if(is_null($offset)){
 			$this->array[] = new ResultRow($value, $this->sourceEncoding, $this->destEncoding);

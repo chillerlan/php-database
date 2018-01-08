@@ -45,7 +45,7 @@ class ResultTest extends TestCase{
 	}
 
 	/**
-	 * @expectedException \chillerlan\Database\ConnectionException
+	 * @expectedException \chillerlan\Database\DatabaseException
 	 * @expectedExceptionMessage invalid data
 	 */
 	public function testConstructInvalidData(){

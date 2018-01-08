@@ -12,6 +12,6 @@
 
 namespace chillerlan\Database\Query;
 
-use chillerlan\Database\ConnectionException;
+use chillerlan\Database\DatabaseException;
 
-class QueryException extends ConnectionException{}
+class QueryException extends DatabaseException{}

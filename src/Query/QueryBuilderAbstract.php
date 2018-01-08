@@ -12,19 +12,20 @@
 
 namespace chillerlan\Database\Query;
 
-use chillerlan\Database\Drivers\DriverInterface;
-use chillerlan\Database\Options;
-
-use chillerlan\Database\Query\Dialects\{
-	DeleteAbstract, InsertAbstract, StatementAbstract, UpdateAbstract
+use chillerlan\Database\{
+	DatabaseOptions, Drivers\DriverInterface
 };
-
 use chillerlan\Database\Query\Statements\{
-	Alter, Create, CreateDatabase, CreateTable, Delete,
-	Drop, Insert, Select, Update
+	Alter, AlterAbstract,
+	Delete, DeleteAbstract,
+	Drop, DropAbstract,
+	Insert, InsertAbstract,
+	Update, UpdateAbstract
 };
+use chillerlan\Logger\LogTrait;
 
 abstract class QueryBuilderAbstract implements QueryBuilderInterface{
+	use LogTrait;
 
 	/**
 	 * @var \chillerlan\Database\Drivers\DriverInterface
@@ -32,7 +33,7 @@ abstract class QueryBuilderAbstract implements QueryBuilderInterface{
 	protected $db;
 
 	/**
-	 * @var \chillerlan\Database\Options
+	 * @var \chillerlan\Database\DatabaseOptions
 	 */
 	protected $options;
 
@@ -45,9 +46,9 @@ abstract class QueryBuilderAbstract implements QueryBuilderInterface{
 	 * QueryBuilderAbstract constructor.
 	 *
 	 * @param \chillerlan\Database\Drivers\DriverInterface $db
-	 * @param \chillerlan\Database\Options                 $options
+	 * @param \chillerlan\Database\DatabaseOptions         $options
 	 */
-	public function __construct(DriverInterface $db, Options $options){
+	public function __construct(DriverInterface $db, DatabaseOptions $options){
 		$this->db      = $db;
 		$this->options = $options;
 	}
@@ -61,8 +62,8 @@ abstract class QueryBuilderAbstract implements QueryBuilderInterface{
 	public function __get(string $name){
 		$name = strtolower($name);
 
-		if(in_array($name, self::STATEMENTS)){
-			return $this->{$name}();
+		if(in_array($name, $this::STATEMENTS, true)){
+			return call_user_func([$this, $name]);
 		}
 
 		throw new QueryException('invalid statement');
@@ -115,14 +116,14 @@ abstract class QueryBuilderAbstract implements QueryBuilderInterface{
 	 * @inheritdoc
 	 */
 	public function alter():Alter{
-		return new class($this->db, $this->options, $this->quotes) extends StatementAbstract implements Alter{};
+		return new class($this->db, $this->options, $this->quotes) extends AlterAbstract{};
 	}
 
 	/**
 	 * @inheritdoc
 	 */
 	public function drop():Drop{
-		return new class($this->db, $this->options, $this->quotes) extends StatementAbstract implements Drop{};
+		return new class($this->db, $this->options, $this->quotes) extends DropAbstract{};
 	}
 
 }

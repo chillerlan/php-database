@@ -9,24 +9,22 @@
 
 namespace chillerlan\DatabaseExample;
 
-use chillerlan\Database\Connection;
-use chillerlan\Database\Drivers\Native\MySQLiDriver;
-use chillerlan\Database\Options;
-use chillerlan\Database\Query\Dialects\MySQLQueryBuilder;
-use chillerlan\SimpleCache\Cache;
-use chillerlan\SimpleCache\Drivers\MemoryCacheDriver;
+use chillerlan\Database\{
+	Database,DatabaseOptions,Drivers\MySQL
+};
+use chillerlan\SimpleCache\{
+	Cache, Drivers\MemoryCacheDriver
+};
 use chillerlan\Traits\DotEnv;
 
 require_once __DIR__.'/../vendor/autoload.php';
 
 $env = (new DotEnv(__DIR__.'/../config', '.env'))->load();
 
-
 $cache = new Cache(new MemoryCacheDriver);
 
-$options = new Options([
-	'driver'       => MySQLiDriver::class,
-	'querybuilder' => MySQLQueryBuilder::class,
+$options = new DatabaseOptions([
+	'driver'       => MySQL::class,
 	'host'         => $env->get('DB_MYSQLI_HOST'),
 	'port'         => $env->get('DB_MYSQLI_PORT'),
 	'socket'       => $env->get('DB_MYSQLI_SOCKET'),
@@ -35,7 +33,7 @@ $options = new Options([
 	'password'     => $env->get('DB_MYSQLI_PASSWORD'),
 ]);
 
-$db = new Connection($options, $cache);
+$db = new Database($options, $cache);
 $db->connect();
 
 

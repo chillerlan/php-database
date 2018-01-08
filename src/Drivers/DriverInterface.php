@@ -12,18 +12,24 @@
 
 namespace chillerlan\Database\Drivers;
 
-use \chillerlan\Database\Options;
-use \Psr\SimpleCache\CacheInterface;
+use chillerlan\Database\DatabaseOptions;
+use Psr\Log\LoggerAwareInterface;
+use Psr\SimpleCache\CacheInterface;
 
-interface DriverInterface{
+interface DriverInterface extends LoggerAwareInterface{
 
 	/**
 	 * Constructor.
 	 *
-	 * @param \chillerlan\Database\Options         $options
+	 * @param \chillerlan\Database\DatabaseOptions $options
 	 * @param \Psr\SimpleCache\CacheInterface|null $cache
 	 */
-	public function __construct(Options $options, CacheInterface $cache = null);
+	public function __construct(DatabaseOptions $options, CacheInterface $cache = null);
+
+	/**
+	 * @return void
+	 */
+	public function __destruct();
 
 	/**
 	 * Establishes a database connection and returns the connection object
@@ -43,9 +49,14 @@ interface DriverInterface{
 	/**
 	 * Returns the connection object
 	 *
-	 * @return resource|object the database resource object
+	 * @return mixed the database resource object
 	 */
 	public function getDBResource();
+
+	/**
+	 * @return string
+	 */
+	public function getQueryBuilderFQCN():string;
 
 	/**
 	 * Returns info about the used php client
@@ -68,7 +79,7 @@ interface DriverInterface{
 	 *
 	 * @return string string. escaped. obviously.
 	 */
-	public function escape($data);
+	public function escape($data):string;
 
 	/**
 	 * Basic SQL query for non prepared statements
@@ -86,7 +97,7 @@ interface DriverInterface{
 	 * @return \chillerlan\Database\Result|bool array with results, true on void query success, otherwise false.
 	 * @throws \chillerlan\Database\Drivers\DriverException
 	 */
-	public function raw(string $sql, string $index = null, bool $assoc = true);
+	public function raw(string $sql, string $index = null, bool $assoc = null);
 
 	/**
 	 * same as DriverInterface::raw(), but cached.
@@ -99,7 +110,7 @@ interface DriverInterface{
 	 * @return \chillerlan\Database\Result|bool
 	 * @throws \chillerlan\Database\Drivers\DriverException
 	 */
-	public function rawCached(string $sql, string $index = null, bool $assoc = true, int $ttl = null);
+	public function rawCached(string $sql, string $index = null, bool $assoc = null, int $ttl = null);
 
 	/**
 	 * Prepared statements wrapper
@@ -115,7 +126,7 @@ interface DriverInterface{
 	 * @return \chillerlan\Database\Result|bool Array with results, true on void query success, otherwise false
 	 * @throws \chillerlan\Database\Drivers\DriverException
 	 */
-	public function prepared(string $sql, array $values = [], string $index = null, bool $assoc = true);
+	public function prepared(string $sql, array $values = null, string $index = null, bool $assoc = null);
 
 	/**
 	 * same as DriverInterface::prepared(), but cached.
@@ -129,7 +140,7 @@ interface DriverInterface{
 	 * @return \chillerlan\Database\Result|bool
 	 * @throws \chillerlan\Database\Drivers\DriverException
 	 */
-	public function preparedCached(string $sql, array $values = [], string $index = null, bool $assoc = true, int $ttl = null);
+	public function preparedCached(string $sql, array $values = null, string $index = null, bool $assoc = null, int $ttl = null);
 
 	/**
 	 * Prepared multi line insert
@@ -147,7 +158,7 @@ interface DriverInterface{
 	/**
 	 * Prepared multi line insert/update with callback
 	 *
-	 * @todo: multi threading?
+	 * multi threading? - conclusion after 2 years: nah, mysql is the bottleneck.
 	 * @link https://gist.github.com/krakjoe/6437782
 	 * @link https://gist.github.com/krakjoe/9384409
 	 *

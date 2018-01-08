@@ -13,12 +13,12 @@
 namespace chillerlan\DatabaseTest\Drivers;
 
 use chillerlan\Database\Drivers\DriverInterface;
-use chillerlan\DatabaseTest\ConnectionTestAbstract;
+use chillerlan\DatabaseTest\DatabaseTestAbstract;
 
-abstract class DriverTestAbstract extends ConnectionTestAbstract{
+abstract class DriverTestAbstract extends DatabaseTestAbstract{
 
 	/**
-	 * @var \chillerlan\Database\Drivers\DriverInterface
+	 * @var \chillerlan\Database\Database
 	 */
 	protected $db;
 
@@ -36,7 +36,7 @@ abstract class DriverTestAbstract extends ConnectionTestAbstract{
 	protected function setUp(){
 		parent::setUp();
 
-		$this->db = $this->connection->getDriver();
+		$this->db = $this->connection->getDriverInterface();
 	}
 
 	public function testDriverInstance(){
