@@ -53,9 +53,7 @@ class FirebirdPDO extends PDODriverAbstract{
 		return $dsn;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function connect():DriverInterface{
 
 		if($this->db instanceof PDO){
@@ -87,9 +85,7 @@ class FirebirdPDO extends PDODriverAbstract{
 		return '';
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function getServerInfo():string{
 		return $this->db->getAttribute(PDO::ATTR_SERVER_INFO).', connected to: '.$this->options->database;
 	}

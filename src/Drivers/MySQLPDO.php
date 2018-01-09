@@ -22,9 +22,7 @@ class MySQLPDO extends PDODriverAbstract{
 	protected $drivername   = 'mysql';
 	protected $querybuilder = MySQLQuery::class;
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	protected function getDSN():string {
 		// the charset option is specific to mysql
 		return parent::getDSN().';charset='.$this->options->mysql_charset;

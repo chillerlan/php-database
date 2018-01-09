@@ -68,9 +68,7 @@ abstract class PDODriverAbstract extends DriverAbstract{
 		return $dsn;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function connect():DriverInterface{
 
 		if($this->db instanceof PDO){
@@ -107,32 +105,24 @@ abstract class PDODriverAbstract extends DriverAbstract{
 		}
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function disconnect():bool{
 		$this->db = null;
 
 		return true;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function getClientInfo():string{
 		return $this->db->getAttribute(PDO::ATTR_CLIENT_VERSION);
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function getServerInfo():string{
 		return $this->db->getAttribute(PDO::ATTR_SERVER_INFO);
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function escape($data):string {
 		return $this->db->quote($data);
 	}
@@ -187,16 +177,12 @@ abstract class PDODriverAbstract extends DriverAbstract{
 		return $this->getResult([$stmt, 'fetch'], [$assoc ? PDO::FETCH_ASSOC : PDO::FETCH_NUM], $index, $assoc);
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	protected function raw_query(string $sql, string $index = null, bool $assoc = null){
 		return $this->__getResult($this->db->query($sql), $index, $assoc);
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	protected function prepared_query(string $sql, array $values = null, string $index = null, bool $assoc = null){
 		$stmt = $this->db->prepare($sql, $this->pdo_stmt_options);
 
@@ -209,9 +195,7 @@ abstract class PDODriverAbstract extends DriverAbstract{
 		return $this->__getResult($stmt, $index, $assoc);
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	protected function multi_query(string $sql, array $values){
 		$stmt = $this->db->prepare($sql, $this->pdo_stmt_options);
 
@@ -225,9 +209,7 @@ abstract class PDODriverAbstract extends DriverAbstract{
 		return true;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	protected function multi_callback_query(string $sql, array $data, $callback){
 		$stmt = $this->db->prepare($sql, $this->pdo_stmt_options);
 

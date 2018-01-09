@@ -22,9 +22,7 @@ class PostgreSQL extends DriverAbstract{
 
 	protected $querybuilder = PostgresQuery::class;
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function connect():DriverInterface{
 
 		if(gettype($this->db) === 'resource'){
@@ -57,9 +55,7 @@ class PostgreSQL extends DriverAbstract{
 
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function disconnect():bool{
 
 		if(gettype($this->db) === 'resource'){
@@ -69,27 +65,21 @@ class PostgreSQL extends DriverAbstract{
 		return true;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function getClientInfo():string{
 		$ver = pg_version($this->db);
 
 		return 'PostgreSQL '.$ver['client'].' ('.$ver['client_encoding'].')';
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function getServerInfo():string{
 		$ver = pg_version($this->db);
 
 		return 'PostgreSQL '.$ver['server'].' ('.$ver['server_encoding'].', date style: '.$ver['DateStyle'].', time zone: '.$ver['TimeZone'].')';
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function escape($data):string{
 		return pg_escape_string($this->db, $data);
 	}
@@ -143,25 +133,19 @@ class PostgreSQL extends DriverAbstract{
 		return $i === 0 ? true : $out;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	protected function raw_query(string $sql, string $index = null, bool $assoc = null){
 		return $this->__getResult(pg_query($sql), $index, $assoc);
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	protected function prepared_query(string $sql, array $values = null, string $index = null, bool $assoc = null){
 		pg_prepare($this->db, '', $this->replaceParams($sql));
 
 		return $this->__getResult(pg_execute($this->db, '', $values), $index, $assoc);
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	protected function multi_query(string $sql, array $values){
 		pg_prepare($this->db, '', $this->replaceParams($sql));
 
@@ -172,9 +156,7 @@ class PostgreSQL extends DriverAbstract{
 		return true;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	protected function multi_callback_query(string $sql, array $data, $callback){
 		pg_prepare($this->db, '', $this->replaceParams($sql));
 
@@ -185,9 +167,7 @@ class PostgreSQL extends DriverAbstract{
 		return true;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	protected function replaceParams(string $sql):string{
 		$i = 0;
 

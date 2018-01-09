@@ -2,9 +2,9 @@
 /**
  * Class MSSqlSrvQuery
  *
- * @filesource   MSSqlSrvQuery
+ * @filesource   MSSqlSrvQuery.php
  * @created      29.06.2017
- * @package      chillerlan\Database\Query\Dialects
+ * @package      chillerlan\Database\Query
  * @author       Smiley <smiley@chillerlan.net>
  * @copyright    2017 Smiley
  * @license      MIT
@@ -12,34 +12,23 @@
 
 namespace chillerlan\Database\Query;
 
-use chillerlan\Database\Query\Statements\{
-	Create, CreateAbstract,
-	CreateDatabase, CreateDatabaseAbstract,
-	CreateTable, CreateTableAbstract,
-	Select, SelectAbstract,
-	StatementException
+use chillerlan\Database\Query\Create\{
+	Create, CreateAbstract, CreateDatabase, CreateDatabaseAbstract, CreateTable, CreateTableAbstract
+};
+use chillerlan\Database\Query\Select\{
+	Select, SelectAbstract
 };
 
 class MSSqlSrvQuery extends QueryBuilderAbstract{
 
-	/**
-	 * @inheritdoc
-	 */
 	protected $quotes = ['[', ']'];
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function select():Select{
 
-		/**
-		 * @link https://msdn.microsoft.com/library/ms176104(v=sql.110).aspx
-		 */
 		return new class($this->db, $this->options, $this->quotes) extends SelectAbstract{
 
-			/**
-			 * @inheritdoc
-			 */
+			/** @inheritdoc */
 			public function sql():string{
 
 				if(empty($this->from)){
@@ -78,26 +67,17 @@ class MSSqlSrvQuery extends QueryBuilderAbstract{
 
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function create():Create{
 
 		return new class($this->db, $this->options, $this->quotes) extends CreateAbstract{
 
-			/**
-			 * @inheritdoc
-			 */
+			/** @inheritdoc */
 			public function database(string $dbname):CreateDatabase{
 
-				/**
-				 * @link https://msdn.microsoft.com/library/ms176061(v=sql.110).aspx
-				 */
 				return (new class($this->db, $this->options, $this->quotes) extends CreateDatabaseAbstract{
 
-					/**
-					 * @inheritdoc
-					 */
+					/** @inheritdoc */
 					public function sql():string{
 
 						$sql = 'CREATE DATABASE ';
@@ -111,20 +91,12 @@ class MSSqlSrvQuery extends QueryBuilderAbstract{
 
 			}
 
-			/**
-			 * @inheritdoc
-			 */
+			/** @inheritdoc */
 			public function table(string $tablename):CreateTable{
 
-				/**
-				 * @link https://msdn.microsoft.com/library/ms174979(v=sql.110).aspx
-				 * @link https://docs.microsoft.com/sql/t-sql/data-types/data-types-transact-sql
-				 */
 				return (new class($this->db, $this->options, $this->quotes) extends CreateTableAbstract{
 
-					/**
-					 * @inheritdoc
-					 */
+					/** @inheritdoc */
 					public function sql():string{
 
 						$sql = /** @lang text */ 'CREATE TABLE ';
@@ -143,9 +115,7 @@ class MSSqlSrvQuery extends QueryBuilderAbstract{
 						return $sql;
 					}
 
-					/**
-					 * @inheritdoc
-					 */
+					/** @inheritdoc */
 					protected function fieldspec(string $name, string $type, $length = null, string $attribute = null, string $collation = null, bool $isNull = null, string $defaultType = null, $defaultValue = null, string $extra = null):string {
 						$name = trim($name);
 						$type = strtolower(trim($type));

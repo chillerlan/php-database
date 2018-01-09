@@ -44,9 +44,7 @@ class MSSqlSrvPDO extends PDODriverAbstract{
 		parent::__construct($options, $cache);
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	protected function getDSN():string{
 		$dsn = $this->drivername;
 
@@ -58,9 +56,7 @@ class MSSqlSrvPDO extends PDODriverAbstract{
 		return $dsn;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function getClientInfo():string{
 		$info = $this->db->getAttribute(PDO::ATTR_CLIENT_VERSION);
 
@@ -71,9 +67,7 @@ class MSSqlSrvPDO extends PDODriverAbstract{
 		return 'disconnected, no info available';
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function getServerInfo():string{
 		$info = $this->db->getAttribute(PDO::ATTR_SERVER_INFO);
 
@@ -84,9 +78,7 @@ class MSSqlSrvPDO extends PDODriverAbstract{
 		return 'disconnected, no info available';
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function raw(string $sql, string $index = null, bool $assoc = null){
 
 		try{
@@ -98,9 +90,7 @@ class MSSqlSrvPDO extends PDODriverAbstract{
 
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function prepared(string $sql, array $values = null, string $index = null, bool $assoc = null){
 
 		try{
@@ -112,6 +102,12 @@ class MSSqlSrvPDO extends PDODriverAbstract{
 
 	}
 
+	/**
+	 * @param \Exception $e
+	 *
+	 * @return bool
+	 * @throws \chillerlan\Database\Drivers\DriverException
+	 */
 	protected function silenceNonErrorException(\Exception $e){
 		$message = $e->getMessage();
 

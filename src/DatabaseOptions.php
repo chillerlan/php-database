@@ -2,7 +2,7 @@
 /**
  * Class DatabaseOptions
  *
- * @filesource   DatabaseOptions.phpions.php
+ * @filesource   DatabaseOptions.php
  * @created      28.06.2017
  * @package      chillerlan\Database
  * @author       Smiley <smiley@chillerlan.net>

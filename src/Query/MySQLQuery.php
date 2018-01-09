@@ -4,7 +4,7 @@
  *
  * @filesource   MySQLQuery.php
  * @created      28.06.2017
- * @package      chillerlan\Database\Query\Dialects\MySQL
+ * @package      chillerlan\Database\Query
  * @author       Smiley <smiley@chillerlan.net>
  * @copyright    2017 Smiley
  * @license      MIT
@@ -12,35 +12,26 @@
 
 namespace chillerlan\Database\Query;
 
-use chillerlan\Database\Query\Statements\{
-	Create, CreateAbstract,
-	CreateDatabase, CreateDatabaseAbstract,
-	CreateTable, CreateTableAbstract,
-	Insert, InsertAbstract,
-	Select, SelectAbstract,
-	StatementException
+use chillerlan\Database\Query\Create\{
+	Create, CreateAbstract, CreateDatabase, CreateDatabaseAbstract, CreateTable, CreateTableAbstract
+};
+use chillerlan\Database\Query\Insert\{
+	Insert, InsertAbstract
+};
+use chillerlan\Database\Query\Select\{
+	Select, SelectAbstract
 };
 
 class MySQLQuery extends QueryBuilderAbstract{
 
-	/**
-	 * @inheritdoc
-	 */
 	protected $quotes = ['`', '`'];
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function select():Select{
 
-		/**
-		 * @link https://dev.mysql.com/doc/refman/5.7/en/select.html
-		 */
 		return new class($this->db, $this->options, $this->quotes) extends SelectAbstract{
 
-			/**
-			 * @inheritdoc
-			 */
+			/** @inheritdoc */
 			public function sql():string{
 
 				if(empty($this->from)){
@@ -65,34 +56,13 @@ class MySQLQuery extends QueryBuilderAbstract{
 
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function insert():Insert{
 
-		/**
-		 * @link https://dev.mysql.com/doc/refman/5.7/en/insert.html
-		 */
 		return new class($this->db, $this->options, $this->quotes) extends InsertAbstract{
+			use OnConflictTrait;
 
-			protected $on_conflict;
-
-			/**
-			 * @param string      $table
-			 * @param string|null $on_conflict
-			 *
-			 * @return \chillerlan\Database\Query\Statements\Insert
-			 */
-			public function into(string $table, string $on_conflict = null):Insert{
-				$this->on_conflict = strtoupper($on_conflict);
-
-				return $this->_name($table);
-			}
-
-			/**
-			 * @return string
-			 * @throws \chillerlan\Database\Query\QueryException
-			 */
+			/** @inheritdoc */
 			public function sql():string{
 
 				if(empty($this->bindValues)){
@@ -114,31 +84,19 @@ class MySQLQuery extends QueryBuilderAbstract{
 
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function create():Create{
 
 		return new class($this->db, $this->options, $this->quotes) extends CreateAbstract{
 
-			/**
-			 * @inheritdoc
-			 */
+			/** @inheritdoc */
 			public function database(string $dbname):CreateDatabase{
 
-				/**
-				 * @link https://dev.mysql.com/doc/refman/5.7/en/create-database.html
-				 */
 				return (new class($this->db, $this->options, $this->quotes) extends CreateDatabaseAbstract{
 
-					/**
-					 * @inheritdoc
-					 */
 					protected $charset = 'utf8mb4_bin';
 
-					/**
-					 * @inheritdoc
-					 */
+					/** @inheritdoc */
 					public function sql():string{
 
 						[$charset] = explode('_', $this->charset);
@@ -161,19 +119,12 @@ class MySQLQuery extends QueryBuilderAbstract{
 
 			}
 
-			/**
-			 * @inheritdoc
-			 */
+			/** @inheritdoc */
 			public function table(string $tablename):CreateTable{
 
-				/**
-				 * @link https://dev.mysql.com/doc/refman/5.7/en/create-table.html
-				 */
 				return (new class($this->db, $this->options, $this->quotes) extends CreateTableAbstract{
 
-					/**
-					 * @inheritdoc
-					 */
+					/** @inheritdoc */
 					public function sql():string{
 
 						$sql = 'CREATE ';
@@ -205,9 +156,7 @@ class MySQLQuery extends QueryBuilderAbstract{
 						return $sql;
 					}
 
-					/**
-					 * @inheritdoc
-					 */
+					/** @inheritdoc */
 					protected function fieldspec(string $name, string $type, $length = null, string $attribute = null, string $collation = null, bool $isNull = null, string $defaultType = null, $defaultValue = null, string $extra = null):string {
 						$name = trim($name);
 						$type = strtoupper(trim($type));

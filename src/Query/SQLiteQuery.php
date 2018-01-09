@@ -12,21 +12,18 @@
 
 namespace chillerlan\Database\Query;
 
-use chillerlan\Database\Query\Statements\{
-	Create, CreateAbstract,
-	CreateDatabase,
-	CreateTable, CreateTableAbstract,
-	Drop, DropAbstract,
-	DropDatabase,
-	Select, SelectAbstract,
-	StatementException
+use chillerlan\Database\Query\Create\{
+	Create, CreateAbstract, CreateDatabase, CreateTable, CreateTableAbstract
+};
+use chillerlan\Database\Query\Drop\{
+	Drop, DropAbstract, DropDatabase
+};
+use chillerlan\Database\Query\Select\{
+	Select, SelectAbstract
 };
 
 class SQLiteQuery extends QueryBuilderAbstract{
 
-	/**
-	 * @inheritdoc
-	 */
 	protected $quotes = ['"', '"'];
 
 	/**
@@ -34,9 +31,6 @@ class SQLiteQuery extends QueryBuilderAbstract{
 	 */
 	public function select():Select{
 
-		/**
-		 * @link https://www.sqlite.org/lang_select.html
-		 */
 		return new class($this->db, $this->options, $this->quotes) extends SelectAbstract{
 
 			/**
@@ -74,9 +68,7 @@ class SQLiteQuery extends QueryBuilderAbstract{
 		return new class($this->db, $this->options, $this->quotes) extends DropAbstract{
 
 			/**
-			 * @param string $dbname
-			 *
-			 * @return \chillerlan\Database\Query\Statements\DropDatabase
+			 * @inheritdoc
 			 * @throws \chillerlan\Database\Query\QueryException
 			 */
 			public function database(string $dbname):DropDatabase{
@@ -94,9 +86,7 @@ class SQLiteQuery extends QueryBuilderAbstract{
 		return new class($this->db, $this->options, $this->quotes) extends CreateAbstract{
 
 			/**
-			 * @param string $dbname
-			 *
-			 * @return \chillerlan\Database\Query\Statements\CreateDatabase
+			 * @inheritdoc
 			 * @throws \chillerlan\Database\Query\QueryException
 			 */
 			public function database(string $dbname):CreateDatabase{
@@ -108,9 +98,6 @@ class SQLiteQuery extends QueryBuilderAbstract{
 			 */
 			public function table(string $tablename):CreateTable{
 
-				/**
-				 * @link https://www.sqlite.org/lang_createtable.html
-				 */
 				return (new class($this->db, $this->options, $this->quotes) extends CreateTableAbstract{
 
 					/**
@@ -122,7 +109,7 @@ class SQLiteQuery extends QueryBuilderAbstract{
 					 * @param string      $field
 					 * @param string|null $dir
 					 *
-					 * @return \chillerlan\Database\Query\Statements\CreateTable
+					 * @return \chillerlan\Database\Query\Create\CreateTable
 					 */
 					public function primaryKey(string $field, string $dir = null):CreateTable{
 						$this->primaryKey = $field;
@@ -219,6 +206,7 @@ class SQLiteQuery extends QueryBuilderAbstract{
 					}
 
 				})->name($tablename); // new class end
+
 			}
 
 		};

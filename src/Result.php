@@ -19,21 +19,10 @@ use ArrayAccess, Countable, SeekableIterator, stdClass, Traversable;
 
 /**
  * @property int $length
- *
- * each($func [, $fieldname)
+ * @property \chillerlan\Database\ResultRow[] $array
  */
 class Result implements SeekableIterator, ArrayAccess, Countable{
 	use ArrayAccessTrait, SeekableIteratorTrait, CountableTrait, Magic, Enumerable;
-
-	/**
-	 * @var \chillerlan\Database\ResultRow[]
-	 */
-	protected $array = [];
-
-	/**
-	 * @var int
-	 */
-	protected $offset = 0;
 
 	/**
 	 * @var null|string
@@ -44,6 +33,24 @@ class Result implements SeekableIterator, ArrayAccess, Countable{
 	 * @var string
 	 */
 	protected $destEncoding;
+
+	/**
+	 * @todo
+	 * @var bool
+	 */
+	protected $isBool;
+
+	/**
+	 * @todo
+	 * @var bool
+	 */
+	protected $success = false;
+
+	/**
+	 * @todo
+	 * @var array
+	 */
+	protected $metadata = [];
 
 	/**
 	 * Result constructor.
@@ -75,7 +82,26 @@ class Result implements SeekableIterator, ArrayAccess, Countable{
 		$this->offset = 0;
 	}
 
-	public function __toString():string {
+	/**
+	 * @param $offset
+	 *
+	 * @return bool
+	 */
+	public function __isset($offset):bool{
+		return $this->offsetExists($offset);
+	}
+
+	/**
+	 * @param $offset
+	 */
+	public function __unset($offset):void{
+		$this->offsetUnset($offset);
+	}
+
+	/**
+	 * @return string
+	 */
+	public function __toString():string{
 		return json_encode($this->__toArray());
 	}
 
@@ -106,9 +132,7 @@ class Result implements SeekableIterator, ArrayAccess, Countable{
 	}
 
 	/**
-	 * @link http://api.prototypejs.org/language/Enumerable/prototype/toArray/
-	 *
-	 * @return array
+	 * @inheritdoc
 	 */
 	public function __toArray():array {
 		$arr = [];
@@ -137,10 +161,7 @@ class Result implements SeekableIterator, ArrayAccess, Countable{
 	 ***************/
 
 	/**
-	 * @param int|string   $offset
-	 * @param array        $value
-	 *
-	 * @return void
+	 * @inheritdoc
 	 */
 	public function offsetSet($offset, $value):void{
 

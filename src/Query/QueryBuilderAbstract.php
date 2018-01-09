@@ -15,16 +15,34 @@ namespace chillerlan\Database\Query;
 use chillerlan\Database\{
 	DatabaseOptions, Drivers\DriverInterface
 };
-use chillerlan\Database\Query\Statements\{
-	Alter, AlterAbstract,
-	Delete, DeleteAbstract,
-	Drop, DropAbstract,
-	Insert, InsertAbstract,
+use chillerlan\Database\Query\Alter\{
+	Alter, AlterAbstract
+};
+use chillerlan\Database\Query\Delete\{
+	Delete, DeleteAbstract
+};
+use chillerlan\Database\Query\Drop\{
+	Drop, DropAbstract
+};
+use chillerlan\Database\Query\Insert\{
+	Insert, InsertAbstract
+};
+use chillerlan\Database\Query\Show\{
+	Show, ShowAbstract
+};
+use chillerlan\Database\Query\Truncate\{
+	Truncate, TruncateAbstract
+};
+use chillerlan\Database\Query\Update\{
 	Update, UpdateAbstract
 };
 use chillerlan\Logger\LogTrait;
+use Psr\Log\{
+	LoggerAwareInterface, LoggerInterface
+};
 
-abstract class QueryBuilderAbstract implements QueryBuilderInterface{
+
+abstract class QueryBuilderAbstract implements QueryBuilderInterface, LoggerAwareInterface{
 	use LogTrait;
 
 	/**
@@ -42,23 +60,14 @@ abstract class QueryBuilderAbstract implements QueryBuilderInterface{
 	 */
 	protected $quotes;
 
-	/**
-	 * QueryBuilderAbstract constructor.
-	 *
-	 * @param \chillerlan\Database\Drivers\DriverInterface $db
-	 * @param \chillerlan\Database\DatabaseOptions         $options
-	 */
-	public function __construct(DriverInterface $db, DatabaseOptions $options){
+	/** @inheritdoc */
+	public function __construct(DriverInterface $db, DatabaseOptions $options, LoggerInterface $logger = null){
 		$this->db      = $db;
 		$this->options = $options;
+		$this->log     = $logger;
 	}
 
-	/**
-	 * @param $name
-	 *
-	 * @return mixed
-	 * @throws \chillerlan\Database\Query\QueryException
-	 */
+	/** @inheritdoc */
 	public function __get(string $name){
 		$name = strtolower($name);
 
@@ -69,61 +78,38 @@ abstract class QueryBuilderAbstract implements QueryBuilderInterface{
 		throw new QueryException('invalid statement');
 	}
 
-	/**
-	 * @inheritdoc
-	 */
-	public function insert():Insert{
-
-		/**
-		 * @link https://www.sqlite.org/lang_insert.html
-		 * @link https://msdn.microsoft.com/library/ms174335(v=sql.110).aspx
-		 */
-		return new class($this->db, $this->options, $this->quotes) extends InsertAbstract{};
-
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public function update():Update{
-
-		/**
-		 * @link https://www.sqlite.org/lang_update.html
-		 * @link https://dev.mysql.com/doc/refman/5.7/en/update.html
-		 * @link https://www.postgresql.org/docs/current/static/sql-update.html
-		 * @link https://msdn.microsoft.com/library/ms177523(v=sql.110).aspx
-		 */
-		return new class($this->db, $this->options, $this->quotes) extends UpdateAbstract{};
-
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public function delete():Delete{
-
-		/**
-		 * @link https://www.sqlite.org/lang_delete.html
-		 * @link https://dev.mysql.com/doc/refman/5.7/en/delete.html
-		 * @link https://www.postgresql.org/docs/current/static/sql-delete.html
-		 * @link https://msdn.microsoft.com/de-de/library/ms189835(v=sql.110).aspx
-		 */
-		return new class($this->db, $this->options, $this->quotes) extends DeleteAbstract{};
-
-	}
-
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function alter():Alter{
 		return new class($this->db, $this->options, $this->quotes) extends AlterAbstract{};
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
+	public function delete():Delete{
+		return new class($this->db, $this->options, $this->quotes) extends DeleteAbstract{};
+	}
+
+	/** @inheritdoc */
 	public function drop():Drop{
 		return new class($this->db, $this->options, $this->quotes) extends DropAbstract{};
+	}
+
+	/** @inheritdoc */
+	public function insert():Insert{
+		return new class($this->db, $this->options, $this->quotes) extends InsertAbstract{};
+	}
+
+	public function show():Show{
+		return new class($this->db, $this->options, $this->quotes) extends ShowAbstract{};
+	}
+
+	/** @inheritdoc */
+	public function truncate():Truncate{
+		return new class($this->db, $this->options, $this->quotes) extends TruncateAbstract{};
+	}
+
+	/** @inheritdoc */
+	public function update():Update{
+		return new class($this->db, $this->options, $this->quotes) extends UpdateAbstract{};
 	}
 
 }

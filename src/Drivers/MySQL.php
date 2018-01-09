@@ -23,9 +23,7 @@ class MySQL extends DriverAbstract{
 
 	protected $querybuilder = MySQLQuery::class;
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function connect():DriverInterface{
 
 		if($this->db instanceof mysqli){
@@ -71,9 +69,7 @@ class MySQL extends DriverAbstract{
 
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function disconnect():bool{
 
 		if($this->db instanceof mysqli){
@@ -90,30 +86,22 @@ class MySQL extends DriverAbstract{
 		return true;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function getClientInfo():string{
 		return $this->db->client_info;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function getServerInfo():string{
 		return $this->db->server_info;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function escape($data):string{
 		return $this->db->real_escape_string($data);
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	protected function raw_query(string $sql, string $index = null, bool $assoc = null){
 		$result = $this->db->query($sql);
 
@@ -128,9 +116,7 @@ class MySQL extends DriverAbstract{
 		return $r;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	protected function prepared_query(string $sql, array $values = null, string $index = null, bool $assoc = null){
 		$stmt = $this->db->stmt_init();
 		$stmt->prepare($sql);
@@ -185,9 +171,7 @@ class MySQL extends DriverAbstract{
 		return $i === 0 ? true : $output;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	protected function multi_query(string $sql, array $values){
 		$stmt = $this->db->stmt_init();
 		$stmt->prepare($sql);
@@ -203,9 +187,7 @@ class MySQL extends DriverAbstract{
 		return true;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	protected function multi_callback_query(string $sql, array $data, $callback){
 		$stmt = $this->db->stmt_init();
 		$stmt->prepare($sql);

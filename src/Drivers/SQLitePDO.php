@@ -33,16 +33,12 @@ class SQLitePDO extends PDODriverAbstract{
 		return $this->drivername.':'.$this->options->database;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function getServerInfo():string {
 		return $this->drivername.', connected to: '.$this->options->database.' (PDO::ATTR_SERVER_INFO not available)';
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function connect():DriverInterface{
 
 		if($this->db instanceof PDO){

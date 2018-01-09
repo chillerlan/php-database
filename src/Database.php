@@ -17,18 +17,14 @@ use chillerlan\Database\{
 };
 use chillerlan\Logger\LogTrait;
 use chillerlan\Traits\ClassLoader;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
 
 /**
- * @property \chillerlan\Database\Query\Statements\Select $select
- * @property \chillerlan\Database\Query\Statements\Insert $insert
- * @property \chillerlan\Database\Query\Statements\Update $update
- * @property \chillerlan\Database\Query\Statements\Delete $delete
- * @property \chillerlan\Database\Query\Statements\Create $create
- * @property \chillerlan\Database\Query\Statements\Drop   $drop
- * @property \chillerlan\Database\Query\Statements\Alter  $alter
+ *
  */
-class Database implements DriverInterface{
+class Database implements DriverInterface, LoggerAwareInterface{
 	use ClassLoader, LogTrait;
 
 	/**
@@ -56,13 +52,24 @@ class Database implements DriverInterface{
 	 *
 	 * @param \chillerlan\Database\DatabaseOptions $options
 	 * @param \Psr\SimpleCache\CacheInterface|null $cache
+	 * @param \Psr\Log\LoggerInterface|null        $logger
 	 */
-	public function __construct(DatabaseOptions $options, CacheInterface $cache = null){
+	public function __construct(DatabaseOptions $options, CacheInterface $cache = null, LoggerInterface $logger = null){
 		$this->options = $options;
 		$this->cache   = $cache;
 
 		$this->driver = $this->loadClass($this->options->driver, DriverInterface::class, $this->options, $this->cache, $this->log);
 		$this->query  = $this->loadClass($this->driver->getQueryBuilderFQCN(), QueryBuilderInterface::class, $this->driver, $this->options, $this->log);
+
+		if($logger instanceof LoggerInterface){
+			$this->setLogger($logger);
+		}
+
+	}
+
+	/** @inheritdoc */
+	public function __destruct(){
+		unset($this->driver); // trigger the driver destructor
 	}
 
 	/**
@@ -71,23 +78,21 @@ class Database implements DriverInterface{
 	 * @return mixed
 	 * @throws \chillerlan\Database\Query\QueryException
 	 */
-	public function __get($name){
-		$name = strtolower($name);
-
-		if(in_array($name, $this->query::STATEMENTS, true)){
-			return $this->query->{$name}();
-		}
-
-		throw new QueryException('invalid statement');
+	public function __get(string $name){
+		return $this->driver->__get($name);
 	}
 
 	/**
-	 * @return void
+	 * @param \Psr\Log\LoggerInterface $logger
 	 *
-	 * @codeCoverageIgnore
+	 * @return \chillerlan\Database\Database
 	 */
-	public function __destruct(){
-		unset($this->driver); // trigger the driver destructor
+	public function setLogger(LoggerInterface $logger):Database{
+		$this->log = $logger;
+		$this->driver->setLogger($logger);
+		$this->query->setLogger($logger);
+
+		return $this;
 	}
 
 	/**
@@ -104,94 +109,69 @@ class Database implements DriverInterface{
 		return $this->query;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function connect():DriverInterface{
 		return $this->driver->connect();
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function disconnect():bool{
 		return $this->driver->disconnect();
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function getDBResource(){
 		return $this->driver->getDBResource();
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function getClientInfo():string{
 		return $this->driver->getClientInfo();
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function getServerInfo():string{
 		return $this->driver->getServerInfo();
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function escape($data):string{
 		return $this->driver->escape($data);
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function raw(string $sql, string $index = null, bool $assoc = null){
 		return $this->driver->raw($sql, $index, $assoc);
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function rawCached(string $sql, string $index = null, bool $assoc = null, int $ttl = null){
 		return $this->driver->rawCached($sql, $index, $assoc, $ttl);
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function prepared(string $sql, array $values = null, string $index = null, bool $assoc = null){
 		return $this->driver->prepared($sql, $values, $index, $assoc);
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function preparedCached(string $sql, array $values = null, string $index = null, bool $assoc = null, int $ttl = null){
 		return $this->driver->preparedCached($sql, $values, $index, $assoc, $ttl);
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function multi(string $sql, array $values){
 		return $this->driver->multi($sql, $values);
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function multiCallback(string $sql, array $data, $callback){
 		return $this->driver->multiCallback($sql, $data, $callback);
 	}
 
-	/**
-	 * @return string
-	 */
+	/** @inheritdoc */
 	public function getQueryBuilderFQCN():string{
 		return $this->driver->getQueryBuilderFQCN();
 	}
+
 }

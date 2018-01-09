@@ -2,9 +2,9 @@
 /**
  * Class PostgresQuery
  *
- * @filesource   PostgresQuery
+ * @filesource   PostgresQuery.php
  * @created      29.06.2017
- * @package      chillerlan\Database\Query\Dialects
+ * @package      chillerlan\Database\Query
  * @author       Smiley <smiley@chillerlan.net>
  * @copyright    2017 Smiley
  * @license      MIT
@@ -12,34 +12,23 @@
 
 namespace chillerlan\Database\Query;
 
-use chillerlan\Database\Query\Statements\{
-	Create, CreateAbstract,
-	CreateDatabase, CreateDatabaseAbstract,
-	CreateTable, CreateTableAbstract,
-	Select, SelectAbstract,
-	StatementException
+use chillerlan\Database\Query\Create\{
+	Create, CreateAbstract, CreateDatabase, CreateDatabaseAbstract, CreateTable, CreateTableAbstract
+};
+use chillerlan\Database\Query\Select\{
+	Select, SelectAbstract
 };
 
 class PostgresQuery extends QueryBuilderAbstract{
 
-	/**
-	 * @inheritdoc
-	 */
 	protected $quotes = ['"', '"'];
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function select():Select{
 
-		/**
-		 * @link https://www.postgresql.org/docs/current/static/sql-select.html
-		 */
 		return new class($this->db, $this->options, $this->quotes) extends SelectAbstract{
 
-			/**
-			 * @inheritdoc
-			 */
+			/** @inheritdoc */
 			public function sql():string{
 
 				if(empty($this->from)){
@@ -65,26 +54,17 @@ class PostgresQuery extends QueryBuilderAbstract{
 
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function create():Create{
 
 		return new class($this->db, $this->options, $this->quotes) extends CreateAbstract{
 
-			/**
-			 * @inheritdoc
-			 */
+			/** @inheritdoc */
 			public function database(string $dbname):CreateDatabase{
 
-				/**
-				 * @link https://www.postgresql.org/docs/current/static/sql-createdatabase.html
-				 */
 				return (new class($this->db, $this->options, $this->quotes) extends CreateDatabaseAbstract{
 
-					/**
-					 * @inheritdoc
-					 */
+					/** @inheritdoc */
 					public function sql():string{
 
 						$sql = 'CREATE DATABASE ';
@@ -116,20 +96,12 @@ class PostgresQuery extends QueryBuilderAbstract{
 
 			}
 
-			/**
-			 * @inheritdoc
-			 */
+			/** @inheritdoc */
 			public function table(string $tablename):CreateTable{
 
-				/**
-				 * @link https://www.postgresql.org/docs/current/static/sql-createtable.html
-				 * @link https://www.postgresql.org/docs/current/static/datatype.html
-				 */
 				return (new class($this->db, $this->options, $this->quotes) extends CreateTableAbstract{
 
-					/**
-					 * @inheritdoc
-					 */
+					/** @inheritdoc */
 					public function sql():string{
 
 						$sql = 'CREATE ';
@@ -156,9 +128,7 @@ class PostgresQuery extends QueryBuilderAbstract{
 						return $sql;
 					}
 
-					/**
-					 * @inheritdoc
-					 */
+					/** @inheritdoc */
 					protected function fieldspec(string $name, string $type, $length = null, string $attribute = null, string $collation = null, bool $isNull = null, string $defaultType = null, $defaultValue = null, string $extra = null):string {
 						$name = trim($name);
 						$type = strtoupper(trim($type));

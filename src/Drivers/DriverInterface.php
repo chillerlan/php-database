@@ -13,18 +13,19 @@
 namespace chillerlan\Database\Drivers;
 
 use chillerlan\Database\DatabaseOptions;
-use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
 
-interface DriverInterface extends LoggerAwareInterface{
+interface DriverInterface{
 
 	/**
 	 * Constructor.
 	 *
 	 * @param \chillerlan\Database\DatabaseOptions $options
 	 * @param \Psr\SimpleCache\CacheInterface|null $cache
+	 * @param \Psr\Log\LoggerInterface|null        $logger
 	 */
-	public function __construct(DatabaseOptions $options, CacheInterface $cache = null);
+	public function __construct(DatabaseOptions $options, CacheInterface $cache = null, LoggerInterface $logger = null);
 
 	/**
 	 * @return void

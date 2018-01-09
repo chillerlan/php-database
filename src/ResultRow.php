@@ -12,12 +12,10 @@
 
 namespace chillerlan\Database;
 
+/**
+ * @property mixed[] $array
+ */
 class ResultRow extends Result{
-
-	/**
-	 * @var mixed[]
-	 */
-	protected $array = [];
 
 	/**
 	 * @param string $name
@@ -40,11 +38,9 @@ class ResultRow extends Result{
 	}
 
 	/**
-	 * @param string $name
-	 *
-	 * @return mixed|null
+	 * @inheritdoc
 	 */
-	public function __get(string $name) {
+	public function __get(string $name){
 
 		if(isset($this->array[$name])){
 			return $this->array[$name];
@@ -54,19 +50,14 @@ class ResultRow extends Result{
 	}
 
 	/**
-	 * @link http://api.prototypejs.org/language/Enumerable/prototype/toArray/
-	 *
-	 * @return array
+	 * @inheritdoc
 	 */
-	public function __toArray():array {
+	public function __toArray():array{
 		return $this->array;
 	}
 
 	/**
-	 * @param int   $offset
-	 * @param mixed $value
-	 *
-	 * @return void
+	 * @inheritdoc
 	 */
 	public function offsetSet($offset, $value):void{
 
@@ -75,7 +66,7 @@ class ResultRow extends Result{
 			: $value;
 
 		if(is_null($offset)){
-			$this->array[] = $value; // @codeCoverageIgnore
+			$this->array[] = $value;
 		}
 		else{
 			$this->array[$offset] = $value;

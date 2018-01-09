@@ -13,10 +13,14 @@
 namespace chillerlan\DatabaseTest\Query;
 
 use chillerlan\Database\Drivers\DriverException;
+use chillerlan\Database\Query\Create\CreateDatabase;
+use chillerlan\Database\Query\Create\CreateTable;
+use chillerlan\Database\Query\Delete\Delete;
+use chillerlan\Database\Query\Insert\Insert;
 use chillerlan\Database\Query\QueryBuilderInterface;
-use chillerlan\Database\Query\Statements\{
-	CreateDatabase, CreateTable, Delete, Insert, Select, Statement, Update
-};
+use chillerlan\Database\Query\Select\Select;
+use chillerlan\Database\Query\Statement;
+use chillerlan\Database\Query\Update\Update;
 use chillerlan\Database\Result;
 use chillerlan\DatabaseTest\DatabaseTestAbstract;
 

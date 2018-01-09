@@ -16,9 +16,14 @@ use chillerlan\Database\{
 	DatabaseOptions, Result
 };
 use chillerlan\Logger\LogTrait;
+use Psr\Log\LoggerInterface;
+use Psr\Log\LoggerAwareInterface;
 use Psr\SimpleCache\CacheInterface;
 
-abstract class DriverAbstract implements DriverInterface{
+/**
+ * @method setLogger(\Psr\Log\LoggerInterface $logger):DriverInterface
+ */
+abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 	use LogTrait;
 
 	protected const CACHEKEY_HASH_ALGO = 'sha256';
@@ -54,10 +59,12 @@ abstract class DriverAbstract implements DriverInterface{
 	 *
 	 * @param \chillerlan\Database\DatabaseOptions $options
 	 * @param \Psr\SimpleCache\CacheInterface|null $cache
+	 * @param \Psr\Log\LoggerInterface|null        $logger
 	 */
-	public function __construct(DatabaseOptions $options, CacheInterface $cache = null){
+	public function __construct(DatabaseOptions $options, CacheInterface $cache = null, LoggerInterface $logger = null){
 		$this->options = $options;
 		$this->cache   = $cache;
+		$this->log     = $logger;
 	}
 
 	/**
@@ -105,23 +112,17 @@ abstract class DriverAbstract implements DriverInterface{
 	 */
 	abstract protected function multi_callback_query(string $sql, array $data, $callback);
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function getDBResource(){
 		return $this->db;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function getQueryBuilderFQCN():string {
 		return $this->querybuilder;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function raw(string $sql, string $index = null, bool $assoc = null){
 		$assoc = $assoc !== null ? $assoc : true;
 
@@ -134,9 +135,7 @@ abstract class DriverAbstract implements DriverInterface{
 
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function prepared(string $sql, array $values = null, string $index = null, bool $assoc = null){
 		$values = $values !== null ? $values : [];
 		$assoc  = $assoc  !== null ? $assoc  : true;
@@ -192,9 +191,7 @@ abstract class DriverAbstract implements DriverInterface{
 
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function rawCached(string $sql, string $index = null, bool $assoc = null, int $ttl = null){
 		$result = $this->cacheGet($sql, [], $index);
 
@@ -207,9 +204,7 @@ abstract class DriverAbstract implements DriverInterface{
 		return $result;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function preparedCached(string $sql, array $values = null, string $index = null, bool $assoc = null, int $ttl = null){
 		$result = $this->cacheGet($sql, $values, $index);
 
@@ -223,6 +218,8 @@ abstract class DriverAbstract implements DriverInterface{
 	}
 
 	/**
+	 * @todo return result only, Result::$isBool, Result::$success
+	 *
 	 * @param             $callable
 	 * @param array       $args
 	 * @param string|null $index
@@ -264,7 +261,7 @@ abstract class DriverAbstract implements DriverInterface{
 	 */
 	protected function cacheGet(string $sql, array $values = null, string $index = null){
 
-		if($this->cache){
+		if($this->cache instanceof CacheInterface){
 			return $this->cache->get($this->cacheKey($sql, $values, $index));
 		}
 
@@ -282,7 +279,7 @@ abstract class DriverAbstract implements DriverInterface{
 	 */
 	protected function cacheSet(string $sql, $result, array $values = null, string $index = null, int $ttl = null):bool{
 
-		if($this->cache){
+		if($this->cache instanceof CacheInterface){
 			return $this->cache->set($this->cacheKey($sql, $values, $index), $result, $ttl);
 		}
 

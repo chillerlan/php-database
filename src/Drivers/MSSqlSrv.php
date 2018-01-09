@@ -21,9 +21,7 @@ class MSSqlSrv extends DriverAbstract{
 
 	protected $querybuilder = MSSqlSrvQuery::class;
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	protected function raw_query(string $sql, string $index = null, bool $assoc = null){
 
 		// sqlsrv_query does not raise an error on empty/invalid SQL
@@ -34,9 +32,7 @@ class MSSqlSrv extends DriverAbstract{
 		return $this->__getResult(sqlsrv_query($this->db, $sql), $index, $assoc);
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	protected function prepared_query(string $sql, array $values = null, string $index = null, bool $assoc = null){
 
 		// sqlsrv_query does not raise an error on empty/invalid SQL
@@ -47,9 +43,7 @@ class MSSqlSrv extends DriverAbstract{
 		return $this->__getResult(sqlsrv_query($this->db, $sql, $values), $index, $assoc);
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	protected function multi_query(string $sql, array $values){
 
 		// sqlsrv_prepare does not raise an error on empty/invalid SQL
@@ -75,9 +69,7 @@ class MSSqlSrv extends DriverAbstract{
 		return true;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	protected function multi_callback_query(string $sql, array $data, $callback){
 
 		// sqlsrv_query does not raise an error on empty/invalid SQL
@@ -123,9 +115,7 @@ class MSSqlSrv extends DriverAbstract{
 		return $r;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function connect():DriverInterface{
 
 		if(gettype($this->db) === 'resource'){
@@ -179,9 +169,7 @@ class MSSqlSrv extends DriverAbstract{
 		return $this;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function disconnect():bool{
 
 		if(gettype($this->db) === 'resource'){
@@ -191,9 +179,7 @@ class MSSqlSrv extends DriverAbstract{
 		return true;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function getClientInfo():string{
 
 		if(gettype($this->db) === 'resource'){
@@ -205,9 +191,7 @@ class MSSqlSrv extends DriverAbstract{
 		return 'disconnected, no info available';
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function getServerInfo():string{
 
 		if(gettype($this->db) === 'resource'){
@@ -219,9 +203,7 @@ class MSSqlSrv extends DriverAbstract{
 		return 'disconnected, no info available';
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function escape($data):string {
 		return $data;
 	}

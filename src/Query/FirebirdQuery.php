@@ -2,9 +2,9 @@
 /**
  * Class FirebirdQuery
  *
- * @filesource   FirebirdQuery
+ * @filesource   FirebirdQuery.php
  * @created      29.06.2017
- * @package      chillerlan\Database\Query\Dialects
+ * @package      chillerlan\Database\Query
  * @author       Smiley <smiley@chillerlan.net>
  * @copyright    2017 Smiley
  * @license      MIT
@@ -12,40 +12,36 @@
 
 namespace chillerlan\Database\Query;
 
-use chillerlan\Database\Query\Statements\{
-	Create, CreateAbstract,
-	CreateDatabase,
-	CreateTable, CreateTableAbstract,
-	Delete, DeleteAbstract,
-	Drop, DropAbstract,
-	DropDatabase,
-	Insert, InsertAbstract,
-	Select, SelectAbstract,
-	StatementException,
+use chillerlan\Database\Query\Create\{
+	Create, CreateAbstract, CreateDatabase, CreateTable, CreateTableAbstract
+};
+use chillerlan\Database\Query\Delete\{
+	Delete, DeleteAbstract
+};
+use chillerlan\Database\Query\Drop\{
+	Drop, DropAbstract, DropDatabase
+};
+use chillerlan\Database\Query\Insert\{
+	Insert, InsertAbstract
+};
+use chillerlan\Database\Query\Select\{
+	Select, SelectAbstract
+};
+use chillerlan\Database\Query\Update\{
 	Update, UpdateAbstract
 };
 
 class FirebirdQuery extends QueryBuilderAbstract{
 
-	/**
-	 * @inheritdoc
-	 */
 	protected $quotes = ['"', '"'];
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function select():Select{
 
-		/**
-		 * @link https://www.firebirdsql.org/file/documentation/reference_manuals/fblangref25-en/html/fblangref25-dml-select.html
-		 */
 		return new class($this->db, $this->options, $this->quotes) extends SelectAbstract{
 			use FirebirdBindValuesTrait;
 
-			/**
-			 * @inheritdoc
-			 */
+			/** @inheritdoc */
 			public function sql():string{
 
 				if(empty($this->from)){
@@ -74,59 +70,34 @@ class FirebirdQuery extends QueryBuilderAbstract{
 
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function insert():Insert{
-
-		/**
-		 * @link https://www.firebirdsql.org/file/documentation/reference_manuals/fblangref25-en/html/fblangref25-dml-insert.html
-		 */
 		return new class($this->db, $this->options, $this->quotes) extends InsertAbstract{
 			use FirebirdBindValuesTrait;
 		};
-
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function update():Update{
-
-		/**
-		 * @link https://www.firebirdsql.org/file/documentation/reference_manuals/fblangref25-en/html/fblangref25-dml-update.html
-		 */
 		return new class($this->db, $this->options, $this->quotes) extends UpdateAbstract{
 			use FirebirdBindValuesTrait;
 		};
-
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function delete():Delete{
-
-		/**
-		 * @link https://www.firebirdsql.org/file/documentation/reference_manuals/fblangref25-en/html/fblangref25-dml-delete.html
-		 */
 		return new class($this->db, $this->options, $this->quotes) extends DeleteAbstract{
 			use FirebirdBindValuesTrait;
 		};
-
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function drop():Drop{
 
 		return new class($this->db, $this->options, $this->quotes) extends DropAbstract{
 
 			/**
-			 * @param string $dbname
-			 *
-			 * @return \chillerlan\Database\Query\Statements\DropDatabase
+			 * @inheritdoc
 			 * @throws \chillerlan\Database\Query\QueryException
 			 */
 			public function database(string $dbname):DropDatabase{
@@ -134,38 +105,28 @@ class FirebirdQuery extends QueryBuilderAbstract{
 			}
 
 		};
+
 	}
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function create():Create{
 
 		return new class($this->db, $this->options, $this->quotes) extends CreateAbstract{
 
 			/**
-			 * @param string $dbname
-			 *
-			 * @return \chillerlan\Database\Query\Statements\CreateDatabase
+			 * @inheritdoc
 			 * @throws \chillerlan\Database\Query\QueryException
 			 */
 			public function database(string $dbname):CreateDatabase{
 				throw new QueryException('not supported');
 			}
 
-			/**
-			 * @inheritdoc
-			 */
+			/** @inheritdoc */
 			public function table(string $tablename):CreateTable{
 
-				/**
-				 * @link https://www.firebirdsql.org/file/documentation/reference_manuals/fblangref25-en/html/fblangref25-ddl-tbl.html#fblangref25-ddl-tbl-create
-				 */
 				return (new class($this->db, $this->options, $this->quotes) extends CreateTableAbstract{
 
-					/**
-					 * @inheritdoc
-					 */
+					/** @inheritdoc */
 					public function sql():string{
 
 						$sql = $this->ifNotExists ? 'RECREATE ' : 'CREATE '; // nasty
@@ -203,9 +164,7 @@ class FirebirdQuery extends QueryBuilderAbstract{
 						return $sql;
 					}
 
-					/**
-					 * @inheritdoc
-					 */
+					/** @inheritdoc */
 					protected function fieldspec(string $name, string $type, $length = null, string $attribute = null, string $collation = null, bool $isNull = null, string $defaultType = null, $defaultValue = null, string $extra = null):string {
 						$name = trim($name);
 						$type = strtoupper(trim($type));
