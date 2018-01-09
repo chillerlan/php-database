@@ -13,10 +13,11 @@
 namespace chillerlan\Database\Query\Delete;
 
 use chillerlan\Database\Query\{
-	NameTrait, StatementAbstract, WhereTrait
+	NameTrait, StatementAbstract, Where, WhereTrait
 };
 
-abstract class DeleteAbstract extends StatementAbstract implements Delete{
+/** @noinspection PhpSuperClassIncompatibleWithInterfaceInspection */
+abstract class DeleteAbstract extends StatementAbstract implements Delete, Where{
 	use WhereTrait, NameTrait{
 		name as from;
 	}
