@@ -22,7 +22,15 @@ use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
 
 /**
- *
+ * @property \chillerlan\Database\Query\Alter\Alter       $alter
+ * @property \chillerlan\Database\Query\Create\Create     $create
+ * @property \chillerlan\Database\Query\Delete\Delete     $delete
+ * @property \chillerlan\Database\Query\Drop\Drop         $drop
+ * @property \chillerlan\Database\Query\Insert\Insert     $insert
+ * @property \chillerlan\Database\Query\Select\Select     $select
+ * @property \chillerlan\Database\Query\Show\Show         $show
+ * @property \chillerlan\Database\Query\Truncate\Truncate $truncate
+ * @property \chillerlan\Database\Query\Update\Update     $update
  */
 class Database implements DriverInterface, LoggerAwareInterface{
 	use ClassLoader, LogTrait;
@@ -72,12 +80,7 @@ class Database implements DriverInterface, LoggerAwareInterface{
 		unset($this->driver); // trigger the driver destructor
 	}
 
-	/**
-	 * @param $name
-	 *
-	 * @return mixed
-	 * @throws \chillerlan\Database\Query\QueryException
-	 */
+	/** @inheritdoc */
 	public function __get(string $name){
 		return $this->driver->__get($name);
 	}

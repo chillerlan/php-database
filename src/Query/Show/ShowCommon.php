@@ -13,9 +13,10 @@
 namespace chillerlan\Database\Query\Show;
 
 use chillerlan\Database\Query\StatementAbstract;
+use chillerlan\Database\Query\Where;
 use chillerlan\Database\Query\WhereTrait;
 
-class ShowCommon extends StatementAbstract{
+class ShowCommon extends StatementAbstract implements Where{
 	use WhereTrait;
 
 	public function sql():string{

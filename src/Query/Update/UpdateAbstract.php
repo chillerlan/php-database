@@ -13,10 +13,11 @@
 namespace chillerlan\Database\Query\Update;
 
 use chillerlan\Database\Query\{
-	NameTrait, Statement, StatementAbstract, StatementException, WhereTrait
+	NameTrait, Statement, StatementAbstract, StatementException, Where, WhereTrait
 };
 
-abstract class UpdateAbstract extends StatementAbstract implements Update{
+/** @noinspection PhpSuperClassIncompatibleWithInterfaceInspection */
+abstract class UpdateAbstract extends StatementAbstract implements Update, Where{
 	use WhereTrait, NameTrait{
 		name as table;
 	}

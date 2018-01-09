@@ -13,11 +13,12 @@
 namespace chillerlan\Database\Query\Select;
 
 use chillerlan\Database\Query\{
-	StatementAbstract, StatementException, WhereTrait
+	StatementAbstract, StatementException, Where, WhereTrait
 };
 use chillerlan\Database\Result;
 
-abstract class SelectAbstract extends StatementAbstract implements Select{
+/** @noinspection PhpSuperClassIncompatibleWithInterfaceInspection */
+abstract class SelectAbstract extends StatementAbstract implements Select, Where{
 	use WhereTrait;
 
 	/**

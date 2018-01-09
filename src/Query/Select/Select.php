@@ -20,6 +20,10 @@ use chillerlan\Database\Query\Statement;
  * @link https://www.postgresql.org/docs/current/static/sql-select.html
  * @link https://msdn.microsoft.com/library/ms176104(v=sql.110).aspx
  * @link https://www.firebirdsql.org/file/documentation/reference_manuals/fblangref25-en/html/fblangref25-dml-select.html
+ *
+ * @method \chillerlan\Database\Query\Select\Select where($val1, $val2, string $operator = null, bool $bind = null, string $join = null)
+ * @method \chillerlan\Database\Query\Select\Select openBracket(string $join = null)
+ * @method \chillerlan\Database\Query\Select\Select closeBracket()
  */
 interface Select extends Statement{
 
@@ -54,17 +58,6 @@ interface Select extends Statement{
 	public function groupBy(array $expressions):Select;
 
 	/**
-	 * @param             $val1
-	 * @param             $val2
-	 * @param null|string $operator
-	 * @param bool|null   $bind
-	 * @param null|string $join
-	 *
-	 * @return \chillerlan\Database\Query\Select\Select
-	 */
-	public function where($val1, $val2, string $operator = null, bool $bind = null, string $join = null);
-
-	/**
 	 * @param array $expressions
 	 *
 	 * @return \chillerlan\Database\Query\Select\Select
@@ -84,18 +77,6 @@ interface Select extends Statement{
 	 * @return \chillerlan\Database\Query\Select\Select
 	 */
 	public function limit(int $limit):Select;
-
-	/**
-	 * @param null|string $join
-	 *
-	 * @return \chillerlan\Database\Query\Select\Select
-	 */
-	public function openBracket(string $join = null);
-
-	/**
-	 * @return \chillerlan\Database\Query\Select\Select
-	 */
-	public function closeBracket();
 
 	/**
 	 * @return int

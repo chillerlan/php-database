@@ -12,6 +12,9 @@
 
 namespace chillerlan\Database\Query;
 
+/**
+ * @implements \chillerlan\Database\Query\Where
+ */
 trait WhereTrait{
 
 	/**
