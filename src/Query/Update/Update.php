@@ -20,10 +20,6 @@ use chillerlan\Database\Query\Statement;
  * @link https://www.postgresql.org/docs/current/static/sql-update.html
  * @link https://msdn.microsoft.com/library/ms177523(v=sql.110).aspx
  * @link https://www.firebirdsql.org/file/documentation/reference_manuals/fblangref25-en/html/fblangref25-dml-update.html
- *
- * @method \chillerlan\Database\Query\Update\Update where($val1, $val2, string $operator = null, bool $bind = null, string $join = null)
- * @method \chillerlan\Database\Query\Update\Update openBracket(string $join = null)
- * @method \chillerlan\Database\Query\Update\Update closeBracket()
  */
 interface Update extends Statement{
 

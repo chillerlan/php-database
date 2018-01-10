@@ -16,7 +16,12 @@ use chillerlan\Database\Query\{
 	NameTrait, Statement, StatementAbstract, StatementException, Where, WhereTrait
 };
 
-/** @noinspection PhpSuperClassIncompatibleWithInterfaceInspection */
+/**
+ * @method \chillerlan\Database\Query\Update\Update where($val1, $val2, string $operator = null, bool $bind = null, string $join = null)
+ * @method \chillerlan\Database\Query\Update\Update openBracket(string $join = null)
+ * @method \chillerlan\Database\Query\Update\Update closeBracket()
+ * @method \chillerlan\Database\Query\Update\Update table(string $name)
+ */
 abstract class UpdateAbstract extends StatementAbstract implements Update, Where{
 	use WhereTrait, NameTrait{
 		name as table;

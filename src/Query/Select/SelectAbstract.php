@@ -17,7 +17,11 @@ use chillerlan\Database\Query\{
 };
 use chillerlan\Database\Result;
 
-/** @noinspection PhpSuperClassIncompatibleWithInterfaceInspection */
+/**
+ * @method \chillerlan\Database\Query\Select\Select where($val1, $val2, string $operator = null, bool $bind = null, string $join = null)
+ * @method \chillerlan\Database\Query\Select\Select openBracket(string $join = null)
+ * @method \chillerlan\Database\Query\Select\Select closeBracket()
+ */
 abstract class SelectAbstract extends StatementAbstract implements Select, Where{
 	use WhereTrait;
 

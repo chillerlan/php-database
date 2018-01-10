@@ -20,10 +20,6 @@ use chillerlan\Database\Query\Statement;
  * @link https://www.postgresql.org/docs/current/static/sql-select.html
  * @link https://msdn.microsoft.com/library/ms176104(v=sql.110).aspx
  * @link https://www.firebirdsql.org/file/documentation/reference_manuals/fblangref25-en/html/fblangref25-dml-select.html
- *
- * @method \chillerlan\Database\Query\Select\Select where($val1, $val2, string $operator = null, bool $bind = null, string $join = null)
- * @method \chillerlan\Database\Query\Select\Select openBracket(string $join = null)
- * @method \chillerlan\Database\Query\Select\Select closeBracket()
  */
 interface Select extends Statement{
 

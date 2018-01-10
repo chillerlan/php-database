@@ -16,7 +16,12 @@ use chillerlan\Database\Query\{
 	NameTrait, StatementAbstract, Where, WhereTrait
 };
 
-/** @noinspection PhpSuperClassIncompatibleWithInterfaceInspection */
+/**
+ * @method \chillerlan\Database\Query\Delete\Delete where($val1, $val2, string $operator = null, bool $bind = null, string $join = null)
+ * @method \chillerlan\Database\Query\Delete\Delete openBracket(string $join = null)
+ * @method \chillerlan\Database\Query\Delete\Delete closeBracket()
+ * @method \chillerlan\Database\Query\Delete\Delete from(string $name)
+ */
 abstract class DeleteAbstract extends StatementAbstract implements Delete, Where{
 	use WhereTrait, NameTrait{
 		name as from;
