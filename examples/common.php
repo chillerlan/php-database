@@ -10,7 +10,7 @@
 namespace chillerlan\DatabaseExample;
 
 use chillerlan\Database\{
-	Database,DatabaseOptions,Drivers\MySQL
+	Database,DatabaseOptions,Drivers\MySQLiDrv
 };
 use chillerlan\SimpleCache\{
 	Cache, Drivers\MemoryCacheDriver
@@ -24,7 +24,7 @@ $env = (new DotEnv(__DIR__.'/../config', '.env'))->load();
 $cache = new Cache(new MemoryCacheDriver);
 
 $options = new DatabaseOptions([
-	'driver'       => MySQL::class,
+	'driver'       => MySQLiDrv::class,
 	'host'         => $env->get('DB_MYSQLI_HOST'),
 	'port'         => $env->get('DB_MYSQLI_PORT'),
 	'socket'       => $env->get('DB_MYSQLI_SOCKET'),
