@@ -4,7 +4,7 @@
  *
  * @filesource   MySQLPDO.php
  * @created      28.06.2017
- * @package      chillerlan\Database\Drivers\PDO
+ * @package      chillerlan\Database\Drivers
  * @author       Smiley <smiley@chillerlan.net>
  * @copyright    2017 Smiley
  * @license      MIT
@@ -12,15 +12,15 @@
 
 namespace chillerlan\Database\Drivers;
 
-use chillerlan\Database\Query\MySQLQuery;
+use chillerlan\Database\Query\MySQL;
 
 /**
  * @property \PDO $db
  */
 class MySQLPDO extends PDODriverAbstract{
 
-	protected $drivername   = 'mysql';
-	protected $querybuilder = MySQLQuery::class;
+	protected $drivername = 'mysql';
+	protected $dialect    = MySQL::class;
 
 	/** @inheritdoc */
 	protected function getDSN():string {

@@ -4,7 +4,7 @@
  *
  * @filesource   PDODriverAbstract.php
  * @created      28.06.2017
- * @package      chillerlan\Database\Drivers\PDO
+ * @package      chillerlan\Database\Drivers
  * @author       Smiley <smiley@chillerlan.net>
  * @copyright    2017 Smiley
  * @license      MIT
@@ -12,8 +12,7 @@
 
 namespace chillerlan\Database\Drivers;
 
-use PDO;
-use PDOStatement;
+use PDO, PDOStatement;
 
 /**
  * @property \PDO $db

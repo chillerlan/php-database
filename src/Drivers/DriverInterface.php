@@ -13,6 +13,7 @@
 namespace chillerlan\Database\Drivers;
 
 use chillerlan\Database\DatabaseOptions;
+use chillerlan\Database\Query\Dialect;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
 
@@ -55,9 +56,9 @@ interface DriverInterface{
 	public function getDBResource();
 
 	/**
-	 * @return string
+	 * @return \chillerlan\Database\Query\Dialect
 	 */
-	public function getQueryBuilderFQCN():string;
+	public function getDialect():Dialect;
 
 	/**
 	 * Returns info about the used php client

@@ -13,7 +13,7 @@
 namespace chillerlan\Database\Drivers;
 
 use chillerlan\Database\{
-	DatabaseOptions, Result
+	DatabaseOptions, Query\Dialect, Result
 };
 use chillerlan\Logger\LogTrait;
 use Psr\Log\LoggerInterface;
@@ -48,11 +48,11 @@ abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 	protected $cache;
 
 	/**
-	 * The query builder to use (FQCN)
+	 * The dialect to use (FQCN)
 	 *
 	 * @var string
 	 */
-	protected $querybuilder;
+	protected $dialect;
 
 	/**
 	 * Constructor.
@@ -117,9 +117,8 @@ abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 		return $this->db;
 	}
 
-	/** @inheritdoc */
-	public function getQueryBuilderFQCN():string {
-		return $this->querybuilder;
+	public function getDialect():Dialect{
+		return new $this->dialect;
 	}
 
 	/** @inheritdoc */

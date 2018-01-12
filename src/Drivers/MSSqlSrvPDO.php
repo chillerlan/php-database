@@ -4,7 +4,7 @@
  *
  * @filesource   MSSqlSrvPDO.php
  * @created      28.06.2017
- * @package      chillerlan\Database\Drivers\PDO
+ * @package      chillerlan\Database\Drivers
  * @author       Smiley <smiley@chillerlan.net>
  * @copyright    2017 Smiley
  * @license      MIT
@@ -13,18 +13,17 @@
 namespace chillerlan\Database\Drivers;
 
 use chillerlan\Database\DatabaseOptions;
-use chillerlan\Database\Query\MSSqlSrvQuery;
+use chillerlan\Database\Query\MSSQL;
 use PDO;
-use Psr\Log\LoggerInterface;
-use Psr\SimpleCache\CacheInterface;
+use Psr\{Log\LoggerInterface, SimpleCache\CacheInterface};
 
 /**
  * @property \PDO $db
  */
 class MSSqlSrvPDO extends PDODriverAbstract{
 
-	protected $drivername   = 'sqlsrv';
-	protected $querybuilder = MSSqlSrvQuery::class;
+	protected $drivername = 'sqlsrv';
+	protected $dialect    = MSSQL::class;
 
 	/**
 	 * MSSqlSrvPDO constructor.

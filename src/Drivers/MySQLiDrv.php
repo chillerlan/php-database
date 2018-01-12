@@ -1,10 +1,10 @@
 <?php
 /**
- * Class MySQL
+ * Class MySQLiDrv
  *
  * @filesource   MySQLphp
  * @created      28.06.2017
- * @package      chillerlan\Database\Drivers\MySQLi
+ * @package      chillerlan\Database\Drivers
  * @author       Smiley <smiley@chillerlan.net>
  * @copyright    2017 Smiley
  * @license      MIT
@@ -12,16 +12,16 @@
 
 namespace chillerlan\Database\Drivers;
 
-use chillerlan\Database\Query\MySQLQuery;
+use chillerlan\Database\Query\MySQL;
 use chillerlan\Database\Result;
 use mysqli;
 
 /**
  * @property mysqli $db
  */
-class MySQL extends DriverAbstract{
+class MySQLiDrv extends DriverAbstract{
 
-	protected $querybuilder = MySQLQuery::class;
+	protected $dialect = MySQL::class;
 
 	/** @inheritdoc */
 	public function connect():DriverInterface{
@@ -64,7 +64,7 @@ class MySQL extends DriverAbstract{
 			return $this;
 		}
 		catch(\Exception $e){
-			throw new DriverException('db error: [MySQL]: '.$e->getMessage());
+			throw new DriverException('db error: [MySQLiDrv]: '.$e->getMessage());
 		}
 
 	}

@@ -4,7 +4,7 @@
  *
  * @filesource   SQLiteDriver.php
  * @created      28.06.2017
- * @package      chillerlan\Database\Drivers\PDO
+ * @package      chillerlan\Database\Drivers
  * @author       Smiley <smiley@chillerlan.net>
  * @copyright    2018 Smiley
  * @license      MIT
@@ -12,17 +12,16 @@
 
 namespace chillerlan\Database\Drivers;
 
-use chillerlan\Database\Query\SQLiteQuery;
-use Exception;
-use PDO;
+use chillerlan\Database\Query\SQLite;
+use Exception, PDO;
 
 /**
  * @property \PDO $db
  */
 class SQLitePDO extends PDODriverAbstract{
 
-	protected $drivername   = 'sqlite';
-	protected $querybuilder = SQLiteQuery::class;
+	protected $drivername = 'sqlite';
+	protected $dialect    = SQLite::class;
 
 	/**
 	 * @inheritdoc

@@ -4,7 +4,7 @@
  *
  * @filesource   FirebirdPDO.php
  * @created      28.06.2017
- * @package      chillerlan\Database\Drivers\PDO
+ * @package      chillerlan\Database\Drivers
  * @author       Smiley <smiley@chillerlan.net>
  * @copyright    2017 Smiley
  * @license      MIT
@@ -12,19 +12,16 @@
 
 namespace chillerlan\Database\Drivers;
 
-use chillerlan\Database\Query\FirebirdQuery;
-use Exception;
-use PDO;
+use chillerlan\Database\Query\Firebird;
+use Exception, PDO;
 
 /**
- * @todo: STRTOLOWER UNQUOTED COLUMN NAMES
- *
  * @property \PDO $db
  */
 class FirebirdPDO extends PDODriverAbstract{
 
-	protected $drivername   = 'firebird';
-	protected $querybuilder = FirebirdQuery::class;
+	protected $drivername = 'firebird';
+	protected $dialect    = Firebird::class;
 
 	/**
 	 * @inheritdoc

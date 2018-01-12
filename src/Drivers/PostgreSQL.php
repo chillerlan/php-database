@@ -4,7 +4,7 @@
  *
  * @filesource   PostgreSQL.php
  * @created      28.06.2017
- * @package      chillerlan\Database\Drivers\Native
+ * @package      chillerlan\Database\Drivers
  * @author       Smiley <smiley@chillerlan.net>
  * @copyright    2017 Smiley
  * @license      MIT
@@ -12,15 +12,14 @@
 
 namespace chillerlan\Database\Drivers;
 
-use chillerlan\Database\Query\PostgresQuery;
-use chillerlan\Database\Result;
+use chillerlan\Database\{Query\Postgres, Result};
 
 /**
  * @property resource $db
  */
 class PostgreSQL extends DriverAbstract{
 
-	protected $querybuilder = PostgresQuery::class;
+	protected $dialect = Postgres::class;
 
 	/** @inheritdoc */
 	public function connect():DriverInterface{

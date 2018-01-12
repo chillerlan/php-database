@@ -4,7 +4,7 @@
  *
  * @filesource   MSSqlSrv.php
  * @created      28.06.2017
- * @package      chillerlan\Database\Drivers\Native
+ * @package      chillerlan\Database\Drivers
  * @author       Smiley <smiley@chillerlan.net>
  * @copyright    2017 Smiley
  * @license      MIT
@@ -12,14 +12,14 @@
 
 namespace chillerlan\Database\Drivers;
 
-use chillerlan\Database\Query\MSSqlSrvQuery;
+use chillerlan\Database\Query\MSSQL;
 
 /**
  * @property resource $db
  */
 class MSSqlSrv extends DriverAbstract{
 
-	protected $querybuilder = MSSqlSrvQuery::class;
+	protected $dialect = MSSQL::class;
 
 	/** @inheritdoc */
 	protected function raw_query(string $sql, string $index = null, bool $assoc = null){
