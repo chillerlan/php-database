@@ -13,14 +13,14 @@
 namespace chillerlan\DatabaseTest\Query;
 
 use chillerlan\Database\Drivers\DriverException;
-use chillerlan\Database\Query\Create\CreateDatabase;
-use chillerlan\Database\Query\Create\CreateTable;
-use chillerlan\Database\Query\Delete\Delete;
-use chillerlan\Database\Query\Insert\Insert;
-use chillerlan\Database\Query\QueryBuilderInterface;
-use chillerlan\Database\Query\Select\Select;
+use chillerlan\Database\Query\CreateDatabase;
+use chillerlan\Database\Query\CreateTable;
+use chillerlan\Database\Query\Delete;
+use chillerlan\Database\Query\Insert;
+use chillerlan\Database\Query\QueryBuilder;
+use chillerlan\Database\Query\Select;
 use chillerlan\Database\Query\Statement;
-use chillerlan\Database\Query\Update\Update;
+use chillerlan\Database\Query\Update;
 use chillerlan\Database\Result;
 use chillerlan\DatabaseTest\DatabaseTestAbstract;
 
@@ -30,17 +30,17 @@ abstract class QueryTestAbstract extends DatabaseTestAbstract{
 	const TEST_TABLENAME = 'querytest';
 
 	/**
-	 * @var \chillerlan\Database\Query\QueryBuilderInterface
+	 * @var \chillerlan\Database\Query\QueryBuilder
 	 */
 	protected $query;
 
 	protected function setUp(){
 		parent::setUp();
-		$this->query = $this->connection->getQueryBuilderInterface();
+		$this->query = $this->connection->getQueryBuilder();
 	}
 
 	public function testQueryBuilderInstance(){
-		$this->assertInstanceOf(QueryBuilderInterface::class, $this->query);
+		$this->assertInstanceOf(QueryBuilder::class, $this->query);
 	}
 
 	protected function createDatabase(){
@@ -72,6 +72,7 @@ abstract class QueryTestAbstract extends DatabaseTestAbstract{
 		try{
 			$this->query->drop->table(self::TEST_TABLENAME)->query();
 		}
+		/** @noinspection PhpRedundantCatchClauseInspection */
 		catch(DriverException $e){
 			var_dump('cannot drop table: '.$e->getMessage());
 		}

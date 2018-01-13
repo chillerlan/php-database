@@ -29,12 +29,5 @@ class PDOFirebirdQueryTest extends QueryTestAbstract{
 		$this->query->create->database('foo')->sql();
 	}
 
-	/**
-	 * @expectedException \chillerlan\Database\Query\QueryException
-	 * @expectedExceptionMessage not supported
-	 */
-	public function testCreateDatabaseNoName(){
-		$this->query->create->database('')->sql();
-	}
 
 }

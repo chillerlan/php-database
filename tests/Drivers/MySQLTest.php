@@ -12,11 +12,11 @@
 
 namespace chillerlan\DatabaseTest\Drivers;
 
-use chillerlan\Database\Drivers\MySQL;
+use chillerlan\Database\Drivers\MySQLiDrv;
 
 class MySQLTest extends DriverTestAbstract{
 
-	protected $driver = MySQL::class;
+	protected $driver = MySQLiDrv::class;
 	protected $envVar = 'DB_MYSQLI_';
 
 	protected $SQL_RAW_ERROR      = '';

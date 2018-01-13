@@ -12,10 +12,10 @@
 
 namespace chillerlan\DatabaseTest\Query;
 
-use chillerlan\Database\Drivers\MySQL;
+use chillerlan\Database\Drivers\MySQLiDrv;
 
 class MySQLNativeQueryTest extends MySQLQueryTestAbstract{
 
-	protected $driver = MySQL::class;
+	protected $driver = MySQLiDrv::class;
 
 }
