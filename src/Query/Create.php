@@ -4,15 +4,13 @@
  *
  * @filesource   Create.php
  * @created      28.06.2017
- * @package      chillerlan\Database\Query\Create
+ * @package      chillerlan\Database\Create
  * @author       Smiley <smiley@chillerlan.net>
  * @copyright    2017 Smiley
  * @license      MIT
  */
 
-namespace chillerlan\Database\Query\Create;
-
-use chillerlan\Database\Query\Statement;
+namespace chillerlan\Database\Query;
 
 /**
  * @link https://www.postgresql.org/docs/current/static/datatype.html
@@ -27,14 +25,14 @@ interface Create extends Statement{
 	/**
 	 * @param string|null $dbname
 	 *
-	 * @return \chillerlan\Database\Query\Create\CreateDatabase
+	 * @return \chillerlan\Database\Query\CreateDatabase
 	 */
 	public function database(string $dbname):CreateDatabase;
 
 	/**
 	 * @param string $tablename
 	 *
-	 * @return \chillerlan\Database\Query\Create\CreateTable
+	 * @return \chillerlan\Database\Query\CreateTable
 	 */
 	public function table(string $tablename):CreateTable;
 

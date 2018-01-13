@@ -17,7 +17,7 @@ trait CharsetTrait{
 	/**
 	 * @var string
 	 */
-	protected $charset = 'utf8';
+	protected $charset;
 
 	/**
 	 * @param string $charset

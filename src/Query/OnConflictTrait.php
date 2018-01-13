@@ -12,12 +12,12 @@
 
 namespace chillerlan\Database\Query;
 
-use chillerlan\Database\Query\Insert\Insert;
-
-/**
- * @extends \chillerlan\Database\Query\Insert\Insert
- */
 trait OnConflictTrait{
+
+	/**
+	 * @var string
+	 */
+	protected $name;
 
 	/**
 	 * @var string
@@ -25,31 +25,25 @@ trait OnConflictTrait{
 	protected $on_conflict;
 
 	/**
+	 * @param string      $name
 	 * @param string|null $on_conflict
 	 *
 	 * @return $this
+	 * @throws \chillerlan\Database\Query\QueryException
 	 */
-	private function _on_conflict(string $on_conflict = null){
+	public function name(string $name, string $on_conflict = null){
+		$this->name  = trim($name);
 		$on_conflict = trim(strtoupper($on_conflict));
+
+		if(empty($this->name)){
+			throw new QueryException('no name specified');
+		}
 
 		if(!empty($on_conflict)){
 			$this->on_conflict = $on_conflict;
 		}
 
 		return $this;
-	}
-
-	/**
-	 * @param string      $table
-	 * @param string|null $on_conflict
-	 *
-	 * @return $this
-	 */
-	public function into(string $table, string $on_conflict = null):Insert{
-		$this->_on_conflict($on_conflict);
-
-		/** @noinspection PhpUndefinedClassInspection */
-		return parent::into($table);
 	}
 
 }

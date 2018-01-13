@@ -23,13 +23,13 @@ trait NameTrait{
 	 * @param string $name
 	 *
 	 * @return $this
-	 * @throws \chillerlan\Database\Query\StatementException
+	 * @throws \chillerlan\Database\Query\QueryException
 	 */
 	public function name(string $name){
 		$this->name = trim($name);
 
 		if(empty($this->name)){
-			throw new StatementException('no name specified');
+			throw new QueryException('no name specified');
 		}
 
 		return $this;

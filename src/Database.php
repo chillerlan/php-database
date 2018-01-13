@@ -13,24 +13,25 @@
 namespace chillerlan\Database;
 
 use chillerlan\Database\{
-	Drivers\DriverInterface, Query\QueryBuilderInterface, Query\QueryException
+	Drivers\DriverInterface, Query\Dialect, Query\QueryBuilder
 };
-use chillerlan\Logger\LogTrait;
-use chillerlan\Traits\ClassLoader;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerInterface;
-use Psr\SimpleCache\CacheInterface;
+use chillerlan\{
+	Logger\LogTrait, Traits\ClassLoader
+};
+use Psr\{
+	Log\LoggerAwareInterface, Log\LoggerInterface, SimpleCache\CacheInterface
+};
 
 /**
- * @property \chillerlan\Database\Query\Alter\Alter       $alter
- * @property \chillerlan\Database\Query\Create\Create     $create
- * @property \chillerlan\Database\Query\Delete\Delete     $delete
- * @property \chillerlan\Database\Query\Drop\Drop         $drop
- * @property \chillerlan\Database\Query\Insert\Insert     $insert
- * @property \chillerlan\Database\Query\Select\Select     $select
- * @property \chillerlan\Database\Query\Show\Show         $show
- * @property \chillerlan\Database\Query\Truncate\Truncate $truncate
- * @property \chillerlan\Database\Query\Update\Update     $update
+ * @property \chillerlan\Database\Query\Alter    $alter
+ * @property \chillerlan\Database\Query\Create   $create
+ * @property \chillerlan\Database\Query\Delete   $delete
+ * @property \chillerlan\Database\Query\Drop     $drop
+ * @property \chillerlan\Database\Query\Insert   $insert
+ * @property \chillerlan\Database\Query\Select   $select
+ * @property \chillerlan\Database\Query\Show     $show
+ * @property \chillerlan\Database\Query\Truncate $truncate
+ * @property \chillerlan\Database\Query\Update   $update
  */
 class Database implements DriverInterface, LoggerAwareInterface{
 	use ClassLoader, LogTrait;
@@ -51,7 +52,7 @@ class Database implements DriverInterface, LoggerAwareInterface{
 	protected $driver;
 
 	/**
-	 * @var \chillerlan\Database\Query\QueryBuilderInterface
+	 * @var \chillerlan\Database\Query\QueryBuilder
 	 */
 	protected $query;
 
@@ -65,9 +66,8 @@ class Database implements DriverInterface, LoggerAwareInterface{
 	public function __construct(DatabaseOptions $options, CacheInterface $cache = null, LoggerInterface $logger = null){
 		$this->options = $options;
 		$this->cache   = $cache;
-
-		$this->driver = $this->loadClass($this->options->driver, DriverInterface::class, $this->options, $this->cache, $this->log);
-		$this->query  = $this->loadClass($this->driver->getQueryBuilderFQCN(), QueryBuilderInterface::class, $this->driver, $this->options, $this->log);
+		$this->driver  = $this->loadClass($this->options->driver, DriverInterface::class, $this->options, $this->cache, $this->log);
+		$this->query   = new QueryBuilder($this->driver, $this->log);
 
 		if($logger instanceof LoggerInterface){
 			$this->setLogger($logger);
@@ -106,9 +106,9 @@ class Database implements DriverInterface, LoggerAwareInterface{
 	}
 
 	/**
-	 * @return \chillerlan\Database\Query\QueryBuilderInterface
+	 * @return \chillerlan\Database\Query\QueryBuilder
 	 */
-	public function getQueryBuilderInterface():QueryBuilderInterface{
+	public function getQueryBuilder():QueryBuilder{
 		return $this->query;
 	}
 
@@ -173,8 +173,8 @@ class Database implements DriverInterface, LoggerAwareInterface{
 	}
 
 	/** @inheritdoc */
-	public function getQueryBuilderFQCN():string{
-		return $this->driver->getQueryBuilderFQCN();
+	public function getDialect():Dialect{
+		return $this->driver->getDialect();
 	}
 
 }

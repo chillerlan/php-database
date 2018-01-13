@@ -4,15 +4,13 @@
  *
  * @filesource   Truncate.php
  * @created      09.01.2018
- * @package      chillerlan\Database\Query\Truncate
+ * @package      chillerlan\Database\Query
  * @author       Smiley <smiley@chillerlan.net>
  * @copyright    2018 Smiley
  * @license      MIT
  */
 
-namespace chillerlan\Database\Query\Truncate;
-
-use chillerlan\Database\Query\Statement;
+namespace chillerlan\Database\Query;
 
 /**
  * https://dev.mysql.com/doc/refman/5.7/en/truncate-table.html

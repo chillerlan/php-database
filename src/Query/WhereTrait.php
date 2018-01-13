@@ -14,6 +14,9 @@ namespace chillerlan\Database\Query;
 
 /**
  * @implements \chillerlan\Database\Query\Where
+ *
+ * @property \chillerlan\Database\Query\Dialect $dialect
+ * @property array $bindValues
  */
 trait WhereTrait{
 
@@ -43,7 +46,7 @@ trait WhereTrait{
 		];
 
 		if(in_array($operator, $operators, true)){
-			$where = [is_array($val1) ? strtoupper($val1[1]).'('.$this->quote($val1[0]).')' : $this->quote($val1)];
+			$where = [is_array($val1) ? strtoupper($val1[1]).'('.$this->dialect->quote($val1[0]).')' : $this->dialect->quote($val1)];
 			$values = [];
 
 			if(in_array($operator, ['IN', 'NOT IN'], true)){
