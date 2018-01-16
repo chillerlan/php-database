@@ -12,8 +12,9 @@
 
 namespace chillerlan\Database\Drivers;
 
-use chillerlan\Database\Query\MySQL;
+use chillerlan\Database\Dialects\MySQL;
 use chillerlan\Database\Result;
+use Exception;
 use mysqli;
 
 /**
@@ -57,13 +58,13 @@ class MySQLiDrv extends DriverAbstract{
 			);
 
 			/**
-			 * @see https://mathiasbynens.be/notes/mysql-utf8mb4 How to support full Unicode in MySQLStatement
+			 * @see https://mathiasbynens.be/notes/mysql-utf8mb4 How to support full Unicode in MySQL
 			 */
 			$this->db->set_charset($this->options->mysql_charset);
 
 			return $this;
 		}
-		catch(\Exception $e){
+		catch(Exception $e){
 			throw new DriverException('db error: [MySQLiDrv]: '.$e->getMessage());
 		}
 
@@ -73,14 +74,9 @@ class MySQLiDrv extends DriverAbstract{
 	public function disconnect():bool{
 
 		if($this->db instanceof mysqli){
-			// prevent Warning: mysqli::close(): Couldn't fetch mysqli
-			$r = $this->db->close();
+			$this->db->close();
 
-			if($r){
-				$this->db = null;
-			}
-
-			return $r;
+			$this->db = null;
 		}
 
 		return true;
@@ -97,8 +93,8 @@ class MySQLiDrv extends DriverAbstract{
 	}
 
 	/** @inheritdoc */
-	public function escape($data):string{
-		return $this->db->real_escape_string($data);
+	public function escape(string $data):string{
+		return '\''.$this->db->real_escape_string($data).'\''; // emulate PDO
 	}
 
 	/** @inheritdoc */
@@ -106,10 +102,15 @@ class MySQLiDrv extends DriverAbstract{
 		$result = $this->db->query($sql);
 
 		if(is_bool($result)){
-			return $result;
+
+			if(!$result){
+				throw new DriverException($this->db->error);
+			}
+
+			return $result; // @codeCoverageIgnore
 		}
 
-		$r = $this->getResult([$result, 'fetch_'.($assoc ? 'assoc' : 'row')], [], $index, $assoc);
+		$r = $this->getResult([$result, 'fetch_'.(($assoc ?? true) ? 'assoc' : 'row')], [], $index, $assoc);
 
 		$result->free();
 
@@ -118,6 +119,7 @@ class MySQLiDrv extends DriverAbstract{
 
 	/** @inheritdoc */
 	protected function prepared_query(string $sql, array $values = null, string $index = null, bool $assoc = null){
+		$assoc = $assoc ?? true;
 		$stmt = $this->db->stmt_init();
 		$stmt->prepare($sql);
 
@@ -130,7 +132,7 @@ class MySQLiDrv extends DriverAbstract{
 		$result = $stmt->result_metadata();
 
 		if(is_bool($result)){
-			return true; // @todo: returning $result causes trouble on prepared INSERT first line. why???
+			return true;
 		}
 
 		// get the columns and their references
@@ -138,21 +140,21 @@ class MySQLiDrv extends DriverAbstract{
 		$cols = [];
 		$refs = [];
 
-		foreach($result->fetch_fields() as $k => &$field){
+		foreach($result->fetch_fields() as $k => $field){
 			$refs[] = &$cols[$assoc ? $field->name : $k];
 		}
 
 		call_user_func_array([$stmt, 'bind_result'], $refs);
 
 		// fetch the data
-		$output = new Result(null, $this->options->convert_encoding_src, $this->options->convert_encoding_dest);
+		$output = new Result(null, $this->convert_encoding_src, $this->convert_encoding_dest);
 		$i      = 0;
 
 		while($stmt->fetch()){
 			$row = [];
 			$key = $i;
 
-			foreach($cols as $field => &$data){
+			foreach($cols as $field => $data){
 				$row[$field] = $data;
 			}
 
@@ -188,7 +190,7 @@ class MySQLiDrv extends DriverAbstract{
 	}
 
 	/** @inheritdoc */
-	protected function multi_callback_query(string $sql, array $data, $callback){
+	protected function multi_callback_query(string $sql, iterable $data, $callback){
 		$stmt = $this->db->stmt_init();
 		$stmt->prepare($sql);
 
@@ -205,7 +207,6 @@ class MySQLiDrv extends DriverAbstract{
 		return true;
 	}
 
-
 	/**
 	 * Copies an array to an array of referenced values
 	 *
@@ -219,11 +220,16 @@ class MySQLiDrv extends DriverAbstract{
 		$types      = [];
 
 		foreach($row as &$field){
+			$type = gettype($field);
 
-			switch(gettype($field)){
-				case 'integer': $types[] = 'i'; break;
-				case 'double' : $types[] = 'd'; break; // @codeCoverageIgnore
-				default:        $types[] = 's'; break;
+			if($type === 'integer'){
+				$types[] = 'i';
+			}
+			elseif($type === 'double'){
+				$types[] = 'd';
+			}
+			else{
+				$types[] = 's';
 			}
 
 			$references[] = &$field;

@@ -12,11 +12,11 @@
 
 namespace chillerlan\Database;
 
-use chillerlan\Database\{
-	Drivers\DriverInterface, Query\Dialect, Query\QueryBuilder
-};
 use chillerlan\{
 	Logger\LogTrait, Traits\ClassLoader
+};
+use chillerlan\Database\{
+	Dialects\Dialect, Drivers\DriverInterface, Query\QueryBuilder
 };
 use Psr\{
 	Log\LoggerAwareInterface, Log\LoggerInterface, SimpleCache\CacheInterface
@@ -75,14 +75,17 @@ class Database implements DriverInterface, LoggerAwareInterface{
 
 	}
 
-	/** @inheritdoc */
+	/**
+	 * @inheritdoc
+	 * @codeCoverageIgnore
+	 */
 	public function __destruct(){
-		unset($this->driver); // trigger the driver destructor
+		$this->driver->disconnect();
 	}
 
 	/** @inheritdoc */
 	public function __get(string $name){
-		return $this->driver->__get($name);
+		return $this->query->{$name};
 	}
 
 	/**
@@ -101,7 +104,7 @@ class Database implements DriverInterface, LoggerAwareInterface{
 	/**
 	 * @return \chillerlan\Database\Drivers\DriverInterface
 	 */
-	public function getDriverInterface():DriverInterface{
+	public function getDriver():DriverInterface{
 		return $this->driver;
 	}
 
@@ -112,19 +115,24 @@ class Database implements DriverInterface, LoggerAwareInterface{
 		return $this->query;
 	}
 
+	/**
+	 * @inheritdoc
+	 * @codeCoverageIgnore
+	 */
+	public function getDBResource(){
+		return $this->driver->getDBResource();
+	}
+
 	/** @inheritdoc */
 	public function connect():DriverInterface{
-		return $this->driver->connect();
+		$this->driver->connect();
+
+		return $this;
 	}
 
 	/** @inheritdoc */
 	public function disconnect():bool{
 		return $this->driver->disconnect();
-	}
-
-	/** @inheritdoc */
-	public function getDBResource(){
-		return $this->driver->getDBResource();
 	}
 
 	/** @inheritdoc */
@@ -138,7 +146,7 @@ class Database implements DriverInterface, LoggerAwareInterface{
 	}
 
 	/** @inheritdoc */
-	public function escape($data):string{
+	public function escape(string $data):string{
 		return $this->driver->escape($data);
 	}
 
@@ -168,7 +176,7 @@ class Database implements DriverInterface, LoggerAwareInterface{
 	}
 
 	/** @inheritdoc */
-	public function multiCallback(string $sql, array $data, $callback){
+	public function multiCallback(string $sql, iterable $data, $callback){
 		return $this->driver->multiCallback($sql, $data, $callback);
 	}
 

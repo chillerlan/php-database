@@ -12,8 +12,10 @@
 
 namespace chillerlan\DatabaseTest;
 
-use chillerlan\Database\Result;
-use Iterator, ArrayAccess, Countable, stdClass;
+use chillerlan\Database\{
+	Result, ResultInterface, ResultRow
+};
+use ArrayAccess, Countable, SeekableIterator;
 use PHPUnit\Framework\TestCase;
 
 class ResultTest extends TestCase{
@@ -24,7 +26,7 @@ class ResultTest extends TestCase{
 	protected $result;
 
 	protected function setUp(){
-		$this->result = new Result(null, 'UTF-8');
+		$this->result = new Result;
 
 		foreach(range(0, 9) as $k){
 			$this->result[] = ['id' => $k, 'hash' => md5($k)];
@@ -34,29 +36,16 @@ class ResultTest extends TestCase{
 	}
 
 	public function testInstance(){
-		$this->assertInstanceOf(Result::class, $this->result);
-		$this->assertInstanceOf(Iterator::class, $this->result);
+		$this->assertInstanceOf(ResultInterface::class, $this->result);
 		$this->assertInstanceOf(ArrayAccess::class, $this->result);
 		$this->assertInstanceOf(Countable::class, $this->result);
-
-		//coverage
-		new Result(new Result);
-		new Result(new stdClass);
-	}
-
-	/**
-	 * @expectedException \chillerlan\Database\DatabaseException
-	 * @expectedExceptionMessage invalid data
-	 */
-	public function testConstructInvalidData(){
-		new Result('');
+		$this->assertInstanceOf(SeekableIterator::class, $this->result);
 	}
 
 	public function testRow(){
-
 		$this->assertSame(10, $this->result->length);
 		$this->assertSame(md5(0), $this->result[0]->hash);
-
+		/** @var \chillerlan\Database\ResultInterface|mixed $row */
 		while($row = $this->result->current()){
 			$this->assertNull($row->foo);
 			$this->assertNull($row->foo());
@@ -80,7 +69,7 @@ class ResultTest extends TestCase{
 
 	public function testEach(){
 		$this->result->__each(function($row, $i){
-			/** @var \chillerlan\Database\ResultRow $row */
+			/** @var \chillerlan\Database\ResultRow|mixed $row */
 			$this->assertSame($row->id, $i);
 			$this->assertSame(md5($row->id), $row->hash());
 
@@ -117,4 +106,25 @@ class ResultTest extends TestCase{
 		$this->assertSame([['id' => 1], ['id' => 2]], $r->__toArray());
 		$this->assertSame([['id' => 1]], $r->__chunk(1)[0]);
 	}
+
+	public function testToJSON(){
+		$this->assertSame('[{"id":1},{"id":2}]', (new Result([['id' => 1], ['id' => 2]]))->__toJSON());
+	}
+
+	public function testRowOffsetSet(){
+		$r = new ResultRow;
+
+		$r['id'] = 'foo';
+		$r[] = 'bar';
+
+		$this->assertSame('foo', $r['id']);
+		$this->assertSame('bar', $r[0]);
+	}
+
+	public function testConvertEncoding(){
+		$r = new ResultRow(['name_zh' => hex2bin('72ee5b5062f195e8')], 'UTF-16', 'UTF-8');
+
+		$this->assertSame('狮子拱门', $r->name_zh);
+	}
+
 }

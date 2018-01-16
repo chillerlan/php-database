@@ -4,13 +4,13 @@
  *
  * @filesource   SQLite.php
  * @created      11.01.2018
- * @package      chillerlan\Database\Query
+ * @package      chillerlan\Database\Dialects
  * @author       Smiley <smiley@chillerlan.net>
  * @copyright    2018 Smiley
  * @license      MIT
  */
 
-namespace chillerlan\Database\Query;
+namespace chillerlan\Database\Dialects;
 
 class SQLite extends DialectAbstract{
 
@@ -68,7 +68,7 @@ class SQLite extends DialectAbstract{
 
 	/** @inheritdoc */
 	public function createTable(string $table, array $cols, string $primaryKey = null, bool $ifNotExists, bool $temp, string $dir = null):array{
-		$sql[] = 'CREATE';
+		$sql = ['CREATE'];
 
 		if($temp){
 			$sql[] = 'TEMPORARY';
@@ -104,7 +104,28 @@ class SQLite extends DialectAbstract{
 		}
 
 		return $sql;
-
 	}
 
+	/** @inheritdoc */
+	public function truncate(string $table):array{
+		$sql = ['DELETE FROM'];// ??? sqlite
+		$sql[] = $this->quote($table);
+
+		return $sql;
+	}
+
+	/** @inheritdoc */
+	public function showTables(string $database = null, string $pattern = null, string $where = null):array{
+		/** @noinspection SqlResolve */
+		return ['SELECT "name" AS "tablename" FROM sqlite_master'];
+	}
+
+	/** @inheritdoc */
+	public function showCreateTable(string $table):array{
+		/** @noinspection SqlResolve */
+		$sql = ['SELECT "name" AS "Table", "sql" AS "Create Table" FROM sqlite_master WHERE name ='];
+		$sql[] = $this->quote($table);
+
+		return $sql;
+	}
 }

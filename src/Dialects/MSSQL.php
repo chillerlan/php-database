@@ -4,21 +4,21 @@
  *
  * @filesource   MSSQL.php
  * @created      11.01.2018
- * @package      chillerlan\Database\Query
+ * @package      chillerlan\Database\Dialects
  * @author       Smiley <smiley@chillerlan.net>
  * @copyright    2018 Smiley
  * @license      MIT
  */
 
-namespace chillerlan\Database\Query;
+namespace chillerlan\Database\Dialects;
 
 class MSSQL extends DialectAbstract{
 
 	protected $quotes = ['[', ']'];
 
 	/** @inheritdoc */
-	public function select(array $from, string $where = null, $limit = null, $offset = null, bool $distinct = null, array $groupby, array $orderby):array{
-		$sql[] = 'SELECT';
+	public function select(array $cols, array $from, string $where = null, $limit = null, $offset = null, bool $distinct = null, array $groupby, array $orderby):array{
+		$sql = ['SELECT'];
 
 		if($distinct){
 			$sql[] = 'DISTINCT';
@@ -56,7 +56,7 @@ class MSSQL extends DialectAbstract{
 
 	/** @inheritdoc */
 	public function createDatabase(string $dbname, bool $ifNotExists = null, string $collate = null):array{
-		$sql[] = 'CREATE DATABASE ';
+		$sql = [ 'CREATE DATABASE'];
 		$sql[] = $this->quote($dbname);
 
 		if($collate){
@@ -69,7 +69,7 @@ class MSSQL extends DialectAbstract{
 
 	/** @inheritdoc */
 	public function createTable(string $table, array $cols, string $primaryKey = null, bool $ifNotExists, bool $temp, string $dir = null):array{
-		$sql[] = 'CREATE TABLE';
+		$sql = ['CREATE TABLE'];
 		$sql[] = $this->quote($table);
 
 		if(!empty($this->cols)){
@@ -138,6 +138,13 @@ class MSSQL extends DialectAbstract{
 		}
 
 		return implode(' ', $field);
+	}
+
+	/** @inheritdoc */
+	public function showDatabases():array{
+		// https://stackoverflow.com/questions/147659/get-list-of-databases-from-sql-server
+		// EXEC sp_databases
+		return ['SELECT name AS [Database] FROM master.dbo.sysdatabases WHERE name NOT IN (\'master\', \'tempdb\', \'model\', \'msdb\')'];
 	}
 
 }

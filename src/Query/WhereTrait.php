@@ -13,10 +13,12 @@
 namespace chillerlan\Database\Query;
 
 /**
+ * https://xkcd.com/1409/
+ *
  * @implements \chillerlan\Database\Query\Where
  *
- * @property \chillerlan\Database\Query\Dialect $dialect
- * @property array $bindValues
+ * @property \chillerlan\Database\Dialects\Dialect $dialect
+ * @property array                                 $bindValues
  */
 trait WhereTrait{
 
@@ -164,7 +166,7 @@ trait WhereTrait{
 
 		}
 
-		return !empty($where) ? PHP_EOL.'WHERE '.implode(' '.PHP_EOL."\t", $where) : '';
+		return !empty($where) ? 'WHERE '.implode(' ', $where) : '';
 	}
 
 }

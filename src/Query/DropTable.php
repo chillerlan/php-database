@@ -17,7 +17,6 @@ namespace chillerlan\Database\Query;
  * @link https://dev.mysql.com/doc/refman/5.7/en/drop-table.html
  *
  * @method string sql(bool $multi = null)
- * @method array  getBindValues()
  * @method mixed  query(string $index = null)
  */
 interface DropTable extends Statement{

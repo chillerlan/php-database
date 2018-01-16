@@ -17,12 +17,12 @@ use Closure;
 interface MultiQuery extends Query{
 
 	/**
-	 * @param iterable|null $values
+	 * @param array|null $values
 	 *
 	 * @return mixed
 	 * @throws \chillerlan\Database\Query\QueryException
 	 */
-	public function multi(iterable $values = null);
+	public function multi(array $values = null);
 
 	/**
 	 * @param iterable $values

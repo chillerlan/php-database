@@ -12,7 +12,7 @@
 
 namespace chillerlan\Database\Drivers;
 
-use chillerlan\Database\Query\Postgres;
+use chillerlan\Database\Dialects\Postgres;
 
 /**
  * @property \PDO $db

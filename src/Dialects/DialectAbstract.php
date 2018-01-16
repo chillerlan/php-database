@@ -4,16 +4,22 @@
  *
  * @filesource   DialectAbstract.php
  * @created      11.01.2018
- * @package      chillerlan\Database\Query
+ * @package      chillerlan\Database\Dialects
  * @author       Smiley <smiley@chillerlan.net>
  * @copyright    2018 Smiley
  * @license      MIT
  */
 
-namespace chillerlan\Database\Query;
+namespace chillerlan\Database\Dialects;
+
+use chillerlan\Database\Drivers\DriverInterface;
+use chillerlan\Database\Query\QueryException;
 
 /**
  * please don't look at it
+ *
+ * @link https://en.wikibooks.org/wiki/SQL_Dialects_Reference
+ * @link https://en.wikibooks.org/wiki/Converting_MySQL_to_PostgreSQL
  */
 abstract class DialectAbstract implements Dialect{
 
@@ -27,9 +33,23 @@ abstract class DialectAbstract implements Dialect{
 	 */
 	protected $charset = 'utf8';
 
+	/**
+	 * @var \chillerlan\Database\Drivers\DriverInterface
+	 */
+	protected $db;
+
+	/**
+	 * Dialect constructor.
+	 *
+	 * @param \chillerlan\Database\Drivers\DriverInterface $driver
+	 */
+	public function __construct(DriverInterface $driver){
+		$this->db = $driver;
+	}
+
 	/** @inheritdoc */
-	public function select(array $from, string $where = null, $limit = null, $offset = null, bool $distinct = null, array $groupby, array $orderby):array{
-		$sql[] = 'SELECT';
+	public function select(array $cols, array $from, string $where = null, $limit = null, $offset = null, bool $distinct = null, array $groupby, array $orderby):array{
+		$sql = ['SELECT'];
 
 		if($distinct){
 			$sql[] = 'DISTINCT';
@@ -63,7 +83,7 @@ abstract class DialectAbstract implements Dialect{
 
 	/** @inheritdoc */
 	public function insert(string $table, array $fields, string $onConflict = null):array{
-		$sql[] = 'INSERT INTO';
+		$sql = ['INSERT INTO'];
 		$sql[] = $this->quote($table);
 		$sql[] = '('.$this->quotes[0].implode($this->quotes[1].', '.$this->quotes[0], $fields).$this->quotes[1].')';
 		$sql[] = 'VALUES';
@@ -74,7 +94,7 @@ abstract class DialectAbstract implements Dialect{
 
 	/** @inheritdoc */
 	public function update(string $table, array $set, string $where):array{
-		$sql[] = 'UPDATE';
+		$sql = ['UPDATE'];
 		$sql[] = $this->quote($table);
 		$sql[] = 'SET';
 		$sql[] = implode(', ', $set);
@@ -85,7 +105,7 @@ abstract class DialectAbstract implements Dialect{
 
 	/** @inheritdoc */
 	public function delete(string $table, string $where):array{
-		$sql[] = 'DELETE FROM';
+		$sql = ['DELETE FROM'];
 		$sql[] = $this->quote($table);
 		$sql[] = $where;
 
@@ -104,7 +124,7 @@ abstract class DialectAbstract implements Dialect{
 
 	/** @inheritdoc */
 	public function dropDatabase(string $dbname, bool $ifExists){
-		$sql[] = 'DROP DATABASE';
+		$sql = ['DROP DATABASE'];
 
 		if($ifExists){
 			$sql[] = 'IF EXISTS';
@@ -113,12 +133,11 @@ abstract class DialectAbstract implements Dialect{
 		$sql[] = $this->quote($dbname);
 
 		return $sql;
-
 	}
 
 	/** @inheritdoc */
 	public function dropTable(string $table, bool $ifExists):array{
-		$sql[] = 'DROP TABLE';
+		$sql = ['DROP TABLE'];
 
 		if($ifExists){
 			$sql[] = 'IF EXISTS';
@@ -130,11 +149,10 @@ abstract class DialectAbstract implements Dialect{
 	}
 
 	public function selectCount(array $from, string $where = null, bool $distinct = null, array $groupby = null){
-		$sql[] = 'SELECT';
+		$sql = ['SELECT'];
 
 		if($distinct){
 			$sql[] = 'DISTINCT';
-
 		}
 
 		$sql[] = 'COUNT(*) AS';
@@ -209,7 +227,6 @@ abstract class DialectAbstract implements Dialect{
 		$r = [];
 
 		foreach($expressions as $k => $ref){
-
 			if(is_string($k)){
 				$r[$ref[0] ?? $k] = is_array($ref)
 					? $_col($ref[0], $k, $ref[1] ?? null)
@@ -283,4 +300,28 @@ abstract class DialectAbstract implements Dialect{
 
 		return $field;
 	}
+
+	/** @inheritdoc */
+	public function truncate(string $table):array{
+		$sql = ['TRUNCATE TABLE'];
+		$sql[] = $this->quote($table);
+
+		return $sql;
+	}
+
+	/** @inheritdoc */
+	public function showDatabases():array{
+		throw new QueryException('not supported');
+	}
+
+	/** @inheritdoc */
+	public function showTables(string $database = null, string $pattern = null, string $where = null):array{
+		throw new QueryException('not supported');
+	}
+
+	/** @inheritdoc */
+	public function showCreateTable(string $table):array{
+		throw new QueryException('not supported');
+	}
+
 }

@@ -59,7 +59,11 @@ abstract class PDODriverAbstract extends DriverAbstract{
 		}
 		else{
 			$dsn .= ':host='.$this->options->host;
-			$dsn .= is_numeric($this->options->port) ? ';port='.$this->options->port : '';
+
+			if(is_numeric($this->options->port)){
+				$dsn .= ';port='.$this->options->port;
+			}
+
 		}
 
 		$dsn .= ';dbname='.$this->options->database;
@@ -117,20 +121,20 @@ abstract class PDODriverAbstract extends DriverAbstract{
 	}
 
 	/** @inheritdoc */
-	public function getServerInfo():string{
+	public function getServerInfo():?string{
 		return $this->db->getAttribute(PDO::ATTR_SERVER_INFO);
 	}
 
 	/** @inheritdoc */
-	public function escape($data):string {
+	public function escape(string $data):string {
 		return $this->db->quote($data);
 	}
 
 	/**
 	 * Returns the last insert id (if present)
-	 *
 	 * @link http://php.net/manual/pdo.lastinsertid.php
 	 * @return string
+	 * @codeCoverageIgnore
 	 */
 	protected function insertID():string{
 		return $this->db->lastInsertId();
@@ -146,12 +150,17 @@ abstract class PDODriverAbstract extends DriverAbstract{
 		$param_no = 1;
 
 		foreach($values as $v){
+			$t    = gettype($v);
+			$type = PDO::PARAM_STR;
 
-			switch(gettype($v)){
-				case 'boolean': $type = PDO::PARAM_BOOL; break;
-				case 'integer': $type = PDO::PARAM_INT;  break;
-				case 'NULL'   : $type = PDO::PARAM_NULL; break;
-				default:        $type = PDO::PARAM_STR;  break;
+			if($t === 'boolean'){
+				$type = PDO::PARAM_BOOL; // @codeCoverageIgnore
+			}
+			elseif($t === 'integer'){
+				$type = PDO::PARAM_INT;
+			}
+			elseif($t === 'NULL'){
+				$type = PDO::PARAM_NULL; // @codeCoverageIgnore
 			}
 
 			$stmt->bindValue($param_no, $v, $type);
@@ -167,13 +176,13 @@ abstract class PDODriverAbstract extends DriverAbstract{
 	 * @return bool|\chillerlan\Database\Result
 	 */
 	protected function __getResult($stmt, string $index = null, bool $assoc = null){
-		$assoc = $assoc !== null ? $assoc : true;
+		$assoc = $assoc ?? true;
 
 		if(is_bool($stmt)){
 			return $stmt; // @codeCoverageIgnore
 		}
 
-		return $this->getResult([$stmt, 'fetch'], [$assoc ? PDO::FETCH_ASSOC : PDO::FETCH_NUM], $index, $assoc);
+		return parent::getResult([$stmt, 'fetch'], [$assoc ? PDO::FETCH_ASSOC : PDO::FETCH_NUM], $index, $assoc);
 	}
 
 	/** @inheritdoc */
@@ -203,13 +212,13 @@ abstract class PDODriverAbstract extends DriverAbstract{
 			$stmt->execute();
 		}
 
-		$stmt = null;
+		unset($stmt);
 
 		return true;
 	}
 
 	/** @inheritdoc */
-	protected function multi_callback_query(string $sql, array $data, $callback){
+	protected function multi_callback_query(string $sql, iterable $data, $callback){
 		$stmt = $this->db->prepare($sql, $this->pdo_stmt_options);
 
 		foreach($data as $k => $row){
@@ -217,7 +226,7 @@ abstract class PDODriverAbstract extends DriverAbstract{
 			$stmt->execute();
 		}
 
-		$stmt = null;
+		unset($stmt);
 
 		return true;
 	}

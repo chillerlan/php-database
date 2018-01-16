@@ -53,7 +53,7 @@ class ResultRow extends Result{
 	 * @inheritdoc
 	 */
 	public function __toArray():array{
-		return $this->array;
+		return $this->__EnumerableToArray();
 	}
 
 	/**
@@ -61,15 +61,15 @@ class ResultRow extends Result{
 	 */
 	public function offsetSet($offset, $value):void{
 
-		$value = !is_null($this->sourceEncoding) && is_string($value)
-			? mb_convert_encoding($value, $this->destEncoding, $this->sourceEncoding)
-			: $value;
+		if($this->sourceEncoding !== null && is_string($value)){
+			$value = mb_convert_encoding($value, $this->destEncoding, $this->sourceEncoding);
+		}
 
-		if(is_null($offset)){
-			$this->array[] = $value;
+		if($offset !== null){
+			$this->array[$offset] = $value;
 		}
 		else{
-			$this->array[$offset] = $value;
+			$this->array[] = $value;
 		}
 
 	}

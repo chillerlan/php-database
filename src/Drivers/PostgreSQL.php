@@ -12,7 +12,9 @@
 
 namespace chillerlan\Database\Drivers;
 
-use chillerlan\Database\{Query\Postgres, Result};
+use chillerlan\Database\{
+	Dialects\Postgres, Result
+};
 
 /**
  * @property resource $db
@@ -72,15 +74,15 @@ class PostgreSQL extends DriverAbstract{
 	}
 
 	/** @inheritdoc */
-	public function getServerInfo():string{
+	public function getServerInfo():?string{
 		$ver = pg_version($this->db);
 
 		return 'PostgreSQL '.$ver['server'].' ('.$ver['server_encoding'].', date style: '.$ver['DateStyle'].', time zone: '.$ver['TimeZone'].')';
 	}
 
 	/** @inheritdoc */
-	public function escape($data):string{
-		return pg_escape_string($this->db, $data);
+	public function escape(string $data):string{
+		return '\''.pg_escape_string($this->db, $data).'\''; // emulate PDO
 	}
 
 	/**
@@ -96,7 +98,7 @@ class PostgreSQL extends DriverAbstract{
 			return $result; // @codeCoverageIgnore
 		}
 
-		$out = new Result(null, $this->options->convert_encoding_src, $this->options->convert_encoding_dest);
+		$out = new Result(null, $this->convert_encoding_src, $this->convert_encoding_dest);
 		$i   = 0;
 
 		while($row = call_user_func_array($assoc === true ? 'pg_fetch_assoc' : 'pg_fetch_row', [$result])){
@@ -105,15 +107,17 @@ class PostgreSQL extends DriverAbstract{
 			$j = 0;
 			foreach($row as $k => $item){
 				// https://gitter.im/arenanet/api-cdi?at=594326ba31f589c64fafe554
-				$t = pg_field_type($result, $j);
+				$fieldType = pg_field_type($result, $j);
 
-				switch(true){
-					case $t === 'bool':
-						$row[$k] = $item === 't'; break;
-					case in_array($t, ['int2', 'int4', 'int8'], true):
-						$row[$k] = (int)$item; break;
-					case in_array($t, ['float4', 'float8'], true):
-						$row[$k] = (float)$item; break;
+				if($fieldType === 'bool'){
+					$row[$k] = $item === 't';
+				}
+				elseif(in_array($fieldType, ['int2', 'int4', 'int8'], true)){
+					$row[$k] = (int)$item;
+
+				}
+				elseif(in_array($fieldType, ['float4', 'float8'], true)){
+					$row[$k] = (float)$item; // @codeCoverageIgnore
 				}
 
 				$j++;
@@ -156,7 +160,7 @@ class PostgreSQL extends DriverAbstract{
 	}
 
 	/** @inheritdoc */
-	protected function multi_callback_query(string $sql, array $data, $callback){
+	protected function multi_callback_query(string $sql, iterable $data, $callback){
 		pg_prepare($this->db, '', $this->replaceParams($sql));
 
 		foreach($data as $k => $row){

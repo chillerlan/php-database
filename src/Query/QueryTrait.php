@@ -12,14 +12,15 @@
 
 namespace chillerlan\Database\Query;
 
-use Closure;
+use chillerlan\Database\Dialects\Firebird;
+use chillerlan\Database\Dialects\MSSQL;
 
 /**
  * @extends    \chillerlan\Database\Query\StatementAbstract
  * @implements \chillerlan\Database\Query\Query
  *
  * @property  \chillerlan\Database\Drivers\DriverInterface $db
- * @property  \chillerlan\Database\Query\Dialect           $dialect
+ * @property  \chillerlan\Database\Dialects\Dialect        $dialect
  */
 trait QueryTrait{
 
@@ -37,6 +38,11 @@ trait QueryTrait{
 	 * @var bool
 	 */
 	protected $cached = false;
+
+	/**
+	 * @var int
+	 */
+	protected $ttl = 300;
 
 	/**
 	 * @var int
@@ -62,7 +68,14 @@ trait QueryTrait{
 	public function sql(bool $multi = null):string{
 		$this->multi = $multi ?? false;
 
-		return implode(' ',  $this->getSQL());
+		$sql = trim(implode(' ', $this->getSQL()));
+
+		// this should only happen on a corrupt dialect implementation
+		if(empty($sql)){
+			throw new QueryException('empty sql'); // @codeCoverageIgnore
+		}
+
+		return $sql;
 	}
 
 	/** @inheritdoc */
@@ -115,8 +128,12 @@ trait QueryTrait{
 	}
 
 	/** @inheritdoc */
-	public function cached(int $ttl = null){ // @todo: ttl
+	public function cached(int $ttl = null){
 		$this->cached = true;
+
+		if($ttl > 0){
+			$this->ttl = $ttl;
+		}
 
 		return $this;
 	}
@@ -128,8 +145,10 @@ trait QueryTrait{
 			? $this->getBindValues()
 			: null;
 
-		if($this instanceof Select && $this->cached){
-			return $this->db->preparedCached($sql, $bindvalues, $index, true, 300);
+		$this->debug('QueryTrait::query()', ['method' => __METHOD__, 'sql' => $sql, 'val' => $bindvalues, 'index' => $index]);
+
+		if($this->cached && $this instanceof Select){
+			return $this->db->preparedCached($sql, $bindvalues, $index, true, $this->ttl);
 		}
 
 		return $this->db->prepared($sql, $bindvalues, $index);

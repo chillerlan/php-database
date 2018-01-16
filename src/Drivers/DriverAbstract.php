@@ -13,20 +13,18 @@
 namespace chillerlan\Database\Drivers;
 
 use chillerlan\Database\{
-	DatabaseOptions, Query\Dialect, Result
+	DatabaseOptions, Dialects\Dialect, Result
 };
 use chillerlan\Logger\LogTrait;
-use Psr\Log\LoggerInterface;
-use Psr\Log\LoggerAwareInterface;
-use Psr\SimpleCache\CacheInterface;
+use Psr\{
+	Log\LoggerAwareInterface, Log\LoggerInterface, SimpleCache\CacheInterface
+};
 
 /**
  * @method setLogger(\Psr\Log\LoggerInterface $logger):DriverInterface
  */
 abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 	use LogTrait;
-
-	protected const CACHEKEY_HASH_ALGO = 'sha256';
 
 	/**
 	 * Holds the database resource object
@@ -54,6 +52,10 @@ abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 	 */
 	protected $dialect;
 
+	protected $cachekey_hash_algo;
+	protected $convert_encoding_src;
+	protected $convert_encoding_dest;
+
 	/**
 	 * Constructor.
 	 *
@@ -65,16 +67,19 @@ abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 		$this->options = $options;
 		$this->cache   = $cache;
 		$this->log     = $logger;
+
+		// avoid unnecessary getter calls in long loops
+		$this->cachekey_hash_algo    = $this->options->cachekey_hash_algo;
+		$this->convert_encoding_src  = $this->options->convert_encoding_src;
+		$this->convert_encoding_dest = $this->options->convert_encoding_dest;
 	}
 
 	/**
 	 * @return void
-	 *
-	 * @codeCoverageIgnore
 	 */
-	public function __destruct(){
-		$this->disconnect();
-	}
+#	public function __destruct(){
+#		$this->disconnect();
+#	}
 
 	/**
 	 * @param string      $sql
@@ -96,51 +101,60 @@ abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 	abstract protected function prepared_query(string $sql, ?array $values, ?string $index, ?bool $assoc);
 
 	/**
-	 * @param string $sql
-	 * @param array  $values
+	 * @param string   $sql
+	 * @param array    $values
 	 *
 	 * @return bool
 	 */
 	abstract protected function multi_query(string $sql, array $values);
 
 	/**
-	 * @param string $sql
-	 * @param array  $data
-	 * @param        $callback
+	 * @param string   $sql
+	 * @param iterable $data
+	 * @param          $callback
 	 *
 	 * @return bool
 	 */
-	abstract protected function multi_callback_query(string $sql, array $data, $callback);
+	abstract protected function multi_callback_query(string $sql, iterable $data, $callback);
 
-	/** @inheritdoc */
+	/**
+	 * @inheritdoc
+	 * @codeCoverageIgnore
+	 */
 	public function getDBResource(){
 		return $this->db;
 	}
 
 	public function getDialect():Dialect{
-		return new $this->dialect;
+		return new $this->dialect($this);
 	}
 
 	/** @inheritdoc */
 	public function raw(string $sql, string $index = null, bool $assoc = null){
-		$assoc = $assoc !== null ? $assoc : true;
+		$this->checkSQL($sql);
+		$this->debug('DriverAbstract::raw()', ['method' => __METHOD__, 'sql' => $sql, 'index' => $index, 'assoc' => $assoc]);
 
 		try{
-			return $this->raw_query($sql, $index, $assoc);
+			return $this->raw_query($sql, $index, $assoc !== null ? $assoc : true);
 		}
 		catch(\Exception $e){
-			throw new DriverException('sql error: ['.get_called_class().'::raw()]'.$e->getMessage());
+			throw new DriverException('sql error: ['.get_called_class().'::raw()] '.$e->getMessage());
 		}
 
 	}
 
 	/** @inheritdoc */
 	public function prepared(string $sql, array $values = null, string $index = null, bool $assoc = null){
-		$values = $values !== null ? $values : [];
-		$assoc  = $assoc  !== null ? $assoc  : true;
+		$this->checkSQL($sql);
+		$this->debug('DriverAbstract::prepared()', ['method' => __METHOD__, 'sql' => $sql, 'val' => $values, 'index' => $index, 'assoc' => $assoc]);
 
 		try{
-			return $this->prepared_query($sql, $values, $index, $assoc);
+			return $this->prepared_query(
+				$sql,
+				$values !== null ? $values : [],
+				$index,
+				$assoc  !== null ? $assoc  : true
+			);
 		}
 		catch(\Exception $e){
 			throw new DriverException('sql error: ['.get_called_class().'::prepared()] '.$e->getMessage());
@@ -153,6 +167,7 @@ abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 	 * @todo: return array of results
 	 */
 	public function multi(string $sql, array $values){
+		$this->checkSQL($sql);
 
 		if(!is_array($values) || count($values) < 1 || !is_array($values[0]) || count($values[0]) < 1){
 			throw new DriverException('invalid data');
@@ -170,8 +185,10 @@ abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 	/**
 	 * @inheritdoc
 	 * @todo: return array of results
+	 * @see determine callable type? http://php.net/manual/en/language.types.callable.php#118032
 	 */
-	public function multiCallback(string $sql, array $data, $callback){
+	public function multiCallback(string $sql, iterable $data, $callback){
+		$this->checkSQL($sql);
 
 		if(count($data) < 1){
 			throw new DriverException('invalid data');
@@ -219,15 +236,15 @@ abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 	/**
 	 * @todo return result only, Result::$isBool, Result::$success
 	 *
-	 * @param             $callable
+	 * @param callable    $callable
 	 * @param array       $args
 	 * @param string|null $index
 	 * @param bool        $assoc
 	 *
 	 * @return bool|\chillerlan\Database\Result
 	 */
-	protected function getResult($callable, array $args, string $index = null, bool $assoc = null){
-		$out = new Result(null, $this->options->convert_encoding_src, $this->options->convert_encoding_dest);
+	protected function getResult(callable $callable, array $args, string $index = null, bool $assoc = null){
+		$out = new Result(null, $this->convert_encoding_src, $this->convert_encoding_dest);
 		$i   = 0;
 
 		while($row = call_user_func_array($callable, $args)){
@@ -248,7 +265,7 @@ abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 	 * @return string
 	 */
 	protected function cacheKey(string $sql, array $values = null, string $index = null):string{
-		return hash($this::CACHEKEY_HASH_ALGO, serialize([$sql, $values, $index]));
+		return hash($this->cachekey_hash_algo, serialize([$sql, $values, $index]));
 	}
 
 	/**
@@ -283,6 +300,19 @@ abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 		}
 
 		return false; // @codeCoverageIgnore
+	}
+
+	/**
+	 * @param $sql
+	 *
+	 * @throws \chillerlan\Database\Drivers\DriverException
+	 */
+	protected function checkSQL(string $sql):void{
+
+		if(empty(trim($sql))){
+			throw new DriverException('sql error: empty sql');
+		}
+
 	}
 
 }

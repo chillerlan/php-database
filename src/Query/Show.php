@@ -15,19 +15,18 @@ namespace chillerlan\Database\Query;
 
 /**
  * @link https://dev.mysql.com/doc/refman/5.7/en/show.html
+ *
+ * @property \chillerlan\Database\Query\ShowCreate create
  */
 interface Show extends Statement{
-/*
-	public function createTable(string $tablename);
-	public function createDatabase(string $dbname);
-	public function createFunction(string $func);
-	public function createProcedure(string $proc);
-	public function databases();
-	public function tables();
-	public function columns();
-	public function index();
-	public function collation();
-	public function characterSet();
-	public function tableStatus();
-*/
+
+	public function create():ShowCreate;
+	public function databases():ShowItem;
+	public function tables(string $from = null):ShowItem;
+#	public function columns():ShowItem;
+#	public function index():ShowItem;
+#	public function collation():ShowItem;
+#	public function characterSet():ShowItem;
+#	public function tableStatus():ShowItem;
+
 }

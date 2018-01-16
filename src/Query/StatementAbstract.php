@@ -12,6 +12,7 @@
 
 namespace chillerlan\Database\Query;
 
+use chillerlan\Database\Dialects\Dialect;
 use chillerlan\Database\Drivers\DriverInterface;
 use chillerlan\Logger\LogTrait;
 use Psr\Log\LoggerAwareInterface;
@@ -26,15 +27,15 @@ abstract class StatementAbstract implements Statement, LoggerAwareInterface{
 	protected $db;
 
 	/**
-	 * @var \chillerlan\Database\Query\Dialect
+	 * @var \chillerlan\Database\Dialects\Dialect
 	 */
 	protected $dialect;
 
 	/** @inheritdoc */
-	public function __construct(DriverInterface $db, LoggerInterface $logger = null){
+	public function __construct(DriverInterface $db, Dialect $dialect, LoggerInterface $logger = null){
 		$this->db      = $db;
+		$this->dialect = $dialect;
 		$this->log     = $logger;
-		$this->dialect = $this->db->getDialect();
 	}
 
 }

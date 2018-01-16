@@ -12,7 +12,7 @@
 
 namespace chillerlan\Database\Drivers;
 
-use chillerlan\Database\Query\Firebird;
+use chillerlan\Database\Dialects\Firebird;
 use Exception, PDO;
 
 /**
@@ -83,7 +83,7 @@ class FirebirdPDO extends PDODriverAbstract{
 	}
 
 	/** @inheritdoc */
-	public function getServerInfo():string{
+	public function getServerInfo():?string{
 		return $this->db->getAttribute(PDO::ATTR_SERVER_INFO).', connected to: '.$this->options->database;
 	}
 

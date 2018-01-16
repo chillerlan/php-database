@@ -15,14 +15,16 @@ namespace chillerlan\Database;
 use chillerlan\Traits\{
 	Enumerable, Interfaces\ArrayAccessTrait, Magic, SPL\CountableTrait, SPL\SeekableIteratorTrait
 };
-use ArrayAccess, Countable, SeekableIterator, stdClass, Traversable;
+use ArrayAccess, Countable, SeekableIterator;
 
 /**
- * @property int $length
+ * @property int                              $length
  * @property \chillerlan\Database\ResultRow[] $array
  */
-class Result implements SeekableIterator, ArrayAccess, Countable{
-	use ArrayAccessTrait, SeekableIteratorTrait, CountableTrait, Magic, Enumerable;
+class Result implements ResultInterface, SeekableIterator, ArrayAccess, Countable{
+	use ArrayAccessTrait, SeekableIteratorTrait, CountableTrait, Magic, Enumerable{
+		__toArray as __EnumerableToArray;
+	}
 
 	/**
 	 * @var null|string
@@ -52,89 +54,41 @@ class Result implements SeekableIterator, ArrayAccess, Countable{
 	 */
 	protected $metadata = [];
 
-	/**
-	 * Result constructor.
-	 *
-	 * @param \Traversable|\stdClass|array|null $data
-	 * @param string|null                       $sourceEncoding
-	 * @param string                            $destEncoding
-	 *
-	 * @throws \chillerlan\Database\DatabaseException
-	 */
-	public function __construct($data = null, string $sourceEncoding = null, string $destEncoding = null){
+	/** @inheritdoc */
+	public function __construct(iterable $data = null, string $sourceEncoding = null, string $destEncoding = null){
 		$this->sourceEncoding = $sourceEncoding;
 		$this->destEncoding   = $destEncoding ?? 'UTF-8';
 
-		if($data === null){
-			$data = [];
-		}
-		else if($data instanceof Traversable){
-			$data = iterator_to_array($data);
-		}
-		else if(!$data instanceof stdClass && !is_array($data)){
-			throw new DatabaseException('invalid data');
-		}
+		if($data !== null){
 
-		foreach($data as $k => $v){
-			$this->offsetSet($k, $v);
+			foreach($data as $k => $v){
+				$this->offsetSet($k, $v);
+			}
+
 		}
 
 		$this->offset = 0;
 	}
 
-	/**
-	 * @param $offset
-	 *
-	 * @return bool
-	 */
-	public function __isset($offset):bool{
-		return $this->offsetExists($offset);
+	/** @inheritdoc */
+	public function __toJSON(bool $prettyprint = null):string{
+		return json_encode($this->__toArray(), $prettyprint === true ? JSON_PRETTY_PRINT : null);
 	}
 
-	/**
-	 * @param $offset
-	 */
-	public function __unset($offset):void{
-		$this->offsetUnset($offset);
-	}
-
-	/**
-	 * @return string
-	 */
-	public function __toString():string{
-		return json_encode($this->__toArray());
-	}
-
-	/**
-	 * @param \chillerlan\Database\Result $DBResult
-	 *
-	 * @return \chillerlan\Database\Result
-	 */
+	/** @inheritdoc */
 	public function __merge(Result $DBResult):Result{
-		$arr = [];
-
-		foreach($DBResult as $row){
-			$arr[] = $row;
-		}
-
-		$this->array = array_merge($this->array, $arr);
+		$this->array = array_merge($this->array, $DBResult->__EnumerableToArray());
 
 		return $this;
 	}
 
-	/**
-	 * @param int $size
-	 *
-	 * @return array
-	 */
+	/** @inheritdoc */
 	public function __chunk(int $size):array{
 		return array_chunk($this->__toArray(), $size, true);
 	}
 
-	/**
-	 * @inheritdoc
-	 */
-	public function __toArray():array {
+	/** @inheritdoc */
+	public function __toArray():array{
 		$arr = [];
 
 		foreach($this->array as $key => $item){
@@ -160,16 +114,14 @@ class Result implements SeekableIterator, ArrayAccess, Countable{
 	 * ArrayAccess *
 	 ***************/
 
-	/**
-	 * @inheritdoc
-	 */
+	/** @inheritdoc */
 	public function offsetSet($offset, $value):void{
 
-		if(is_null($offset)){
-			$this->array[] = new ResultRow($value, $this->sourceEncoding, $this->destEncoding);
+		if($offset !== null){
+			$this->array[$offset] = new ResultRow($value, $this->sourceEncoding, $this->destEncoding);
 		}
 		else{
-			$this->array[$offset] = new ResultRow($value, $this->sourceEncoding, $this->destEncoding);
+			$this->array[] = new ResultRow($value, $this->sourceEncoding, $this->destEncoding);
 		}
 
 	}

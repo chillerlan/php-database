@@ -13,7 +13,7 @@
 namespace chillerlan\Database\Query;
 
 use chillerlan\Database\{
-	Drivers\DriverInterface, Result
+	Drivers\DriverInterface, ResultInterface
 };
 use chillerlan\Logger\LogTrait;
 use Psr\Log\{
@@ -44,6 +44,10 @@ class QueryBuilder implements LoggerAwareInterface{
 	 * @var \chillerlan\Database\Drivers\DriverInterface
 	 */
 	protected $db;
+	/**
+	 * @var \chillerlan\Database\Dialects\Dialect
+	 */
+	protected $dialect;
 
 	/**
 	 * QueryBuilder constructor.
@@ -52,8 +56,9 @@ class QueryBuilder implements LoggerAwareInterface{
 	 * @param \Psr\Log\LoggerInterface|null                $logger
 	 */
 	public function __construct(DriverInterface $db, LoggerInterface $logger = null){
-		$this->db  = $db;
-		$this->log = $logger;
+		$this->db      = $db;
+		$this->log     = $logger;
+		$this->dialect = $this->db->getDialect();
 	}
 
 	/**
@@ -76,17 +81,19 @@ class QueryBuilder implements LoggerAwareInterface{
 	 * @return \chillerlan\Database\Query\Alter
 	 */
 	public function alter():Alter{
-		return new class($this->db, $this->log) extends StatementAbstract implements Alter{
+		return new class($this->db, $this->dialect, $this->log) extends StatementAbstract implements Alter{
 
+			/** @inheritdoc */
 			public function table(string $tablename):AlterTable{
-				return (new class($this->db, $this->log) extends StatementAbstract implements AlterTable{
+				return (new class($this->db, $this->dialect, $this->log) extends StatementAbstract implements AlterTable{
 					use NameTrait;
 
 				})->name($tablename);
 			}
 
+			/** @inheritdoc */
 			public function database(string $dbname):AlterDatabase{
-				return (new class($this->db, $this->log) extends StatementAbstract implements AlterDatabase{
+				return (new class($this->db, $this->dialect, $this->log) extends StatementAbstract implements AlterDatabase{
 					use NameTrait;
 
 				})->name($dbname);
@@ -99,11 +106,11 @@ class QueryBuilder implements LoggerAwareInterface{
 	 * @return \chillerlan\Database\Query\Create
 	 */
 	public function create():Create{
-		return new class($this->db, $this->log) extends StatementAbstract implements Create{
+		return new class($this->db, $this->dialect, $this->log) extends StatementAbstract implements Create{
 
 			/** @inheritdoc */
 			public function database(string $dbname):CreateDatabase{
-				return (new class($this->db, $this->log) extends StatementAbstract implements CreateDatabase, Query{
+				return (new class($this->db, $this->dialect, $this->log) extends StatementAbstract implements CreateDatabase, Query{
 					use CharsetTrait, IfNotExistsTrait, NameTrait, QueryTrait;
 
 					/** @inheritdoc */
@@ -116,7 +123,7 @@ class QueryBuilder implements LoggerAwareInterface{
 
 			/** @inheritdoc */
 			public function table(string $tablename):CreateTable{
-				return (new class($this->db, $this->log) extends StatementAbstract implements CreateTable, Query{
+				return (new class($this->db, $this->dialect, $this->log) extends StatementAbstract implements CreateTable, Query{
 					use CharsetTrait, IfNotExistsTrait, NameTrait, QueryTrait;
 
 					/** @var bool */
@@ -205,9 +212,7 @@ class QueryBuilder implements LoggerAwareInterface{
 	 * @return \chillerlan\Database\Query\Delete
 	 */
 	public function delete():Delete{
-		return new
-		/** @noinspection PhpSuperClassIncompatibleWithInterfaceInspection */
-		class($this->db, $this->log) extends StatementAbstract implements Delete, Where, BindValues, Query{
+		return new class($this->db, $this->dialect, $this->log) extends StatementAbstract implements Delete, Where, BindValues, Query{
 			use WhereTrait, QueryTrait, NameTrait {
 				name as from;
 			}
@@ -224,13 +229,11 @@ class QueryBuilder implements LoggerAwareInterface{
 	 * @return \chillerlan\Database\Query\Drop
 	 */
 	public function drop():Drop{
-		return new
-		/** @noinspection PhpHierarchyChecksInspection */
-		class($this->db, $this->log) extends StatementAbstract implements Drop{
+		return new class($this->db, $this->dialect, $this->log) extends StatementAbstract implements Drop{
 
 			/** @inheritdoc */
 			public function database(string $dbname):DropDatabase{
-				return (new class($this->db, $this->log) extends StatementAbstract implements DropDatabase, Query{
+				return (new class($this->db, $this->dialect, $this->log) extends StatementAbstract implements DropDatabase, Query{
 					use IfExistsTrait, NameTrait, QueryTrait;
 
 					/** @inheritdoc */
@@ -243,7 +246,7 @@ class QueryBuilder implements LoggerAwareInterface{
 
 			/** @inheritdoc */
 			public function table(string $tablename):DropTable{
-				return (new class($this->db, $this->log) extends StatementAbstract implements DropTable, Query{
+				return (new class($this->db, $this->dialect, $this->log) extends StatementAbstract implements DropTable, Query{
 					use IfExistsTrait, NameTrait, QueryTrait;
 
 					/** @inheritdoc */
@@ -261,9 +264,7 @@ class QueryBuilder implements LoggerAwareInterface{
 	 * @return \chillerlan\Database\Query\Insert
 	 */
 	public function insert():Insert{
-		return new
-		/** @noinspection PhpSuperClassIncompatibleWithInterfaceInspection */
-		class($this->db, $this->log) extends StatementAbstract implements Insert, BindValues, MultiQuery{
+		return new class($this->db, $this->dialect, $this->log) extends StatementAbstract implements Insert, BindValues, MultiQuery{
 			use MultiQueryTrait, OnConflictTrait{
 				name as into;
 			}
@@ -275,7 +276,7 @@ class QueryBuilder implements LoggerAwareInterface{
 					throw new QueryException('no values given');
 				}
 
-				return $this->dialect->insert($this->name, array_keys($this->multi ? $this->bindValues[0] : $this->bindValues));
+				return $this->dialect->insert($this->name, array_keys($this->multi ? $this->bindValues[0] : $this->bindValues), $this->on_conflict);
 			}
 
 			/** @inheritdoc */
@@ -295,9 +296,7 @@ class QueryBuilder implements LoggerAwareInterface{
 	 * @return \chillerlan\Database\Query\Select
 	 */
 	public function select():Select{
-		return new
-		/** @noinspection PhpSuperClassIncompatibleWithInterfaceInspection */
-		class($this->db, $this->log) extends StatementAbstract implements Select, Where, BindValues, Query{
+		return new class($this->db, $this->dialect, $this->log) extends StatementAbstract implements Select, Where, BindValues, Query{
 			use QueryTrait, WhereTrait;
 
 			/** @var bool */
@@ -322,7 +321,7 @@ class QueryBuilder implements LoggerAwareInterface{
 					throw new QueryException('no FROM expression specified');
 				}
 
-				return $this->dialect->select($this->from, $this->_getWhere(), $this->limit, $this->offset, $this->distinct, $this->groupby, $this->orderby);
+				return $this->dialect->select($this->cols, $this->from, $this->_getWhere(), $this->limit, $this->offset, $this->distinct, $this->groupby, $this->orderby);
 			}
 
 			/** @inheritdoc */
@@ -371,9 +370,9 @@ class QueryBuilder implements LoggerAwareInterface{
 				}
 
 				$sql    = $this->dialect->selectCount($this->from, $this->_getWhere(), $this->distinct, $this->groupby);
-				$result = $this->db->prepared($sql, $this->bindValues);
+				$result = $this->db->prepared(implode(' ', $sql), $this->bindValues);
 
-				if($result instanceof Result && $result->length > 0){
+				if($result instanceof ResultInterface && $result->length > 0){
 					return (int)$result[0]->count;
 				}
 
@@ -387,7 +386,91 @@ class QueryBuilder implements LoggerAwareInterface{
 	 * @return \chillerlan\Database\Query\Show
 	 */
 	public function show():Show{
-		return new class($this->db, $this->log) extends StatementAbstract implements Show{
+		return new class($this->db, $this->dialect, $this->log) extends StatementAbstract implements Show{
+
+			/**
+			 * @param string $name
+			 *
+			 * @return mixed
+			 * @throws \chillerlan\Database\Query\QueryException
+			 */
+			public function __get(string $name){
+				$name = strtolower($name);
+
+				if(in_array($name, ['create'], true)){
+					return call_user_func([$this, $name]);
+				}
+
+				throw new QueryException('invalid statement');
+			}
+
+			/** @inheritdoc */
+			public function databases():ShowItem{
+				return new class($this->db, $this->dialect, $this->log) extends StatementAbstract implements ShowItem, Query{
+					use QueryTrait;
+
+					/** @inheritdoc */
+					protected function getSQL():array{
+						return $this->dialect->showDatabases(); // @todo? WHERE
+					}
+
+				};
+			}
+
+			/** @inheritdoc */
+			public function tables(string $from = null):ShowItem{
+
+				$showTables = new class($this->db, $this->dialect, $this->log) extends StatementAbstract implements ShowItem, Where, Query{
+					use QueryTrait, WhereTrait, NameTrait{
+						name as from;
+					}
+
+					protected $pattern;
+
+					/** @inheritdoc */
+					protected function getSQL():array{
+						return $this->dialect->showTables($this->name, $this->pattern, $this->_getWhere());
+					}
+
+					/** @inheritdoc */
+					public function pattern(string $pattern):ShowItem{
+						$pattern = trim($pattern);
+
+						if(!empty($pattern)){
+							$this->pattern = $pattern;
+						}
+
+						return $this;
+					}
+
+				};
+
+				if(!empty($from)){
+					$showTables->from($from);
+				}
+
+				return $showTables;
+			}
+
+			/** @inheritdoc */
+			public function create():ShowCreate{
+				return new class($this->db, $this->dialect, $this->log) extends StatementAbstract implements ShowCreate{
+
+					/** @inheritdoc */
+					public function table(string $tablename):ShowItem{
+						return (new class($this->db, $this->dialect, $this->log) extends StatementAbstract implements ShowItem, Query{
+							use QueryTrait, NameTrait;
+
+							/** @inheritdoc */
+							protected function getSQL():array{
+								return $this->dialect->showCreateTable($this->name);
+							}
+
+						})->name($tablename);
+					}
+
+				};
+			}
 
 		};
 	}
@@ -396,7 +479,22 @@ class QueryBuilder implements LoggerAwareInterface{
 	 * @return \chillerlan\Database\Query\Truncate
 	 */
 	public function truncate():Truncate{
-		return new class($this->db, $this->log) extends StatementAbstract implements Truncate{
+		return new class($this->db, $this->dialect, $this->log) extends StatementAbstract implements Truncate{
+
+			/** @inheritdoc */
+			public function table(string $table):Truncate{
+				return (new class($this->db, $this->dialect, $this->log) extends StatementAbstract implements Truncate, Query{
+					use QueryTrait, NameTrait {
+						name as table;
+					}
+
+					/** @inheritdoc */
+					protected function getSQL():array{
+						return $this->dialect->truncate($this->name);
+					}
+
+				})->table($table);
+			}
 
 		};
 	}
@@ -406,9 +504,7 @@ class QueryBuilder implements LoggerAwareInterface{
 	 */
 	public function update():Update{
 
-		return new
-		/** @noinspection PhpSuperClassIncompatibleWithInterfaceInspection */
-		class($this->db, $this->log) extends StatementAbstract implements Update, Where, BindValues, MultiQuery{
+		return new class($this->db, $this->dialect, $this->log) extends StatementAbstract implements Update, Where, BindValues, MultiQuery{
 			use WhereTrait, MultiQueryTrait, NameTrait {
 				name as table;
 			}
@@ -430,7 +526,6 @@ class QueryBuilder implements LoggerAwareInterface{
 
 			/** @inheritdoc */
 			public function set(array $set, bool $bind = null):Update{
-				$bind = $bind !== null ? $bind : true;
 
 				foreach($set as $k => $v){
 
@@ -442,14 +537,15 @@ class QueryBuilder implements LoggerAwareInterface{
 						// @todo: [expr, bindval1, bindval2, ...]
 					}
 					else{
-						if($bind){
-							$this->set[]        = $this->dialect->quote($k).' = ?';
-							$this->bindValues[] = $v;
-						}
-						else{
+						if($bind === false){
+							// here be dragons
 							$this->set[] = is_int($k)
 								? $this->dialect->quote($v).' = ?'
-								: $this->dialect->quote($k).' = '.$v;
+								: $this->dialect->quote($k).' = '.$v; //$this->db->escape($v)
+						}
+						else{
+							$this->set[]        = $this->dialect->quote($k).' = ?';
+							$this->addBindValue($k, is_bool($v) ? (int)$v : $v);// avoid errors with PDO firebird & mysql
 						}
 					}
 				}

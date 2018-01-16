@@ -12,7 +12,7 @@
 
 namespace chillerlan\Database\Drivers;
 
-use chillerlan\Database\Query\MSSQL;
+use chillerlan\Database\Dialects\MSSQL;
 
 /**
  * @property resource $db
@@ -23,34 +23,16 @@ class MSSqlSrv extends DriverAbstract{
 
 	/** @inheritdoc */
 	protected function raw_query(string $sql, string $index = null, bool $assoc = null){
-
-		// sqlsrv_query does not raise an error on empty/invalid SQL
-		if(empty(trim($sql))){
-			throw new DriverException('sql error: empty sql');
-		}
-
 		return $this->__getResult(sqlsrv_query($this->db, $sql), $index, $assoc);
 	}
 
 	/** @inheritdoc */
 	protected function prepared_query(string $sql, array $values = null, string $index = null, bool $assoc = null){
-
-		// sqlsrv_query does not raise an error on empty/invalid SQL
-		if(empty(trim($sql))){
-			throw new DriverException('sql error: empty sql');
-		}
-
 		return $this->__getResult(sqlsrv_query($this->db, $sql, $values), $index, $assoc);
 	}
 
 	/** @inheritdoc */
 	protected function multi_query(string $sql, array $values){
-
-		// sqlsrv_prepare does not raise an error on empty/invalid SQL
-		if(empty(trim($sql))){
-			throw new DriverException('sql error: empty sql');
-		}
-
 		$r = [];
 
 		// @todo: sqlsrv_prepare/sqlsrv_execute
@@ -70,13 +52,7 @@ class MSSqlSrv extends DriverAbstract{
 	}
 
 	/** @inheritdoc */
-	protected function multi_callback_query(string $sql, array $data, $callback){
-
-		// sqlsrv_query does not raise an error on empty/invalid SQL
-		if(empty(trim($sql))){
-			throw new DriverException('sql error: empty sql');
-		}
-
+	protected function multi_callback_query(string $sql, iterable $data, $callback){
 		$r = [];
 
 		// @todo: sqlsrv_prepare/sqlsrv_execute
@@ -102,13 +78,13 @@ class MSSqlSrv extends DriverAbstract{
 	 *
 	 * @return bool|\chillerlan\Database\Result
 	 */
-	protected function __getResult($result, string $index = null, bool $assoc = true){
+	protected function __getResult($result, string $index = null, bool $assoc = null){
 
 		if(is_bool($result)){
 			return $result;
 		}
 
-		$r = $this->getResult('sqlsrv_fetch_array', [$result, $assoc ? SQLSRV_FETCH_ASSOC : SQLSRV_FETCH_NUMERIC], $index, $assoc);
+		$r = parent::getResult('sqlsrv_fetch_array', [$result, ($assoc ?? true) ? SQLSRV_FETCH_ASSOC : SQLSRV_FETCH_NUMERIC], $index, $assoc);
 
 		sqlsrv_free_stmt($result);
 
@@ -192,7 +168,7 @@ class MSSqlSrv extends DriverAbstract{
 	}
 
 	/** @inheritdoc */
-	public function getServerInfo():string{
+	public function getServerInfo():?string{
 
 		if(gettype($this->db) === 'resource'){
 			$info = sqlsrv_server_info($this->db);
@@ -204,7 +180,7 @@ class MSSqlSrv extends DriverAbstract{
 	}
 
 	/** @inheritdoc */
-	public function escape($data):string {
+	public function escape(string $data):string {
 		return $data;
 	}
 

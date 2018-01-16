@@ -4,13 +4,13 @@
  *
  * @filesource   Dialect.php
  * @created      11.01.2018
- * @package      chillerlan\Database\Query
+ * @package      chillerlan\Database\Dialects
  * @author       Smiley <smiley@chillerlan.net>
  * @copyright    2018 Smiley
  * @license      MIT
  */
 
-namespace chillerlan\Database\Query;
+namespace chillerlan\Database\Dialects;
 
 interface Dialect{
 
@@ -22,6 +22,7 @@ interface Dialect{
 	public function quote(string $str):string;
 
 	/**
+	 * @param array       $cols
 	 * @param array       $from
 	 * @param string|null $where
 	 * @param null        $limit
@@ -32,7 +33,7 @@ interface Dialect{
 	 *
 	 * @return array
 	 */
-	public function select(array $from, string $where = null, $limit = null, $offset = null, bool $distinct = null, array $groupby, array $orderby):array;
+	public function select(array $cols, array $from, string $where = null, $limit = null, $offset = null, bool $distinct = null, array $groupby, array $orderby):array;
 
 	/**
 	 * @param array $expressions
@@ -129,6 +130,13 @@ interface Dialect{
 	public function dropTable(string $table, bool $ifExists):array;
 
 	/**
+	 * @param string $table
+	 *
+	 * @return array
+	 */
+	public function truncate(string $table):array;
+
+	/**
 	 * @param string      $name
 	 * @param string      $type
 	 * @param null        $length
@@ -152,5 +160,26 @@ interface Dialect{
 	 * @return string
 	 */
 	public function enum(string $name, array $values, $defaultValue = null, bool $isNull = null):string;
+
+	/**
+	 * @return array
+	 */
+	public function showDatabases():array;
+
+	/**
+	 * @param string|null $database
+	 * @param string|null $pattern
+	 * @param string|null $where
+	 *
+	 * @return array
+	 */
+	public function showTables(string $database = null, string $pattern = null, string $where = null):array;
+
+	/**
+	 * @param string $table
+	 *
+	 * @return array
+	 */
+	public function showCreateTable(string $table):array;
 
 }

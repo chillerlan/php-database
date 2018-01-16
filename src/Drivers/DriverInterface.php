@@ -12,10 +12,12 @@
 
 namespace chillerlan\Database\Drivers;
 
-use chillerlan\Database\DatabaseOptions;
-use chillerlan\Database\Query\Dialect;
-use Psr\Log\LoggerInterface;
-use Psr\SimpleCache\CacheInterface;
+use chillerlan\Database\{
+	DatabaseOptions, Dialects\Dialect
+};
+use Psr\{
+	Log\LoggerInterface, SimpleCache\CacheInterface
+};
 
 interface DriverInterface{
 
@@ -27,11 +29,6 @@ interface DriverInterface{
 	 * @param \Psr\Log\LoggerInterface|null        $logger
 	 */
 	public function __construct(DatabaseOptions $options, CacheInterface $cache = null, LoggerInterface $logger = null);
-
-	/**
-	 * @return void
-	 */
-	public function __destruct();
 
 	/**
 	 * Establishes a database connection and returns the connection object
@@ -56,7 +53,7 @@ interface DriverInterface{
 	public function getDBResource();
 
 	/**
-	 * @return \chillerlan\Database\Query\Dialect
+	 * @return \chillerlan\Database\Dialects\Dialect
 	 */
 	public function getDialect():Dialect;
 
@@ -72,7 +69,7 @@ interface DriverInterface{
 	 *
 	 * @return string serverinfo string
 	 */
-	public function getServerInfo():string;
+	public function getServerInfo():?string;
 
 	/**
 	 * Sanitizer.
@@ -81,7 +78,7 @@ interface DriverInterface{
 	 *
 	 * @return string string. escaped. obviously.
 	 */
-	public function escape($data):string;
+	public function escape(string $data):string;
 
 	/**
 	 * Basic SQL query for non prepared statements
@@ -149,8 +146,8 @@ interface DriverInterface{
 	 *
 	 * Prepared statement multi insert/update
 	 *
-	 * @param string $sql    The SQL statement to prepare
-	 * @param array  $values a multidimensional array with the values, each row represents one line to insert.
+	 * @param string   $sql    The SQL statement to prepare
+	 * @param array    $values a multidimensional array with the values, each row represents one line to insert.
 	 *
 	 * @return bool true query success, otherwise false
 	 * @throws \chillerlan\Database\Drivers\DriverException
@@ -165,12 +162,12 @@ interface DriverInterface{
 	 * @link https://gist.github.com/krakjoe/9384409
 	 *
 	 * @param string         $sql      The SQL statement to prepare
-	 * @param array          $data     an array with the (raw) data to insert, each row represents one line to insert.
+	 * @param iterable       $data     an array with the (raw) data to insert, each row represents one line to insert.
 	 * @param callable|array $callback a callback that processes the values for each row.
 	 *
 	 * @return bool true query success, otherwise false
 	 * @throws \chillerlan\Database\Drivers\DriverException
 	 */
-	public function multiCallback(string $sql, array $data, $callback);
+	public function multiCallback(string $sql, iterable $data, $callback);
 
 }

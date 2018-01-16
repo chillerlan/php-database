@@ -4,13 +4,13 @@
  *
  * @filesource   MySQL.php
  * @created      11.01.2018
- * @package      chillerlan\Database\Query
+ * @package      chillerlan\Database\Dialects
  * @author       Smiley <smiley@chillerlan.net>
  * @copyright    2018 Smiley
  * @license      MIT
  */
 
-namespace chillerlan\Database\Query;
+namespace chillerlan\Database\Dialects;
 
 class MySQL extends DialectAbstract{
 
@@ -21,7 +21,7 @@ class MySQL extends DialectAbstract{
 	public function insert(string $table, array $fields, string $onConflict = null):array{
 		$onConflict = strtoupper($onConflict);
 
-		$sql[] = 'INSERT';
+		$sql = ['INSERT'];
 
 		if(in_array($onConflict, ['IGNORE'], true)){
 			$sql[] = $onConflict;
@@ -68,7 +68,7 @@ class MySQL extends DialectAbstract{
 
 	/** @inheritdoc */
 	public function createTable(string $table, array $cols, string $primaryKey = null, bool $ifNotExists, bool $temp, string $dir = null):array {
-		$sql[] = 'CREATE';
+		$sql = ['CREATE'];
 
 		if($temp){
 			$sql[] = 'TEMPORARY';
@@ -183,6 +183,24 @@ class MySQL extends DialectAbstract{
 		}
 
 		return implode(' ', $field);
+	}
+
+	/** @inheritdoc */
+	public function showDatabases():array{
+		return ['SHOW DATABASES'];
+	}
+
+	/** @inheritdoc */
+	public function showTables(string $database = null, string $pattern = null, string $where = null):array{
+		return ['SHOW TABLES'];
+	}
+
+	/** @inheritdoc */
+	public function showCreateTable(string $table):array{
+		$sql = ['SHOW CREATE TABLE'];
+		$sql[] = $this->quote($table);
+
+		return $sql;
 	}
 
 }

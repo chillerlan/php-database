@@ -12,7 +12,8 @@
 
 namespace chillerlan\Database\Drivers;
 
-use chillerlan\Database\Query\SQLite;
+use chillerlan\Database\Dialects\SQLite;
+use chillerlan\Database\Result;
 use Exception, PDO;
 
 /**
@@ -33,7 +34,7 @@ class SQLitePDO extends PDODriverAbstract{
 	}
 
 	/** @inheritdoc */
-	public function getServerInfo():string {
+	public function getServerInfo():?string {
 		return $this->drivername.', connected to: '.$this->options->database.' (PDO::ATTR_SERVER_INFO not available)';
 	}
 
@@ -44,13 +45,15 @@ class SQLitePDO extends PDODriverAbstract{
 			return $this;
 		}
 
+		$db = $this->options->database;
+
 		try{
 
-			if($this->options->database !== ':memory:' && !is_file($this->options->database)){
+			if($db !== ':memory:' && !is_file($db)){
 				trigger_error('file not found');
 			}
 
-			if($this->options->database === ':memory:'){
+			if($db === ':memory:'){
 				$this->pdo_options += [PDO::ATTR_PERSISTENT => true];
 			}
 
@@ -63,5 +66,26 @@ class SQLitePDO extends PDODriverAbstract{
 		}
 	}
 
+/*
+	protected function getResult(callable $callable, array $args, string $index = null, bool $assoc = null){
+		$out = new Result(null, $this->convert_encoding_src, $this->convert_encoding_dest);
+		$i   = 0;
+
+		while($row = call_user_func_array($callable, $args)){
+			$key = $assoc && !empty($index) ? $row[$index] : $i;
+
+			foreach($row as $k => $v){
+				switch(true){
+					case is_numeric($v): $row[$k] = $v + 0; break;
+				}
+			}
+
+			$out[$key] = $row;
+			$i++;
+		}
+
+		return $i === 0 ? true : $out;
+	}
+*/
 
 }

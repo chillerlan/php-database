@@ -12,7 +12,7 @@
 
 namespace chillerlan\Database\Drivers;
 
-use chillerlan\Database\Query\MySQL;
+use chillerlan\Database\Dialects\MySQL;
 
 /**
  * @property \PDO $db

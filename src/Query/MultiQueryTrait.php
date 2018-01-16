@@ -21,25 +21,22 @@ trait MultiQueryTrait{
 	use QueryTrait;
 
 	/** @inheritdoc */
-	public function multi(iterable $values = null){
+	public function multi(array $values = null){
+		$sql    = $this->sql(true);
+		$values = $values ?? ($this instanceof BindValues ? $this->getBindValues() : []);
 
-		if($this instanceof Insert || $this instanceof Update){
-			$bindvalues = $this instanceof BindValues ? $this->getBindValues() : [];
+		$this->debug('MultiQueryTrait::multi()', ['method' => __METHOD__, 'sql' => $sql, 'val' => $values]);
 
-			return $this->db->multi($this->sql(true), $values ?? $bindvalues);
-		}
-
-		throw new QueryException('INSERT or UPDATE only');
+		return $this->db->multi($sql, $values);
 	}
 
 	/** @inheritdoc */
 	public function callback(iterable $values, Closure $callback){
+		$sql    = $this->sql(true);
 
-		if($this instanceof Insert || $this instanceof Update){
-			return $this->db->multiCallback($this->sql(true), $values, $callback);
-		}
+		$this->debug('MultiQueryTrait::callback()', ['method' => __METHOD__, 'sql' => $sql, 'val' => $values]);
 
-		throw new QueryException('INSERT or UPDATE only');
+		return $this->db->multiCallback($sql, $values, $callback);
 	}
 
 }

@@ -13,9 +13,11 @@
 namespace chillerlan\Database\Drivers;
 
 use chillerlan\Database\DatabaseOptions;
-use chillerlan\Database\Query\MSSQL;
+use chillerlan\Database\Dialects\MSSQL;
 use PDO;
-use Psr\{Log\LoggerInterface, SimpleCache\CacheInterface};
+use Psr\{
+	Log\LoggerInterface, SimpleCache\CacheInterface
+};
 
 /**
  * @property \PDO $db
@@ -48,7 +50,10 @@ class MSSqlSrvPDO extends PDODriverAbstract{
 		$dsn = $this->drivername;
 
 		$dsn .= ':Server='.$this->options->host;
-		$dsn .= is_numeric($this->options->port) ? ','.$this->options->port : '';
+
+		if(is_numeric($this->options->port)){
+			$dsn .=  ','.$this->options->port;
+		}
 
 		$dsn .= ';Database='.$this->options->database;
 
@@ -67,7 +72,7 @@ class MSSqlSrvPDO extends PDODriverAbstract{
 	}
 
 	/** @inheritdoc */
-	public function getServerInfo():string{
+	public function getServerInfo():?string{
 		$info = $this->db->getAttribute(PDO::ATTR_SERVER_INFO);
 
 		if(is_array($info) && !empty($info)){

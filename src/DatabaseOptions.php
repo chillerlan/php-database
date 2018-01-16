@@ -40,6 +40,7 @@ use chillerlan\Traits\Container;
  * @property string $mssql_charset
  * @property bool   $mssql_encrypt
  * @property string $firebird_encoding
+ * @property string $cachekey_hash_algo
  */
 class DatabaseOptions{
 	use Container;
@@ -204,5 +205,10 @@ class DatabaseOptions{
 	 * @var string
 	 */
 	protected $firebird_encoding = 'UTF8';
+
+	/**
+	 * @var string
+	 */
+	protected $cachekey_hash_algo = 'sha256';
 
 }
