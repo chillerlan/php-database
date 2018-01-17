@@ -23,7 +23,7 @@ use chillerlan\Database\Drivers\{
 };
 use chillerlan\Database\Query\QueryBuilder;
 use chillerlan\Logger\{
-	Log, LogTrait, Output\LogOutputInterface
+	Log, LogTrait, Output\LogOutputInterface, Output\NullLogger
 };
 use chillerlan\SimpleCache\{
 	Cache, Drivers\MemoryCacheDriver
@@ -102,25 +102,31 @@ class DatabaseTest extends TestCase{
 		$this->isCI = $this->env->get('IS_CI') === 'TRUE';
 
 
-		$logger = (new Log)->addInstance(
-			new class implements LogOutputInterface{
-
-				public function log(string $level, string $message, array $context = null):void{
-					echo $message.PHP_EOL.print_r($context, true).PHP_EOL;
-				}
-
-				public function close():LogOutputInterface{
-					return $this;
-				}
-
-			}, 'console'
-		);
+		$logger = new Log;
 
 		// no log spam on travis
 		if(!$this->isCI){
-			$this->setLogger($logger);
+
+			$logger->addInstance(
+				new class implements LogOutputInterface{
+
+					public function log(string $level, string $message, array $context = null):void{
+						echo $message.PHP_EOL.print_r($context, true).PHP_EOL;
+					}
+
+					public function close():LogOutputInterface{
+						return $this;
+					}
+
+				}, 'console'
+			);
+
+		}
+		else{
+			$logger->addInstance(new NullLogger, 'null');
 		}
 
+		$this->setLogger($logger);
 	}
 
 	/**
