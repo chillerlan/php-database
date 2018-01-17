@@ -87,10 +87,20 @@ class DatabaseTest extends TestCase{
 	protected $env;
 
 	/**
+	 * determines whether the tests run on Travis CI or not -> .env IS_CI=TRUE
+	 *
+	 * @var bool
+	 */
+	protected $isCI;
+
+	/**
 	 *
 	 */
 	protected function setUp(){
 		$this->env = (new DotEnv(__DIR__.'/../config', file_exists(__DIR__.'/../config/.env') ? '.env' : '.env_travis'))->load();
+
+		$this->isCI = $this->env->get('IS_CI') === 'TRUE';
+
 
 		$logger = (new Log)->addInstance(
 			new class implements LogOutputInterface{
@@ -106,7 +116,11 @@ class DatabaseTest extends TestCase{
 			}, 'console'
 		);
 
-		$this->setLogger($logger);
+		// no log spam on travis
+		if(!$this->isCI){
+			$this->setLogger($logger);
+		}
+
 	}
 
 	/**
@@ -144,7 +158,7 @@ class DatabaseTest extends TestCase{
 	 */
 	protected function dbInstance(string $driver, string $env_prefix, bool $skip_on_ci, array $options = [], bool $cached = false){
 
-		if($skip_on_ci === true && $this->env->get('IS_CI') === 'TRUE'){
+		if($skip_on_ci === true && $this->isCI){
 			$this->markTestSkipped('test on Vagrant/local: '.$driver);
 
 			return $this;
@@ -454,7 +468,7 @@ class DatabaseTest extends TestCase{
 	public function testSelectCached(string $driver, string $env_prefix, bool $skip_on_ci){
 		$this->dbInstance($driver, $env_prefix, $skip_on_ci, [], true)->createTable();
 
-		if($this->dialect instanceof Postgres){
+		if($this->isCI && $this->dialect instanceof Postgres){
 			$this->markTestSkipped('sup postgres?');
 			return;
 		}
