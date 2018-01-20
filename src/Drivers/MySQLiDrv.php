@@ -195,7 +195,9 @@ class MySQLiDrv extends DriverAbstract{
 		$stmt->prepare($sql);
 
 		foreach($data as $k => $row){
-			if($row = call_user_func_array($callback, [$row, $k])){
+			$row = call_user_func_array($callback, [$row, $k]);
+
+			if($row !== false && !empty($row)){
 				call_user_func_array([$stmt, 'bind_param'], $this->getReferences($row));
 
 				$stmt->execute();
