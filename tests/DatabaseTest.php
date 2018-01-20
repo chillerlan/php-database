@@ -23,13 +23,14 @@ use chillerlan\Database\Drivers\{
 };
 use chillerlan\Database\Query\QueryBuilder;
 use chillerlan\Logger\{
-	Log, LogTrait, Output\LogOutputInterface, Output\NullLogger
+	Log, LogOptions, LogTrait, Output\LogOutputAbstract
 };
 use chillerlan\SimpleCache\{
 	Cache, Drivers\MemoryCacheDriver
 };
 use chillerlan\Traits\DotEnv;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LogLevel;
 use ReflectionClass, ReflectionMethod;
 
 class DatabaseTest extends TestCase{
@@ -108,22 +109,16 @@ class DatabaseTest extends TestCase{
 		if(!$this->isCI){
 
 			$logger->addInstance(
-				new class implements LogOutputInterface{
+				new class (new LogOptions(['minLogLevel' => LogLevel::DEBUG])) extends LogOutputAbstract{
 
-					public function log(string $level, string $message, array $context = null):void{
+					public function __log(string $level, string $message, array $context = null):void{
 						echo $message.PHP_EOL.print_r($context, true).PHP_EOL;
 					}
 
-					public function close():LogOutputInterface{
-						return $this;
-					}
-
-				}, 'console'
+				},
+				'console'
 			);
 
-		}
-		else{
-			$logger->addInstance(new NullLogger, 'null');
 		}
 
 		$this->setLogger($logger);
@@ -559,7 +554,6 @@ class DatabaseTest extends TestCase{
 
 		foreach($r as $tables){
 			[$table] = array_values($tables);
-			var_dump($table);
 
 			if($table === $this::TABLE){
 				$this->assertSame($this::TABLE, $table);
