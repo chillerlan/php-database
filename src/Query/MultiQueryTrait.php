@@ -31,7 +31,7 @@ trait MultiQueryTrait{
 	}
 
 	/** @inheritdoc */
-	public function callback(iterable $values, Closure $callback){
+	public function callback(iterable $values, callable $callback){
 		$sql    = $this->sql(true);
 
 		$this->debug('MultiQueryTrait::callback()', ['method' => __METHOD__, 'sql' => $sql, 'val' => $values]);

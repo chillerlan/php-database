@@ -26,11 +26,11 @@ interface MultiQuery extends Query{
 
 	/**
 	 * @param iterable $values
-	 * @param \Closure $callback
+	 * @param callable $callback
 	 *
 	 * @return mixed
 	 * @throws \chillerlan\Database\Query\QueryException
 	 */
-	public function callback(iterable $values, Closure $callback);
+	public function callback(iterable $values, callable $callback);
 
 }
