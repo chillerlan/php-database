@@ -1,39 +1,42 @@
 # chillerlan/database
 
-A PHP7 SQL client and querybuilder for the most common databases.
+A PHP 7.2+ SQL client and querybuilder for the most common databases.
 
 [![version][packagist-badge]][packagist]
 [![license][license-badge]][license]
 [![Travis][travis-badge]][travis]
 [![Coverage][coverage-badge]][coverage]
 [![Scrunitizer][scrutinizer-badge]][scrutinizer]
-[![Code Climate][codeclimate-badge]][codeclimate]
+[![Packagist downloads][downloads-badge]][downloads]
+[![PayPal donate][donate-badge]][donate]
 
-[packagist-badge]: https://img.shields.io/packagist/v/chillerlan/database.svg
+[packagist-badge]: https://img.shields.io/packagist/v/chillerlan/database.svg?style=flat-square
 [packagist]: https://packagist.org/packages/chillerlan/database
-[license-badge]: https://img.shields.io/packagist/l/chillerlan/database.svg
+[license-badge]: https://img.shields.io/github/license/codemasher/php-database.svg?style=flat-square
 [license]: https://github.com/codemasher/php-database/blob/master/LICENSE
-[travis-badge]: https://img.shields.io/travis/codemasher/php-database.svg
+[travis-badge]: https://img.shields.io/travis/codemasher/php-database.svg?style=flat-square
 [travis]: https://travis-ci.org/codemasher/php-database
-[coverage-badge]: https://img.shields.io/codecov/c/github/codemasher/php-database.svg
+[coverage-badge]: https://img.shields.io/codecov/c/github/codemasher/php-database.svg?style=flat-square
 [coverage]: https://codecov.io/github/codemasher/php-database
-[scrutinizer-badge]: https://img.shields.io/scrutinizer/g/codemasher/php-database.svg
+[scrutinizer-badge]: https://img.shields.io/scrutinizer/g/codemasher/php-database.svg?style=flat-square
 [scrutinizer]: https://scrutinizer-ci.com/g/codemasher/php-database
-[codeclimate-badge]: https://img.shields.io/codeclimate/github/codemasher/php-database.svg
-[codeclimate]: https://codeclimate.com/github/codemasher/php-database
+[downloads-badge]: https://img.shields.io/packagist/dt/chillerlan/database.svg?style=flat-square
+[downloads]: https://packagist.org/packages/chillerlan/database/stats
+[donate-badge]: https://img.shields.io/badge/donate-paypal-ff33aa.svg?style=flat-square
+[donate]: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=WLYUNAT9ZTJZ4
 
 # Documentation
 
 ## Requirements
-- PHP 7+
+- PHP 7.2+
 - one of the supported databases, set up to work with PHP
 
 ## Supported databases
-- MySQL/MariaDB (native, PDO, ODBC)
-- PostgreSQL (native, PDO, ODBC)
-- Microsoft SQL Server (native, PDO, ODBC)
-- SQLite3 (PDO)
-- Firebird (PDO)
+- MySQL/MariaDB
+- PostgreSQL
+- SQLite3
+- Firebird
+- [Microsoft SQL Server](https://github.com/Microsoft/msphpsql)
 - any other database supported via PDO, ODBC or native PHP extension
 
 ## Installation
@@ -44,7 +47,7 @@ A PHP7 SQL client and querybuilder for the most common databases.
 ```json
 {
 	"require": {
-		"php": ">=7.0.3",
+		"php": ">=7.2.0",
 		"chillerlan/database": "dev-master"
 	}
 }
@@ -61,19 +64,19 @@ Profit!
 ## Usage
 
 ### Getting started
-Both, the `DriverInterface` and `QueryBuilderInterface` can be instanced on their own. 
-However, since the `QueryBuilderInterface` requires an instance of `DriverInterface` it's recommended to just use the `Connection` which instances both and provides all of their methods.
-Each of these requires an `Options` object.
+Both, the `DriverInterface` and `QueryBuilder` can be instanced on their own. 
+However, since the `QueryBuilder` requires an instance of `DriverInterface` it's recommended to just use `Database` which instances both and provides all of their methods.
+A `DriverInterface` requires a `DatabaseOptions` object and accepts a `Psr\SimpleCache\CacheInterface` and a `Psr\Log\LoggerInterface` as optional parameters, the `QueryBuilder` accepts a `LoggerInterface` as additional parameter.
 
 ```php
-$options = new Options;
+$options = new DatabaseOptions;
 $options->database = 'whatever';
 $options->username = 'user';
 $options->password = 'supersecretpassword';
 ```
 which is equivalent to
 ```php
-$options = new Options([
+$options = new DatabaseOptions([
 	'database' => 'whatever',
 	'username' => 'user',
 	'password' => 'supersecretpassword',
@@ -81,7 +84,7 @@ $options = new Options([
 ```
 now instance a driver with these options
 ```php
-$mysql = new PDOMySQLDriver($options);
+$mysql = new MySQLiDrv($options, $cache, $log);
 $mysql->connect();
 
 // a raw query using the driver directly
@@ -90,24 +93,23 @@ $result = $mysql->raw('SELECT * FROM sometable');
 via the querybuilder
 
 ```php
-$querybuilder = new MySQLQueryBuilder($mysql, $options)
+$querybuilder = new QueryBuilder($mysql, $log)
 
-$result = $querybuilder->select->from('sometable')->execute();
+$result = $querybuilder->select->from('sometable')->query();
 ```
-recommended way via `Connection`, which provides all methods of `DriverInterface` and `QueryBuilderInterface`
+recommended way via `Database`, which provides all methods of `DriverInterface` and `QueryBuilder`
 ```php
-$options->driver       = PDOMySQLDriver::class;
-$options->querybuilder = MySQLQueryBuilder::class;
+$options->driver = MySQLiDrv::class;
 
-$conn = new Connection($options);
-$conn->connect();
+$db = new Database($options);
+$db->connect();
 
-$result = $conn->raw('SELECT * FROM sometable');
-
-$result = $conn->select->from('sometable')->execute();
+$result = $db->raw('SELECT * FROM sometable');
+// is equivalent to
+$result = $db->select->from('sometable')->query();
 ```
 
-###  Properties of `Options`
+###  Properties of `DatabaseOptions`
 
 property | type | default | allowed | description
 -------- | ---- | ------- | ------- | -----------
@@ -139,7 +141,7 @@ property | type | default | allowed | description
 
 method | return 
 ------ | ------
-`__construct(Options $options, CacheInterface $cache = null)` | -
+`__construct(DatabaseOptions $options, CacheInterface $cache = null)` | -
 `connect()` | `DriverInterface`
 `disconnect()` | `bool`
 `getDBResource()` | <code>resource&#124;object</code>
@@ -153,13 +155,13 @@ method | return
 `multi(string $sql, array $values)` | `bool` (subject to change)
 `multiCallback(string $sql, array $data, $callback)` | `bool` (subject to change)
 
-### Methods of `QueryBuilderInterface`
-All methods of `QueryBuilderInterface` are also accessible as properties via magic methods.
-The returned object is a `Statement` of `\chillerlan\Database\Query\Statements\*`.
+### Methods of `QueryBuilder`
+All methods of `QueryBuilder` are also accessible as properties via magic methods.
+The returned object is a `Statement` of `\chillerlan\Database\Query\*` interfaces.
 
 method | return 
 ------ | ------
-`__construct(DriverInterface $db, Options $options)` | -
+`__construct(DriverInterface $db, LoggerInterface $logger = null)` | -
 `select()` | `Select`
 `insert()` | `Insert`
 `update()` | `Update`
@@ -168,14 +170,14 @@ method | return
 `alter()`  | `Alter`
 `drop()`   | `Drop`
 
-### Methods of `Connection`
+### Methods of `Database`
 in addition to `DriverInterface` and `QueryBuilderInterface` methods
 
 method | return 
 ------ | ------
-`__construct(Options $options, CacheInterface $cache = null)` | -
+`__construct(DatabaseOptions $options, CacheInterface $cache = null, LoggerInterface $logger = null)` | -
 `getDriver()` | `DriverInterface`
-`getQueryBuilder()` | <code>QueryBuilderInterface&#124;null</code>
+`getQueryBuilderFQCN()` | <code>QueryBuilderInterface&#124;null</code>
 
 ## The `Statement` interface
 
@@ -240,7 +242,7 @@ $conn->create
 	->primaryKey('id')
 	->execute();
 ```
-The generated SQL will look something like this
+The generated Query will look something like this
 ```mysql
 -- mysql
 
@@ -254,7 +256,7 @@ CREATE TABLE IF NOT EXISTS `products` (
 	PRIMARY KEY (`id`)
 )
 ```
-Note that additional constraints and attributes will be appended regardless of the SQL dialect 
+Note that additional constraints and attributes will be appended regardless of the Query dialect 
 ```postgresql
 -- postgres: attributes UNSIGNED and AUTO_INCREMENT are invalid
 
@@ -326,7 +328,7 @@ $conn->insert
 
 method | description 
 ------ | -----------
-`distinct()` | sets the "DISTINCT" statement (if the SQL dialect supports it)
+`distinct()` | sets the "DISTINCT" statement (if the Query dialect supports it)
 `cols(array $expressions)` | An array of column expressions. If omitted, a `SELECT * ...` will be performed. Example: `['col', 'alias' => 'col', 'alias' => ['col', 'sql_function']]`
 `from(array $expressions)` | An array of table expressions. Example: `['table', 'alias' => 'table']`
 `groupBy(array $expressions)` | An array of expressions to group by.
@@ -397,7 +399,7 @@ array(2) {
 method | description 
 ------ | -----------
 `table(string $tablename)` | The table to update
-`set(array $set, bool $bind = true)` | `$set` is a key/value array to update the table with. `$bind` determines whether the values should be inserted into the SQL (unsafe! use only for aliases) or be replaced by parameters (the default). 
+`set(array $set, bool $bind = true)` | `$set` is a key/value array to update the table with. `$bind` determines whether the values should be inserted into the Query (unsafe! use only for aliases) or be replaced by parameters (the default). 
 `where($val1, $val2, $operator = '=', $bind = true, $join = 'AND')` | see `Select::where()`
 `openBracket($join = null)` |  see `Select::openBracket()`
 `closeBracket()` |  see `Select::closeBracket()`
@@ -414,7 +416,7 @@ method | description
 
 
 ## The `Result` and `ResultRow` objects
-`Result` implements `\Iterator`, `\ArrayAccess` and `\Countable`, `ResultRow` extends it.
+`Result` implements `\SeekableIterator`, `\ArrayAccess` and `\Countable`, `ResultRow` extends it.
 
 ### `Result`
 
@@ -422,7 +424,7 @@ property | description
 -------- | -----------
 `length` | 
 
-#### methods in addition to `\Iterator`, `\ArrayAccess` and `\Countable`
+#### methods in addition to `\SeekableIterator`, `\ArrayAccess` and `\Countable`
 
 method | description 
 ------ | -----------
