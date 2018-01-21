@@ -98,6 +98,32 @@ class Result implements ResultInterface, SeekableIterator, ArrayAccess, Countabl
 		return $arr;
 	}
 
+	/**
+	 * @return array
+	 */
+	public function __fields():array{
+		return array_keys($this->array);
+	}
+
+	/**
+	 * @param bool|null $to_array
+	 *
+	 * @return array
+	 */
+	public function __values(bool $to_array = null):array{
+		return array_values($to_array === true ? $this->__toArray() : $this->array);
+	}
+
+	/**
+	 * @param string      $column
+	 * @param string|null $index_key
+	 *
+	 * @return array
+	 */
+	public function __column(string $column, string $index_key = null):array{
+		return array_column($this->__toArray(), $column, $index_key);
+	}
+
 	/*********
 	 * magic *
 	 *********/

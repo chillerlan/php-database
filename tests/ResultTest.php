@@ -45,8 +45,13 @@ class ResultTest extends TestCase{
 	public function testRow(){
 		$this->assertSame(10, $this->result->length);
 		$this->assertSame(md5(0), $this->result[0]->hash);
+		$this->assertSame(range(0, 9), $this->result->__column('id'));
+
+
 		/** @var \chillerlan\Database\ResultInterface|mixed $row */
 		while($row = $this->result->current()){
+			$this->assertSame(['id', 'hash'], $row->__fields());
+			$this->assertSame([$row->id, $row->hash], $row->__values());
 			$this->assertNull($row->foo);
 			$this->assertNull($row->foo());
 			$this->assertTrue(isset($row['hash'], $row['id']));
@@ -61,6 +66,7 @@ class ResultTest extends TestCase{
 			$this->assertTrue($this->result->valid());
 			unset($this->result[$row->id]);
 			$this->assertFalse($this->result->valid());
+
 
 			$this->result->next();
 		}
