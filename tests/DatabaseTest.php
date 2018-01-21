@@ -111,7 +111,7 @@ class DatabaseTest extends TestCase{
 			$logger->addInstance(
 				new class (new LogOptions(['minLogLevel' => LogLevel::DEBUG])) extends LogOutputAbstract{
 
-					public function __log(string $level, string $message, array $context = null):void{
+					protected function __log(string $level, string $message, array $context = null):void{
 						echo $message.PHP_EOL.print_r($context, true).PHP_EOL;
 					}
 
