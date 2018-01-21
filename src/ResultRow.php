@@ -24,29 +24,25 @@ class ResultRow extends Result{
 	 * @return mixed|null
 	 */
 	public function __call(string $name, array $arguments){
+		$value = $this->array[$name] ?? null;
 
-		if(isset($this->array[$name])){
+		if($value !== null){
+			$func = $arguments[0] ?? null;
 
-			if(isset($arguments[0]) && is_callable($arguments[0])){
-				return call_user_func_array($arguments[0], [$this->array[$name]]);
+			if(is_callable($func)){
+				return call_user_func_array($func, [$value]);
 			}
 
-			return $this->array[$name];
 		}
 
-		return null;
+		return $value;
 	}
 
 	/**
 	 * @inheritdoc
 	 */
 	public function __get(string $name){
-
-		if(isset($this->array[$name])){
-			return $this->array[$name];
-		}
-
-		return null;
+		return $this->array[$name] ?? null;
 	}
 
 	/**
@@ -65,12 +61,9 @@ class ResultRow extends Result{
 			$value = mb_convert_encoding($value, $this->destEncoding, $this->sourceEncoding);
 		}
 
-		if($offset !== null){
-			$this->array[$offset] = $value;
-		}
-		else{
-			$this->array[] = $value;
-		}
+		$offset !== null
+			? $this->array[$offset] = $value
+			: $this->array[] = $value;
 
 	}
 

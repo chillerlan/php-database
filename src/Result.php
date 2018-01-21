@@ -117,13 +117,11 @@ class Result implements ResultInterface, SeekableIterator, ArrayAccess, Countabl
 	/** @inheritdoc */
 	public function offsetSet($offset, $value):void{
 
-		if($offset !== null){
-			$this->array[$offset] = new ResultRow($value, $this->sourceEncoding, $this->destEncoding);
-		}
-		else{
-			$this->array[] = new ResultRow($value, $this->sourceEncoding, $this->destEncoding);
-		}
+		$row = new ResultRow($value, $this->sourceEncoding, $this->destEncoding);
 
+		$offset !== null
+			? $this->array[$offset] = $row
+			: $this->array[] = $row;
 	}
 
 }
