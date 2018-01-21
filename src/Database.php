@@ -12,14 +12,8 @@
 
 namespace chillerlan\Database;
 
-use chillerlan\{
-	Logger\LogTrait, Traits\ClassLoader
-};
 use chillerlan\Database\{
 	Dialects\Dialect, Drivers\DriverInterface, Query\QueryBuilder
-};
-use Psr\{
-	Log\LoggerAwareInterface, Log\LoggerInterface, SimpleCache\CacheInterface
 };
 
 /**
@@ -33,47 +27,7 @@ use Psr\{
  * @property \chillerlan\Database\Query\Truncate $truncate
  * @property \chillerlan\Database\Query\Update   $update
  */
-class Database implements DriverInterface, LoggerAwareInterface{
-	use ClassLoader, LogTrait;
-
-	/**
-	 * @var \chillerlan\Database\DatabaseOptions
-	 */
-	protected $options;
-
-	/**
-	 * @var \Psr\SimpleCache\CacheInterface
-	 */
-	protected $cache;
-
-	/**
-	 * @var \chillerlan\Database\Drivers\DriverInterface
-	 */
-	protected $driver;
-
-	/**
-	 * @var \chillerlan\Database\Query\QueryBuilder
-	 */
-	protected $query;
-
-	/**
-	 * Database constructor.
-	 *
-	 * @param \chillerlan\Database\DatabaseOptions $options
-	 * @param \Psr\SimpleCache\CacheInterface|null $cache
-	 * @param \Psr\Log\LoggerInterface|null        $logger
-	 */
-	public function __construct(DatabaseOptions $options, CacheInterface $cache = null, LoggerInterface $logger = null){
-		$this->options = $options;
-		$this->cache   = $cache;
-		$this->driver  = $this->loadClass($this->options->driver, DriverInterface::class, $this->options, $this->cache, $this->log);
-		$this->query   = new QueryBuilder($this->driver, $this->log);
-
-		if($logger instanceof LoggerInterface){
-			$this->setLogger($logger);
-		}
-
-	}
+class Database extends DatabaseAbstract implements DriverInterface{
 
 	/**
 	 * @inheritdoc
@@ -86,19 +40,6 @@ class Database implements DriverInterface, LoggerAwareInterface{
 	/** @inheritdoc */
 	public function __get(string $name){
 		return $this->query->{$name};
-	}
-
-	/**
-	 * @param \Psr\Log\LoggerInterface $logger
-	 *
-	 * @return \chillerlan\Database\Database
-	 */
-	public function setLogger(LoggerInterface $logger):Database{
-		$this->log = $logger;
-		$this->driver->setLogger($logger);
-		$this->query->setLogger($logger);
-
-		return $this;
 	}
 
 	/**
