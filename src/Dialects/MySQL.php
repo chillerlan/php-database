@@ -29,11 +29,9 @@ class MySQL extends DialectAbstract{
 
 		$sql[] = 'INTO';
 		$sql[] = $this->quote($table);
-		$sql[] = '(';
-		$sql[] = $this->quotes[0].implode($this->quotes[1].', '.$this->quotes[0], $fields).$this->quotes[1];
-		$sql[] = ') VALUES (';
-		$sql[] = implode(',', array_fill(0, count($fields), '?'));
-		$sql[] = ')';
+		$sql[] = '('.$this->quotes[0].implode($this->quotes[1].', '.$this->quotes[0], $fields).$this->quotes[1].')';
+		$sql[] = 'VALUES';
+		$sql[] = '('.implode(',', array_fill(0, count($fields), '?')).')';
 
 		return $sql;
 	}

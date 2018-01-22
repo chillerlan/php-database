@@ -87,7 +87,7 @@ abstract class DialectAbstract implements Dialect{
 		$sql[] = $this->quote($table);
 		$sql[] = '('.$this->quotes[0].implode($this->quotes[1].', '.$this->quotes[0], $fields).$this->quotes[1].')';
 		$sql[] = 'VALUES';
-		$sql[] = '('.implode(', ', array_fill(0, count($fields), '?')).')';
+		$sql[] = '('.implode(',', array_fill(0, count($fields), '?')).')';
 
 		return $sql;
 	}
