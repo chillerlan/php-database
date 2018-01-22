@@ -86,14 +86,6 @@ class ResultTest extends TestCase{
 		});
 	}
 
-	/**
-	 * @expectedException \chillerlan\Traits\TraitException
-	 * @expectedExceptionMessage invalid callback
-	 */
-	public function testEachInvalidCallback(){
-		$this->result->__each([$this, 'foo']);
-	}
-
 	public function testMerge(){
 		$r1 = new Result([['id' => 1]]);
 		$this->assertSame(1, $r1[0]->id);
