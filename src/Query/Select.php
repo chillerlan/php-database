@@ -13,11 +13,11 @@
 namespace chillerlan\Database\Query;
 
 /**
- * @link https://www.sqlite.org/lang_select.html
  * @link https://dev.mysql.com/doc/refman/5.7/en/select.html
  * @link https://www.postgresql.org/docs/current/static/sql-select.html
- * @link https://msdn.microsoft.com/library/ms176104(v=sql.110).aspx
+ * @link https://docs.microsoft.com/de-de/sql/t-sql/queries/select-clause-transact-sql
  * @link https://www.firebirdsql.org/file/documentation/reference_manuals/fblangref25-en/html/fblangref25-dml-select.html
+ * @link https://www.sqlite.org/lang_select.html
  *
  * @method \chillerlan\Database\Query\Select where($val1, $val2, string $operator = null, bool $bind = null, string $join = null)
  * @method \chillerlan\Database\Query\Select openBracket(string $join = null)

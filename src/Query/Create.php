@@ -23,6 +23,11 @@ interface Create extends Statement{
 #	public function trigger():Create;
 
 	/**
+	 * @link https://dev.mysql.com/doc/refman/5.7/en/create-database.html
+	 * @link https://www.postgresql.org/docs/current/static/sql-createdatabase.html
+	 * @link https://docs.microsoft.com/en-gb/sql/t-sql/statements/create-database-sql-server-transact-sql
+	 * @link https://www.firebirdsql.org/file/documentation/reference_manuals/fblangref25-en/html/fblangref25-ddl-db.html#fblangref25-ddl-db-create
+	 *
 	 * @param string|null $dbname
 	 *
 	 * @return \chillerlan\Database\Query\CreateDatabase
@@ -30,6 +35,12 @@ interface Create extends Statement{
 	public function database(string $dbname):CreateDatabase;
 
 	/**
+	 * @link https://www.sqlite.org/lang_createtable.html
+	 * @link https://dev.mysql.com/doc/refman/5.7/en/create-table.html
+	 * @link https://www.postgresql.org/docs/current/static/sql-createtable.html
+	 * @link https://docs.microsoft.com/en-gb/sql/t-sql/statements/create-table-transact-sql
+	 * @link https://www.firebirdsql.org/file/documentation/reference_manuals/fblangref25-en/html/fblangref25-ddl-tbl.html#fblangref25-ddl-tbl-create
+	 *
 	 * @param string $tablename
 	 *
 	 * @return \chillerlan\Database\Query\CreateTable

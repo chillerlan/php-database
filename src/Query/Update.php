@@ -13,11 +13,11 @@
 namespace chillerlan\Database\Query;
 
 /**
- * @link https://www.sqlite.org/lang_update.html
  * @link https://dev.mysql.com/doc/refman/5.7/en/update.html
  * @link https://www.postgresql.org/docs/current/static/sql-update.html
- * @link https://msdn.microsoft.com/library/ms177523(v=sql.110).aspx
+ * @link https://docs.microsoft.com/de-de/sql/t-sql/queries/update-transact-sql
  * @link https://www.firebirdsql.org/file/documentation/reference_manuals/fblangref25-en/html/fblangref25-dml-update.html
+ * @link https://www.sqlite.org/lang_update.html
  *
  * @method \chillerlan\Database\Query\Update where($val1, $val2, string $operator = null, bool $bind = null, string $join = null)
  * @method \chillerlan\Database\Query\Update openBracket(string $join = null)

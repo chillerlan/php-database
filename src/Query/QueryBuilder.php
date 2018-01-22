@@ -232,8 +232,8 @@ class QueryBuilder implements LoggerAwareInterface{
 		return new class($this->db, $this->dialect, $this->log) extends StatementAbstract implements Drop{
 
 			/** @inheritdoc */
-			public function database(string $dbname):DropDatabase{
-				return (new class($this->db, $this->dialect, $this->log) extends StatementAbstract implements DropDatabase, Query{
+			public function database(string $dbname):DropItem{
+				return (new class($this->db, $this->dialect, $this->log) extends StatementAbstract implements DropItem, Query{
 					use IfExistsTrait, NameTrait, QueryTrait;
 
 					/** @inheritdoc */
@@ -245,8 +245,8 @@ class QueryBuilder implements LoggerAwareInterface{
 			}
 
 			/** @inheritdoc */
-			public function table(string $tablename):DropTable{
-				return (new class($this->db, $this->dialect, $this->log) extends StatementAbstract implements DropTable, Query{
+			public function table(string $tablename):DropItem{
+				return (new class($this->db, $this->dialect, $this->log) extends StatementAbstract implements DropItem, Query{
 					use IfExistsTrait, NameTrait, QueryTrait;
 
 					/** @inheritdoc */

@@ -12,6 +12,11 @@
 
 namespace chillerlan\Database\Query;
 
+/**
+ * @link https://dev.mysql.com/doc/refman/5.7/en/where-optimization.html
+ * @link https://www.postgresql.org/docs/current/static/sql-select.html#SQL-WHERE
+ * @link https://docs.microsoft.com/de-de/sql/t-sql/queries/where-transact-sql
+ */
 interface Where{
 
 	/**

@@ -14,7 +14,14 @@ namespace chillerlan\Database\Query;
 
 interface ShowCreate extends Statement{
 
+	/**
+	 * @param string $tablename
+	 *
+	 * @return \chillerlan\Database\Query\ShowItem
+	 */
 	public function table(string $tablename):ShowItem;
+
+
 #	public function database(string $dbname);
 #	public function function(string $func);
 #	public function procedure(string $proc);

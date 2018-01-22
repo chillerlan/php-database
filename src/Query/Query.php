@@ -12,8 +12,6 @@
 
 namespace chillerlan\Database\Query;
 
-use Closure;
-
 interface Query{
 
 	/**

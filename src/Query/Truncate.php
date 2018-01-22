@@ -13,7 +13,9 @@
 namespace chillerlan\Database\Query;
 
 /**
- * https://dev.mysql.com/doc/refman/5.7/en/truncate-table.html
+ * @link https://dev.mysql.com/doc/refman/5.7/en/truncate-table.html
+ * @link https://www.postgresql.org/docs/current/static/sql-truncate.html
+ * @link https://docs.microsoft.com/en-us/sql/t-sql/statements/truncate-table-transact-sql
  *
  * @method string sql(bool $multi = null)
  * @method mixed  query(string $index = null)

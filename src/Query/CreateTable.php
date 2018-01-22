@@ -13,12 +13,6 @@
 namespace chillerlan\Database\Query;
 
 /**
- * @link https://www.sqlite.org/lang_createtable.html
- * @link https://dev.mysql.com/doc/refman/5.7/en/create-table.html
- * @link https://www.postgresql.org/docs/current/static/sql-createtable.html
- * @link https://msdn.microsoft.com/library/ms174979(v=sql.110).aspx
- * @link https://www.firebirdsql.org/file/documentation/reference_manuals/fblangref25-en/html/fblangref25-ddl-tbl.html#fblangref25-ddl-tbl-create
- *
  * @method string sql(bool $multi = null)
  * @method array  getBindValues()
  * @method mixed  query(string $index = null)

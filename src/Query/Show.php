@@ -20,8 +20,21 @@ namespace chillerlan\Database\Query;
  */
 interface Show extends Statement{
 
+	/**
+	 * @return \chillerlan\Database\Query\ShowCreate
+	 */
 	public function create():ShowCreate;
+
+	/**
+	 * @return \chillerlan\Database\Query\ShowItem
+	 */
 	public function databases():ShowItem;
+
+	/**
+	 * @param string|null $from
+	 *
+	 * @return \chillerlan\Database\Query\ShowItem
+	 */
 	public function tables(string $from = null):ShowItem;
 #	public function columns():ShowItem;
 #	public function index():ShowItem;
