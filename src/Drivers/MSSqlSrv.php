@@ -180,7 +180,7 @@ class MSSqlSrv extends DriverAbstract{
 	}
 
 	/** @inheritdoc */
-	public function escape(string $data):string {
+	protected function __escape(string $data):string {
 		return $data;
 	}
 

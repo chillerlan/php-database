@@ -74,11 +74,11 @@ interface DriverInterface{
 	/**
 	 * Sanitizer.
 	 *
-	 * @param string $data string to escape
+	 * @param mixed $data string to escape
 	 *
-	 * @return string string. escaped. obviously.
+	 * @return mixed escaped. obviously.
 	 */
-	public function escape(string $data):string;
+	public function escape($data = null);
 
 	/**
 	 * Basic SQL query for non prepared statements

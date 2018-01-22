@@ -87,7 +87,7 @@ class Database extends DatabaseAbstract implements DriverInterface{
 	}
 
 	/** @inheritdoc */
-	public function escape(string $data):string{
+	public function escape($data = null){
 		return $this->driver->escape($data);
 	}
 

@@ -93,7 +93,7 @@ class MySQLiDrv extends DriverAbstract{
 	}
 
 	/** @inheritdoc */
-	public function escape(string $data):string{
+	protected function __escape(string $data):string{
 		return '\''.$this->db->real_escape_string($data).'\''; // emulate PDO
 	}
 
@@ -170,7 +170,7 @@ class MySQLiDrv extends DriverAbstract{
 		$stmt->free_result();
 		$stmt->close();
 
-		return $i === 0 ? true : $output;
+		return $i === 0 ? true : $output; // @todo: return proper Result object in all cases
 	}
 
 	/** @inheritdoc */

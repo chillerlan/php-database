@@ -81,7 +81,7 @@ class PostgreSQL extends DriverAbstract{
 	}
 
 	/** @inheritdoc */
-	public function escape(string $data):string{
+	protected function __escape(string $data):string{
 		return '\''.pg_escape_string($this->db, $data).'\''; // emulate PDO
 	}
 

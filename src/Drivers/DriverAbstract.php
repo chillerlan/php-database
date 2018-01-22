@@ -75,13 +75,6 @@ abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 	}
 
 	/**
-	 * @return void
-	 */
-#	public function __destruct(){
-#		$this->disconnect();
-#	}
-
-	/**
 	 * @param string      $sql
 	 * @param string|null $index
 	 * @param bool        $assoc
@@ -118,6 +111,13 @@ abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 	abstract protected function multi_callback_query(string $sql, iterable $data, $callback);
 
 	/**
+	 * @param string $data
+	 *
+	 * @return string
+	 */
+	abstract protected function __escape(string $data):string;
+
+	/**
 	 * @inheritdoc
 	 * @codeCoverageIgnore
 	 */
@@ -127,6 +127,28 @@ abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 
 	public function getDialect():Dialect{
 		return new $this->dialect($this);
+	}
+
+	public function escape($data = null){
+
+		if($data === null){
+			return 'null';
+		}
+		elseif(is_bool($data)){
+			return (int)$data;
+		}
+		elseif(is_numeric($data)){
+			$data = $data + 0;
+
+			if(is_int($data)){
+				return intval($data);
+			}
+			elseif(is_float($data)){
+				return floatval($data);
+			}
+		}
+
+		return $this->__escape($data);
 	}
 
 	/** @inheritdoc */
