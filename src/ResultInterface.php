@@ -12,8 +12,6 @@
 
 namespace chillerlan\Database;
 
-use Closure;
-
 interface ResultInterface{
 
 	/**
@@ -26,6 +24,8 @@ interface ResultInterface{
 	public function __construct(iterable $data = null, string $sourceEncoding = null, string $destEncoding = null);
 
 	/**
+	 * @param bool|null $prettyprint
+	 *
 	 * @return string
 	 */
 	public function __toJSON(bool $prettyprint = null):string;
@@ -44,18 +44,24 @@ interface ResultInterface{
 	 */
 	public function __chunk(int $size):array;
 
+	/**
+	 * @return array
+	 */
+	public function __fields():array;
 
-	/** @todo -> EnumerableInterface */
+	/**
+	 * @param bool|null $to_array
+	 *
+	 * @return array
+	 */
+	public function __values(bool $to_array = null):array;
 
-	public function __toArray():array;
-	public function __each(callable $callback);
-	public function __map(callable $callback):array;
-	public function __reverse();
-	public function __last();
-	public function __clear();
-	public function __inspect():string;
-	public function __findAll(Closure $callback):array;
-	public function __reject(Closure $callback):array;
-	public function __equal(array $y):bool;
+	/**
+	 * @param string      $column
+	 * @param string|null $index_key
+	 *
+	 * @return array
+	 */
+	public function __column(string $column, string $index_key = null):array;
 
 }

@@ -12,7 +12,9 @@
 
 namespace chillerlan\Database;
 
-use chillerlan\Traits\Container;
+use chillerlan\Traits\{
+	Container, ContainerInterface
+};
 
 /**
  * @property string $driver
@@ -41,8 +43,9 @@ use chillerlan\Traits\Container;
  * @property bool   $mssql_encrypt
  * @property string $firebird_encoding
  * @property string $cachekey_hash_algo
+ * @property string $storage_path
  */
-class DatabaseOptions{
+class DatabaseOptions implements ContainerInterface{
 	use Container;
 
 	/**
@@ -211,4 +214,8 @@ class DatabaseOptions{
 	 */
 	protected $cachekey_hash_algo = 'sha256';
 
+	/**
+	 * @var
+	 */
+	protected $storage_path;
 }
