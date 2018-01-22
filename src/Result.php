@@ -13,7 +13,7 @@
 namespace chillerlan\Database;
 
 use chillerlan\Traits\{
-	Enumerable, EnumerableInterface, Interfaces\ArrayAccessTrait, Magic, SPL\CountableTrait, SPL\SeekableIteratorTrait
+	Enumerable, Interfaces\ArrayAccessTrait, Magic, SPL\CountableTrait, SPL\SeekableIteratorTrait
 };
 use ArrayAccess, Countable, SeekableIterator;
 
@@ -21,7 +21,7 @@ use ArrayAccess, Countable, SeekableIterator;
  * @property int                              $length
  * @property \chillerlan\Database\ResultRow[] $array
  */
-class Result implements ResultInterface, SeekableIterator, ArrayAccess, Countable, EnumerableInterface{
+class Result implements ResultInterface, SeekableIterator, ArrayAccess, Countable{
 	use ArrayAccessTrait, SeekableIteratorTrait, CountableTrait, Magic, Enumerable{
 		__toArray as __EnumerableToArray;
 	}

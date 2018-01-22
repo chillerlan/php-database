@@ -12,7 +12,9 @@
 
 namespace chillerlan\Database;
 
-interface ResultInterface{
+use chillerlan\Traits\EnumerableInterface;
+
+interface ResultInterface extends EnumerableInterface{
 
 	/**
 	 * Result constructor.
