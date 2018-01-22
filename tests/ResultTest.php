@@ -91,7 +91,7 @@ class ResultTest extends TestCase{
 	 * @expectedExceptionMessage invalid callback
 	 */
 	public function testEachInvalidCallback(){
-		$this->result->__each('foo');
+		$this->result->__each([$this, 'foo']);
 	}
 
 	public function testMerge(){
