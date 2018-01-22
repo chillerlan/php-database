@@ -37,6 +37,6 @@ $options = new DatabaseOptions([
 	'password'     => $env->get('DB_MYSQLI_PASSWORD'),
 ]);
 
-$log = (new Log)->addInstance(new ConsoleLog(new LogOptions(['minLogLevel' => LogLevel::DEBUG])), 'console');
+$log = (new Log)->addInstance(new ConsoleLog(new LogOptions(['minLogLevel' => LogLevel::INFO])), 'console');
 
 
