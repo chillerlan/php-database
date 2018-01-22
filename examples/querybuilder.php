@@ -9,10 +9,21 @@
 
 namespace chillerlan\DatabaseExample;
 
-/** @var \chillerlan\Database\Database $db */
-$db = null;
+use chillerlan\Database\Database;
+
+/** @var \chillerlan\Database\DatabaseOptions $options */
+$options = null;
+
+/** @var \Psr\SimpleCache\CacheInterface $cache */
+$cache   = null;
+
+/** @var \Psr\Log\LoggerInterface $log */
+$log = null;
 
 require_once __DIR__.'/common.php';
+
+$db = new Database($options, $cache, $log);
+$db->connect();
 
 $db->create
 	->table('products')
