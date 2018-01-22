@@ -282,6 +282,12 @@ class QueryBuilder implements LoggerAwareInterface{
 			/** @inheritdoc */
 			public function values(iterable $values):Insert{
 
+				if($values instanceof ResultInterface){
+					$this->bindValues = $values->__toArray();
+
+					return $this;
+				}
+
 				foreach($values as $key => $value){
 					$this->addBindValue($key, $value);
 				}

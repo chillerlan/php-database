@@ -35,10 +35,10 @@ interface Insert extends Statement{
 	public function into(string $table, string $on_conflict = null);
 
 	/**
-	 * @param array $values
+	 * @param iterable $values
 	 *
 	 * @return \chillerlan\Database\Query\Insert
 	 */
-	public function values(array $values):Insert;
+	public function values(iterable $values):Insert;
 
 }
