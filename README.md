@@ -1,4 +1,4 @@
-# chillerlan/database
+# chillerlan/php-database
 
 A PHP 7.2+ SQL client and querybuilder for the most common databases.
 
@@ -10,18 +10,18 @@ A PHP 7.2+ SQL client and querybuilder for the most common databases.
 [![Packagist downloads][downloads-badge]][downloads]
 [![PayPal donate][donate-badge]][donate]
 
-[packagist-badge]: https://img.shields.io/packagist/v/chillerlan/database.svg?style=flat-square
-[packagist]: https://packagist.org/packages/chillerlan/database
-[license-badge]: https://img.shields.io/github/license/codemasher/php-database.svg?style=flat-square
-[license]: https://github.com/codemasher/php-database/blob/master/LICENSE
-[travis-badge]: https://img.shields.io/travis/codemasher/php-database.svg?style=flat-square
-[travis]: https://travis-ci.org/codemasher/php-database
-[coverage-badge]: https://img.shields.io/codecov/c/github/codemasher/php-database.svg?style=flat-square
-[coverage]: https://codecov.io/github/codemasher/php-database
-[scrutinizer-badge]: https://img.shields.io/scrutinizer/g/codemasher/php-database.svg?style=flat-square
-[scrutinizer]: https://scrutinizer-ci.com/g/codemasher/php-database
-[downloads-badge]: https://img.shields.io/packagist/dt/chillerlan/database.svg?style=flat-square
-[downloads]: https://packagist.org/packages/chillerlan/database/stats
+[packagist-badge]: https://img.shields.io/packagist/v/chillerlan/php-database.svg?style=flat-square
+[packagist]: https://packagist.org/packages/chillerlan/php-database
+[license-badge]: https://img.shields.io/github/license/chillerlan/php-database.svg?style=flat-square
+[license]: https://github.com/chillerlan/php-database/blob/master/LICENSE
+[travis-badge]: https://img.shields.io/travis/chillerlan/php-database.svg?style=flat-square
+[travis]: https://travis-ci.org/chillerlan/php-database
+[coverage-badge]: https://img.shields.io/codecov/c/github/chillerlan/php-database.svg?style=flat-square
+[coverage]: https://codecov.io/github/chillerlan/php-database
+[scrutinizer-badge]: https://img.shields.io/scrutinizer/g/chillerlan/php-database.svg?style=flat-square
+[scrutinizer]: https://scrutinizer-ci.com/g/chillerlan/php-database
+[downloads-badge]: https://img.shields.io/packagist/dt/chillerlan/php-database.svg?style=flat-square
+[downloads]: https://packagist.org/packages/chillerlan/php-database/stats
 [donate-badge]: https://img.shields.io/badge/donate-paypal-ff33aa.svg?style=flat-square
 [donate]: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=WLYUNAT9ZTJZ4
 
@@ -54,8 +54,8 @@ A PHP 7.2+ SQL client and querybuilder for the most common databases.
 ```
 
 ### Manual installation
-Download the desired version of the package from [master](https://github.com/codemasher/php-database/archive/master.zip) or 
-[release](https://github.com/codemasher/php-database/releases) and extract the contents to your project folder. After that:
+Download the desired version of the package from [master](https://github.com/chillerlan/php-database/archive/master.zip) or 
+[release](https://github.com/chillerlan/php-database/releases) and extract the contents to your project folder. After that:
 - run `composer install` to install the required dependencies and generate `/vendor/autoload.php`.
 - if you use a custom autoloader, point the namespace `chillerlan\Database` to the folder `src` of the package 
 
