@@ -1,7 +1,7 @@
 {
 	"name": "chillerlan/php-database",
 	"description": "An extensible database wrapper and query builder for PHP 7+",
-	"homepage": "https://github.com/codemasher/php-database",
+	"homepage": "https://github.com/chillerlan/php-database",
 	"license": "MIT",
 	"type": "library",
 	"keywords": [
@@ -16,8 +16,8 @@
 		}
 	],
 	"support": {
-		"issues": "https://github.com/codemasher/php-database/issues",
-		"source": "https://github.com/codemasher/php-database"
+		"issues": "https://github.com/chillerlan/php-database/issues",
+		"source": "https://github.com/chillerlan/php-database"
 	},
 	"minimum-stability": "stable",
 	"require": {
