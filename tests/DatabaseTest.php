@@ -16,7 +16,7 @@ use chillerlan\Database\{
 	Database, DatabaseOptions
 };
 use chillerlan\Database\Dialects\{
-	Dialect, Postgres, SQLite
+	Dialect, Firebird, MSSQL, MySQL, Postgres, SQLite
 };
 use chillerlan\Database\Drivers\{
 	DriverInterface, FirebirdPDO, MySQLiDrv, MySQLPDO, PostgreSQL, PostgreSQLPDO, SQLitePDO
@@ -296,17 +296,20 @@ class DatabaseTest extends TestCase{
 		$str = "Robert'); DROP TABLE Students; --";
 		$str = $this->db->escape($str); // comment this line for fancy!
 
-		if($this->driver instanceof MySQLPDO || $this->driver instanceof MySQLiDrv){
+		if($this->dialect instanceof MySQL){
 			$this->assertSame("'Robert\'); DROP TABLE Students; --'", $str);
 		}
-		elseif($this->driver instanceof PostgreSQL || $this->driver instanceof PostgreSQLPDO){
+		elseif($this->dialect instanceof Postgres){
 			$this->assertSame("'Robert''); DROP TABLE Students; --'", $str);
 		}
-		elseif($this->driver instanceof SQLitePDO){
+		elseif($this->dialect instanceof SQLite){
 			$this->assertSame("'Robert''); DROP TABLE Students; --'", $str);
 		}
-		elseif($this->driver instanceof FirebirdPDO){
+		elseif($this->dialect instanceof Firebird){
 			$this->assertSame("'Robert''); DROP TABLE Students; --'", $str);
+		}
+		elseif($this->dialect instanceof MSSQL){
+#			$this->assertSame("'Robert''); DROP TABLE Students; --'", $str);
 		}
 		else{
 			$this->markTestSkipped('https://xkcd.com/327/');
