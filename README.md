@@ -32,11 +32,11 @@ A PHP 7.2+ SQL client and querybuilder for the most common databases.
 - one of the supported databases, set up to work with PHP
 
 ## Supported databases
-- MySQL/MariaDB
-- PostgreSQL
-- SQLite3
-- Firebird
-- [Microsoft SQL Server](https://github.com/Microsoft/msphpsql)
+- [MySQL](https://dev.mysql.com/doc/refman/5.6/en/) (5.5+) / [MariaDB](https://mariadb.com/kb/en/library/basic-sql-statements/)
+- [PostgreSQL](https://www.postgresql.org/docs/9.5/static/index.html) (9.5+)
+- [SQLite3](https://www.sqlite.org/lang.html)
+- [Firebird](https://www.firebirdsql.org/file/documentation/reference_manuals/fblangref25-en/html/fblangref25.html) (2.5+)
+- [Microsoft SQL Server](https://github.com/Microsoft/msphpsql) ([transact-sql](https://docs.microsoft.com/sql/t-sql/language-reference))
 - any other database supported via PDO, ODBC or native PHP extension
 
 ## Installation
