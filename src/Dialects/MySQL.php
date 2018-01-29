@@ -21,10 +21,15 @@ class MySQL extends DialectAbstract{
 	public function insert(string $table, array $fields, string $onConflict = null):array{
 		$onConflict = strtoupper($onConflict);
 
-		$sql = ['INSERT'];
-
-		if(in_array($onConflict, ['IGNORE'], true)){
-			$sql[] = $onConflict;
+		switch($onConflict){
+			case 'IGNORE':
+				$sql = ['INSERT IGNORE'];
+				break;
+			case 'REPLACE':
+				$sql = ['REPLACE'];
+				break;
+			default:
+				$sql = ['INSERT'];
 		}
 
 		$sql[] = 'INTO';
