@@ -12,6 +12,8 @@
 
 namespace chillerlan\Database\Dialects;
 
+use chillerlan\Database\Query\QueryException;
+
 class Postgres extends DialectAbstract{
 
 	protected $quotes = ['"', '"'];
@@ -51,6 +53,51 @@ class Postgres extends DialectAbstract{
 		}
 
 		return $sql;
+	}
+
+	/**
+	 * @link https://www.postgresql.org/docs/9.5/static/sql-insert.html#SQL-ON-CONFLICT
+	 *
+	 * @inheritdoc
+	 */
+	public function insert(string $table, array $fields, string $onConflict = null, string $conflictTarget = null):array{
+		$sql = parent::insert($table, $fields);
+
+		if(in_array($onConflict, ['IGNORE', 'REPLACE'], true)){
+
+			if(empty($conflictTarget)){
+				throw new QueryException('postgres insert on conflict: no conflict target given');
+			}
+
+			$sql[] =  'ON CONFLICT ('.$this->quote($conflictTarget).') DO';
+
+			switch($onConflict){
+				case 'IGNORE':
+					$sql[] = 'NOTHING';
+					break;
+				case 'REPLACE':
+					$sql[] = $this->onConflictUpdate($fields);
+					break;
+			}
+
+		}
+
+		return $sql;
+	}
+
+	/**
+	 * @param array $fields
+	 *
+	 * @return string
+	 */
+	protected function onConflictUpdate(array $fields):string {
+		$onConflictUpdate = [];
+
+		foreach($fields as $f){
+			$onConflictUpdate[] = $this->quote($f).' = EXCLUDED.'.$this->quote($f);
+		}
+
+		return 'UPDATE SET '.implode(', ', $onConflictUpdate);
 	}
 
 	/** @inheritdoc */
@@ -295,20 +342,3 @@ class Postgres extends DialectAbstract{
 	}
 
 }
-
-
-/*
-create table querytest
-(
-	id INTEGER
-		primary key,
-	hash VARCHAR(32),
-	data TEXT,
-	value DECIMAL(9,6),
-	active BOOLEAN,
-	created TIMESTAMP default 'CURRENT_TIMESTAMP'
-)
-;
-
-
-*/

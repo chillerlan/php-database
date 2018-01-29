@@ -276,7 +276,7 @@ class QueryBuilder implements LoggerAwareInterface{
 					throw new QueryException('no values given');
 				}
 
-				return $this->dialect->insert($this->name, array_keys($this->multi ? $this->bindValues[0] : $this->bindValues), $this->on_conflict);
+				return $this->dialect->insert($this->name, array_keys($this->multi ? $this->bindValues[0] : $this->bindValues), $this->on_conflict, $this->conflict_target);
 			}
 
 			/** @inheritdoc */

@@ -18,7 +18,7 @@ class MySQL extends DialectAbstract{
 	protected $charset = 'utf8mb4_bin';
 
 	/** @inheritdoc */
-	public function insert(string $table, array $fields, string $onConflict = null):array{
+	public function insert(string $table, array $fields, string $onConflict = null, string $conflictTarget = null):array{
 		$onConflict = strtoupper($onConflict);
 
 		switch($onConflict){

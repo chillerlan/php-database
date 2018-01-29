@@ -70,10 +70,11 @@ interface Dialect{
 	 * @param string      $table
 	 * @param array       $fields
 	 * @param string|null $onConflict
+	 * @param string|null $conflictTarget
 	 *
 	 * @return array
 	 */
-	public function insert(string $table, array $fields, string $onConflict = null):array;
+	public function insert(string $table, array $fields, string $onConflict = null, string $conflictTarget = null):array;
 
 	/**
 	 * @param string $table

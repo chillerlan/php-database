@@ -82,7 +82,7 @@ abstract class DialectAbstract implements Dialect{
 	}
 
 	/** @inheritdoc */
-	public function insert(string $table, array $fields, string $onConflict = null):array{
+	public function insert(string $table, array $fields, string $onConflict = null, string $conflictTarget = null):array{
 		$sql = ['INSERT INTO'];
 		$sql[] = $this->quote($table);
 		$sql[] = '('.$this->quotes[0].implode($this->quotes[1].', '.$this->quotes[0], $fields).$this->quotes[1].')';

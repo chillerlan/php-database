@@ -30,10 +30,11 @@ interface Insert extends Statement{
 	/**
 	 * @param string      $table
 	 * @param string|null $on_conflict
+	 * @param string|null $conflict_target
 	 *
 	 * @return \chillerlan\Database\Query\Insert
 	 */
-	public function into(string $table, string $on_conflict = null);
+	public function into(string $table, string $on_conflict = null, string $conflict_target = null);
 
 	/**
 	 * @param iterable $values

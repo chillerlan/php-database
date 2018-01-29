@@ -25,15 +25,22 @@ trait OnConflictTrait{
 	protected $on_conflict;
 
 	/**
+	 * @var string
+	 */
+	protected $conflict_target;
+
+	/**
 	 * @param string      $name
 	 * @param string|null $on_conflict
+	 * @param string|null $conflict_target
 	 *
 	 * @return $this
 	 * @throws \chillerlan\Database\Query\QueryException
 	 */
-	public function name(string $name, string $on_conflict = null){
+	public function name(string $name, string $on_conflict = null, string $conflict_target = null){
 		$this->name  = trim($name);
 		$on_conflict = trim(strtoupper($on_conflict));
+		$on_conflict = trim(strtoupper($conflict_target));
 
 		if(empty($this->name)){
 			throw new QueryException('no name specified');
@@ -41,6 +48,10 @@ trait OnConflictTrait{
 
 		if(!empty($on_conflict)){
 			$this->on_conflict = $on_conflict;
+		}
+
+		if(!empty($conflict_target)){
+			$this->conflict_target = $conflict_target;
 		}
 
 		return $this;
