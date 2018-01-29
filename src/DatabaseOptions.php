@@ -12,9 +12,7 @@
 
 namespace chillerlan\Database;
 
-use chillerlan\Traits\{
-	Container, ContainerInterface
-};
+use chillerlan\Traits\ContainerAbstract;
 
 /**
  * @property string $driver
@@ -43,6 +41,6 @@ use chillerlan\Traits\{
  * @property string $cachekey_hash_algo
  * @property string $storage_path
  */
-class DatabaseOptions implements ContainerInterface{
-	use Container, DatabaseOptionsTrait;
+class DatabaseOptions extends ContainerAbstract{
+	use DatabaseOptionsTrait;
 }
