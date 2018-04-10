@@ -41,7 +41,7 @@ class Dumper extends DatabaseAbstract{
 		$fh = fopen($this->options->storage_path.'/dump.sql', 'w');
 
 		foreach($tables as $table){
-			$this->info('dumping table: '.$table);
+			$this->logger->info('dumping table: '.$table);
 			fwrite($fh, PHP_EOL.'--'.PHP_EOL.'-- '.$table.PHP_EOL.'--'.PHP_EOL.PHP_EOL.$this->query->show->create->table($table)->query()[0]->{'Create Table'}.';'.PHP_EOL.PHP_EOL);
 
 			$q = $this->query->select->from([$table]);
@@ -74,7 +74,7 @@ class Dumper extends DatabaseAbstract{
 
 
 				if($i > 0){
-					$this->info('dumping data: '.round((100 / $pages) * $i, 2).'%');
+					$this->logger->info('dumping data: '.round((100 / $pages) * $i, 2).'%');
 				}
 
 			}

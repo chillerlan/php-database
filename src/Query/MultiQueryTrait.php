@@ -23,7 +23,7 @@ trait MultiQueryTrait{
 		$sql    = $this->sql(true);
 		$values = $values ?? ($this instanceof BindValues ? $this->getBindValues() : []);
 
-		$this->debug('MultiQueryTrait::multi()', ['method' => __METHOD__, 'sql' => $sql, 'val' => $values]);
+		$this->logger->debug('MultiQueryTrait::multi()', ['method' => __METHOD__, 'sql' => $sql, 'val' => $values]);
 
 		return $this->db->multi($sql, $values);
 	}
@@ -32,7 +32,7 @@ trait MultiQueryTrait{
 	public function callback(iterable $values, callable $callback){
 		$sql    = $this->sql(true);
 
-		$this->debug('MultiQueryTrait::callback()', ['method' => __METHOD__, 'sql' => $sql, 'val' => $values]);
+		$this->logger->debug('MultiQueryTrait::callback()', ['method' => __METHOD__, 'sql' => $sql, 'val' => $values]);
 
 		return $this->db->multiCallback($sql, $values, $callback);
 	}

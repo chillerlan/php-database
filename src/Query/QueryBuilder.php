@@ -15,9 +15,8 @@ namespace chillerlan\Database\Query;
 use chillerlan\Database\{
 	Drivers\DriverInterface, ResultInterface
 };
-use chillerlan\Logger\LogTrait;
 use Psr\Log\{
-	LoggerAwareInterface, LoggerInterface
+	LoggerAwareInterface, LoggerAwareTrait, LoggerInterface
 };
 
 /**
@@ -32,11 +31,9 @@ use Psr\Log\{
  * @property \chillerlan\Database\Query\Show     $show
  * @property \chillerlan\Database\Query\Truncate $truncate
  * @property \chillerlan\Database\Query\Update   $update
- *
- * @method setLogger(\Psr\Log\LoggerInterface $logger):QueryBuilder
  */
 class QueryBuilder implements LoggerAwareInterface{
-	use LogTrait;
+	use LoggerAwareTrait;
 
 	protected const STATEMENTS = ['alter', 'create', 'delete', 'drop', 'insert', 'select', 'show', 'truncate', 'update'];
 
@@ -57,7 +54,7 @@ class QueryBuilder implements LoggerAwareInterface{
 	 */
 	public function __construct(DriverInterface $db, LoggerInterface $logger = null){
 		$this->db      = $db;
-		$this->log     = $logger;
+		$this->logger  = $logger;
 		$this->dialect = $this->db->getDialect();
 	}
 
@@ -81,11 +78,11 @@ class QueryBuilder implements LoggerAwareInterface{
 	 * @return \chillerlan\Database\Query\Alter
 	 */
 	public function alter():Alter{
-		return new class($this->db, $this->dialect, $this->log) extends StatementAbstract implements Alter{
+		return new class($this->db, $this->dialect, $this->logger) extends StatementAbstract implements Alter{
 
 			/** @inheritdoc */
 			public function table(string $tablename):AlterTable{
-				return (new class($this->db, $this->dialect, $this->log) extends StatementAbstract implements AlterTable{
+				return (new class($this->db, $this->dialect, $this->logger) extends StatementAbstract implements AlterTable{
 					use NameTrait;
 
 				})->name($tablename);
@@ -93,7 +90,7 @@ class QueryBuilder implements LoggerAwareInterface{
 
 			/** @inheritdoc */
 			public function database(string $dbname):AlterDatabase{
-				return (new class($this->db, $this->dialect, $this->log) extends StatementAbstract implements AlterDatabase{
+				return (new class($this->db, $this->dialect, $this->logger) extends StatementAbstract implements AlterDatabase{
 					use NameTrait;
 
 				})->name($dbname);
@@ -106,11 +103,11 @@ class QueryBuilder implements LoggerAwareInterface{
 	 * @return \chillerlan\Database\Query\Create
 	 */
 	public function create():Create{
-		return new class($this->db, $this->dialect, $this->log) extends StatementAbstract implements Create{
+		return new class($this->db, $this->dialect, $this->logger) extends StatementAbstract implements Create{
 
 			/** @inheritdoc */
 			public function database(string $dbname):CreateDatabase{
-				return (new class($this->db, $this->dialect, $this->log) extends StatementAbstract implements CreateDatabase, Query{
+				return (new class($this->db, $this->dialect, $this->logger) extends StatementAbstract implements CreateDatabase, Query{
 					use CharsetTrait, IfNotExistsTrait, NameTrait, QueryTrait;
 
 					/** @inheritdoc */
@@ -123,7 +120,7 @@ class QueryBuilder implements LoggerAwareInterface{
 
 			/** @inheritdoc */
 			public function table(string $tablename):CreateTable{
-				return (new class($this->db, $this->dialect, $this->log) extends StatementAbstract implements CreateTable, Query{
+				return (new class($this->db, $this->dialect, $this->logger) extends StatementAbstract implements CreateTable, Query{
 					use CharsetTrait, IfNotExistsTrait, NameTrait, QueryTrait;
 
 					/** @var bool */
@@ -212,7 +209,7 @@ class QueryBuilder implements LoggerAwareInterface{
 	 * @return \chillerlan\Database\Query\Delete
 	 */
 	public function delete():Delete{
-		return new class($this->db, $this->dialect, $this->log) extends StatementAbstract implements Delete, Where, BindValues, Query{
+		return new class($this->db, $this->dialect, $this->logger) extends StatementAbstract implements Delete, Where, BindValues, Query{
 			use WhereTrait, QueryTrait, NameTrait {
 				name as from;
 			}
@@ -229,11 +226,11 @@ class QueryBuilder implements LoggerAwareInterface{
 	 * @return \chillerlan\Database\Query\Drop
 	 */
 	public function drop():Drop{
-		return new class($this->db, $this->dialect, $this->log) extends StatementAbstract implements Drop{
+		return new class($this->db, $this->dialect, $this->logger) extends StatementAbstract implements Drop{
 
 			/** @inheritdoc */
 			public function database(string $dbname):DropItem{
-				return (new class($this->db, $this->dialect, $this->log) extends StatementAbstract implements DropItem, Query{
+				return (new class($this->db, $this->dialect, $this->logger) extends StatementAbstract implements DropItem, Query{
 					use IfExistsTrait, NameTrait, QueryTrait;
 
 					/** @inheritdoc */
@@ -246,7 +243,7 @@ class QueryBuilder implements LoggerAwareInterface{
 
 			/** @inheritdoc */
 			public function table(string $tablename):DropItem{
-				return (new class($this->db, $this->dialect, $this->log) extends StatementAbstract implements DropItem, Query{
+				return (new class($this->db, $this->dialect, $this->logger) extends StatementAbstract implements DropItem, Query{
 					use IfExistsTrait, NameTrait, QueryTrait;
 
 					/** @inheritdoc */
@@ -264,7 +261,7 @@ class QueryBuilder implements LoggerAwareInterface{
 	 * @return \chillerlan\Database\Query\Insert
 	 */
 	public function insert():Insert{
-		return new class($this->db, $this->dialect, $this->log) extends StatementAbstract implements Insert, BindValues, MultiQuery{
+		return new class($this->db, $this->dialect, $this->logger) extends StatementAbstract implements Insert, BindValues, MultiQuery{
 			use MultiQueryTrait, OnConflictTrait{
 				name as into;
 			}
@@ -302,7 +299,7 @@ class QueryBuilder implements LoggerAwareInterface{
 	 * @return \chillerlan\Database\Query\Select
 	 */
 	public function select():Select{
-		return new class($this->db, $this->dialect, $this->log) extends StatementAbstract implements Select, Where, BindValues, Query{
+		return new class($this->db, $this->dialect, $this->logger) extends StatementAbstract implements Select, Where, BindValues, Query{
 			use QueryTrait, WhereTrait;
 
 			/** @var bool */
@@ -392,7 +389,7 @@ class QueryBuilder implements LoggerAwareInterface{
 	 * @return \chillerlan\Database\Query\Show
 	 */
 	public function show():Show{
-		return new class($this->db, $this->dialect, $this->log) extends StatementAbstract implements Show{
+		return new class($this->db, $this->dialect, $this->logger) extends StatementAbstract implements Show{
 
 			/**
 			 * @param string $name
@@ -412,7 +409,7 @@ class QueryBuilder implements LoggerAwareInterface{
 
 			/** @inheritdoc */
 			public function databases():ShowItem{
-				return new class($this->db, $this->dialect, $this->log) extends StatementAbstract implements ShowItem, Query{
+				return new class($this->db, $this->dialect, $this->logger) extends StatementAbstract implements ShowItem, Query{
 					use QueryTrait;
 
 					/** @inheritdoc */
@@ -426,7 +423,7 @@ class QueryBuilder implements LoggerAwareInterface{
 			/** @inheritdoc */
 			public function tables(string $from = null):ShowItem{
 
-				$showTables = new class($this->db, $this->dialect, $this->log) extends StatementAbstract implements ShowItem, Where, Query{
+				$showTables = new class($this->db, $this->dialect, $this->logger) extends StatementAbstract implements ShowItem, Where, Query{
 					use QueryTrait, WhereTrait, NameTrait{
 						name as from;
 					}
@@ -460,11 +457,11 @@ class QueryBuilder implements LoggerAwareInterface{
 
 			/** @inheritdoc */
 			public function create():ShowCreate{
-				return new class($this->db, $this->dialect, $this->log) extends StatementAbstract implements ShowCreate{
+				return new class($this->db, $this->dialect, $this->logger) extends StatementAbstract implements ShowCreate{
 
 					/** @inheritdoc */
 					public function table(string $tablename):ShowItem{
-						return (new class($this->db, $this->dialect, $this->log) extends StatementAbstract implements ShowItem, Query{
+						return (new class($this->db, $this->dialect, $this->logger) extends StatementAbstract implements ShowItem, Query{
 							use QueryTrait, NameTrait;
 
 							/** @inheritdoc */
@@ -485,11 +482,11 @@ class QueryBuilder implements LoggerAwareInterface{
 	 * @return \chillerlan\Database\Query\Truncate
 	 */
 	public function truncate():Truncate{
-		return new class($this->db, $this->dialect, $this->log) extends StatementAbstract implements Truncate{
+		return new class($this->db, $this->dialect, $this->logger) extends StatementAbstract implements Truncate{
 
 			/** @inheritdoc */
 			public function table(string $table):Truncate{
-				return (new class($this->db, $this->dialect, $this->log) extends StatementAbstract implements Truncate, Query{
+				return (new class($this->db, $this->dialect, $this->logger) extends StatementAbstract implements Truncate, Query{
 					use QueryTrait, NameTrait {
 						name as table;
 					}
@@ -510,7 +507,7 @@ class QueryBuilder implements LoggerAwareInterface{
 	 */
 	public function update():Update{
 
-		return new class($this->db, $this->dialect, $this->log) extends StatementAbstract implements Update, Where, BindValues, MultiQuery{
+		return new class($this->db, $this->dialect, $this->logger) extends StatementAbstract implements Update, Where, BindValues, MultiQuery{
 			use WhereTrait, MultiQueryTrait, NameTrait {
 				name as table;
 			}

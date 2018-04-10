@@ -12,13 +12,10 @@
 
 namespace chillerlan\Database\Drivers;
 
-use chillerlan\Database\{
-	DatabaseOptions, Dialects\Dialect
-};
+use chillerlan\Database\Dialects\Dialect;
 use chillerlan\Traits\ContainerInterface;
-use Psr\{
-	Log\LoggerInterface, SimpleCache\CacheInterface
-};
+use Psr\Log\LoggerInterface;
+use Psr\SimpleCache\CacheInterface;
 
 interface DriverInterface{
 

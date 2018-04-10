@@ -15,15 +15,16 @@ namespace chillerlan\Database;
 use chillerlan\Database\{
 	Drivers\DriverInterface, Query\QueryBuilder
 };
-use chillerlan\{
-	Logger\LogTrait, Traits\ClassLoader, Traits\ContainerInterface
+use chillerlan\Traits\{
+	ClassLoader, ContainerInterface
 };
-use Psr\{
-	Log\LoggerAwareInterface, Log\LoggerInterface, SimpleCache\CacheInterface
+use Psr\Log\{
+	LoggerAwareInterface, LoggerAwareTrait, LoggerInterface, NullLogger
 };
+use Psr\SimpleCache\CacheInterface;
 
 abstract class DatabaseAbstract implements LoggerAwareInterface{
-	use ClassLoader, LogTrait;
+	use ClassLoader, LoggerAwareTrait;
 
 	/**
 	 * @var \chillerlan\Database\DatabaseOptions
@@ -55,27 +56,23 @@ abstract class DatabaseAbstract implements LoggerAwareInterface{
 	public function __construct(ContainerInterface $options, CacheInterface $cache = null, LoggerInterface $logger = null){
 		$this->options = $options;
 		$this->cache   = $cache;
-		$this->driver  = $this->loadClass($this->options->driver, DriverInterface::class, $this->options, $this->cache, $this->log);
-		$this->query   = new QueryBuilder($this->driver, $this->log);
 
-		if($logger instanceof LoggerInterface){
-			$this->setLogger($logger);
-		}
+		// set a default logger
+		$this->logger  = $logger ?? new NullLogger;
 
+		$this->driver  = $this->loadClass($this->options->driver, DriverInterface::class, $this->options, $this->cache, $this->logger);
+		$this->query   = new QueryBuilder($this->driver, $this->logger);
 	}
 
 	/**
 	 * @param \Psr\Log\LoggerInterface $logger
 	 *
-	 * @return \chillerlan\Database\Database
+	 * @return void
 	 */
-	public function setLogger(LoggerInterface $logger):DatabaseAbstract{
-		$this->log = $logger;
+	public function setLogger(LoggerInterface $logger):void{
+		$this->logger = $logger;
 		$this->driver->setLogger($logger);
 		$this->query->setLogger($logger);
-
-		return $this;
 	}
-
 
 }

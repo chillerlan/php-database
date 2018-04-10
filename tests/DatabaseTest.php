@@ -19,11 +19,11 @@ use chillerlan\Database\Dialects\{
 	Dialect, Firebird, MSSQL, MySQL, Postgres, SQLite
 };
 use chillerlan\Database\Drivers\{
-	DriverInterface, FirebirdPDO, MySQLiDrv, MySQLPDO, PostgreSQL, PostgreSQLPDO, SQLitePDO
+	DriverInterface, FirebirdPDO, MSSqlSrv, MSSqlSrvPDO, MySQLiDrv, MySQLPDO, PostgreSQL, PostgreSQLPDO, SQLitePDO
 };
 use chillerlan\Database\Query\QueryBuilder;
 use chillerlan\Logger\{
-	Log, LogOptions, LogTrait, Output\LogOutputAbstract
+	Log, LogOptions, Output\LogOutputAbstract
 };
 use chillerlan\SimpleCache\{
 	Cache, Drivers\MemoryCacheDriver
@@ -34,8 +34,6 @@ use Psr\Log\LogLevel;
 use ReflectionClass, ReflectionMethod;
 
 class DatabaseTest extends TestCase{
-
-	use LogTrait;
 
 	const TABLE = 'querytest';
 
@@ -95,13 +93,17 @@ class DatabaseTest extends TestCase{
 	protected $isCI;
 
 	/**
+	 * @var \Psr\Log\LoggerInterface
+	 */
+	protected $logger;
+
+	/**
 	 *
 	 */
 	protected function setUp(){
 		$this->env = (new DotEnv(__DIR__.'/../config', file_exists(__DIR__.'/../config/.env') ? '.env' : '.env_travis'))->load();
 
 		$this->isCI = $this->env->get('IS_CI') === 'TRUE';
-
 
 		$logger = new Log;
 
@@ -121,7 +123,8 @@ class DatabaseTest extends TestCase{
 
 		}
 
-		$this->setLogger($logger);
+		$this->logger = $logger;
+#		$this->logger = new NullLogger;
 	}
 
 	/**
@@ -169,22 +172,20 @@ class DatabaseTest extends TestCase{
 			$this->db->disconnect();
 		}
 
-		$this->options = new DatabaseOptions(
-			array_merge(
-				[
-					'driver'   => $driver,
-					'host'     => $this->env->get($env_prefix.'_HOST'),
-					'port'     => $this->env->get($env_prefix.'_PORT'),
-					'socket'   => $this->env->get($env_prefix.'_SOCKET'),
-					'database' => $this->env->get($env_prefix.'_DATABASE'),
-					'username' => $this->env->get($env_prefix.'_USERNAME'),
-					'password' => $this->env->get($env_prefix.'_PASSWORD'),
-				], $options
-			)
-		);
+		$this->options = new DatabaseOptions(array_merge([
+			'driver'   => $driver,
+			'host'     => $this->env->get($env_prefix.'_HOST'),
+			'port'     => $this->env->get($env_prefix.'_PORT'),
+			'socket'   => $this->env->get($env_prefix.'_SOCKET'),
+			'database' => $this->env->get($env_prefix.'_DATABASE'),
+			'username' => $this->env->get($env_prefix.'_USERNAME'),
+			'password' => $this->env->get($env_prefix.'_PASSWORD'),
+		], $options));
 
 		$this->cache  = new Cache(new MemoryCacheDriver);
-		$this->db     = new Database($this->options, $cached ? $this->cache : null, $this->log);
+		$this->db     = new Database($this->options, $cached ? $this->cache : null);
+		$this->db->setLogger($this->logger);
+
 		$this->driver = $this->db->getDriver();
 
 		$this->assertSame($this->db, $this->db->connect());
@@ -277,7 +278,7 @@ class DatabaseTest extends TestCase{
 			'server' => $this->db->getServerInfo(),
 		];
 
-		$this->log->info(print_r($info, true));
+		$this->logger->info(print_r($info, true));
 	}
 
 	/**
@@ -534,7 +535,7 @@ class DatabaseTest extends TestCase{
 		}
 
 		$r = $this->db->show->databases()->query()->__toArray();
-		$this->debug('SHOW DATABASES:', $r);
+		$this->logger->debug('SHOW DATABASES:', $r);
 
 		$this->assertTrue(in_array($this->env->get($env_prefix.'_DATABASE'), array_column($r, 'Database')));
 	}
@@ -553,7 +554,7 @@ class DatabaseTest extends TestCase{
 
 		$r = $this->db->show->tables()->query()->__toArray();
 
-		$this->debug('SHOW TABLES:', $r);
+		$this->logger->debug('SHOW TABLES:', $r);
 
 		foreach($r as $tables){
 			[$table] = array_values($tables);

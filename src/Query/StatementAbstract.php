@@ -15,13 +15,12 @@ namespace chillerlan\Database\Query;
 use chillerlan\Database\{
 	Dialects\Dialect, Drivers\DriverInterface
 };
-use chillerlan\Logger\LogTrait;
 use Psr\Log\{
-	LoggerAwareInterface, LoggerInterface
+	LoggerAwareInterface, LoggerAwareTrait, LoggerInterface
 };
 
 abstract class StatementAbstract implements Statement, LoggerAwareInterface{
-	use LogTrait;
+	use LoggerAwareTrait;
 
 	/**
 	 * @var \chillerlan\Database\Drivers\DriverInterface
@@ -37,7 +36,7 @@ abstract class StatementAbstract implements Statement, LoggerAwareInterface{
 	public function __construct(DriverInterface $db, Dialect $dialect, LoggerInterface $logger = null){
 		$this->db      = $db;
 		$this->dialect = $dialect;
-		$this->log     = $logger;
+		$this->logger  = $logger;
 	}
 
 }

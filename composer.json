@@ -1,9 +1,10 @@
 {
 	"name": "chillerlan/php-database",
-	"description": "An extensible database wrapper and query builder for PHP 7+",
+	"description": "An extensible database wrapper and query builder for PHP 7.2+",
 	"homepage": "https://github.com/chillerlan/php-database",
 	"license": "MIT",
 	"type": "library",
+	"minimum-stability": "stable",
 	"keywords": [
 		"database", "query", "builder", "querybuilder", "driver", "mysql",
         "postgres", "mariadb", "firebird", "sqlite", "mssql"
@@ -19,17 +20,16 @@
 		"issues": "https://github.com/chillerlan/php-database/issues",
 		"source": "https://github.com/chillerlan/php-database"
 	},
-	"minimum-stability": "stable",
 	"require": {
-		"php": ">=7.2.0",
+		"php": "^7.2",
+		"chillerlan/php-traits": "^1.1",
 		"psr/simple-cache": "^1.0",
-		"psr/log": "^1.0",
-		"chillerlan/php-log": "^1.0",
-		"chillerlan/php-traits": "^1.1"
+		"psr/log": "^1.0"
 	},
 	"require-dev": {
 		"chillerlan/php-cache": "^1.0",
-		"phpunit/phpunit": "^6.5"
+		"chillerlan/php-log": "^1.0",
+		"phpunit/phpunit": "^7.1"
 	},
 	"autoload": {
 		"psr-4": {

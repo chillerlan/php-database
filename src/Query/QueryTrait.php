@@ -12,8 +12,9 @@
 
 namespace chillerlan\Database\Query;
 
-use chillerlan\Database\Dialects\Firebird;
-use chillerlan\Database\Dialects\MSSQL;
+use chillerlan\Database\Dialects\{
+	Firebird, MSSQL
+};
 
 /**
  * @extends    \chillerlan\Database\Query\StatementAbstract
@@ -21,6 +22,7 @@ use chillerlan\Database\Dialects\MSSQL;
  *
  * @property  \chillerlan\Database\Drivers\DriverInterface $db
  * @property  \chillerlan\Database\Dialects\Dialect        $dialect
+ * @property  \Psr\Log\LoggerInterface                     $logger
  */
 trait QueryTrait{
 
@@ -64,7 +66,12 @@ trait QueryTrait{
 	 */
 	protected $bindValues = [];
 
-	/** @inheritdoc */
+	/**
+	 * @param bool|null $multi
+	 *
+	 * @return string
+	 * @throws \chillerlan\Database\Query\QueryException
+	 */
 	public function sql(bool $multi = null):string{
 		$this->multi = $multi ?? false;
 
@@ -145,7 +152,7 @@ trait QueryTrait{
 			? $this->getBindValues()
 			: null;
 
-		$this->debug('QueryTrait::query()', ['method' => __METHOD__, 'sql' => $sql, 'val' => $bindvalues, 'index' => $index]);
+		$this->logger->debug('QueryTrait::query()', ['method' => __METHOD__, 'sql' => $sql, 'val' => $bindvalues, 'index' => $index]);
 
 		if($this->cached && $this instanceof Select){
 			return $this->db->preparedCached($sql, $bindvalues, $index, true, $this->ttl);

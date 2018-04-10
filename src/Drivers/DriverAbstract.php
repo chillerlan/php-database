@@ -15,17 +15,17 @@ namespace chillerlan\Database\Drivers;
 use chillerlan\Database\{
 	Dialects\Dialect, Result
 };
-use chillerlan\Logger\LogTrait;
 use chillerlan\Traits\ContainerInterface;
-use Psr\{
-	Log\LoggerAwareInterface, Log\LoggerInterface, SimpleCache\CacheInterface
+use Psr\Log\{
+	LoggerAwareInterface, LoggerAwareTrait, LoggerInterface
 };
+use Psr\SimpleCache\CacheInterface;
 
 /**
- * @method setLogger(\Psr\Log\LoggerInterface $logger):DriverInterface
+ *
  */
 abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
-	use LogTrait;
+	use LoggerAwareTrait;
 
 	/**
 	 * Holds the database resource object
@@ -67,7 +67,7 @@ abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 	public function __construct(ContainerInterface $options, CacheInterface $cache = null, LoggerInterface $logger = null){
 		$this->options = $options;
 		$this->cache   = $cache;
-		$this->log     = $logger;
+		$this->logger  = $logger;
 
 		// avoid unnecessary getter calls in long loops
 		$this->cachekey_hash_algo    = $this->options->cachekey_hash_algo;
@@ -155,7 +155,7 @@ abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 	/** @inheritdoc */
 	public function raw(string $sql, string $index = null, bool $assoc = null){
 		$this->checkSQL($sql);
-		$this->debug('DriverAbstract::raw()', ['method' => __METHOD__, 'sql' => $sql, 'index' => $index, 'assoc' => $assoc]);
+		$this->logger->debug('DriverAbstract::raw()', ['method' => __METHOD__, 'sql' => $sql, 'index' => $index, 'assoc' => $assoc]);
 
 		try{
 			return $this->raw_query($sql, $index, $assoc !== null ? $assoc : true);
@@ -169,7 +169,7 @@ abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 	/** @inheritdoc */
 	public function prepared(string $sql, array $values = null, string $index = null, bool $assoc = null){
 		$this->checkSQL($sql);
-		$this->debug('DriverAbstract::prepared()', ['method' => __METHOD__, 'sql' => $sql, 'val' => $values, 'index' => $index, 'assoc' => $assoc]);
+		$this->logger->debug('DriverAbstract::prepared()', ['method' => __METHOD__, 'sql' => $sql, 'val' => $values, 'index' => $index, 'assoc' => $assoc]);
 
 		try{
 			return $this->prepared_query(
@@ -270,6 +270,7 @@ abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 		$out = new Result(null, $this->convert_encoding_src, $this->convert_encoding_dest);
 		$i   = 0;
 
+		/** @noinspection PhpAssignmentInConditionInspection */
 		while($row = call_user_func_array($callable, $args)){
 			$key = $assoc && !empty($index) ? $row[$index] : $i;
 
