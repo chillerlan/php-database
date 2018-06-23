@@ -404,6 +404,35 @@ method | description
 `openBracket($join = null)` |  see `Select::openBracket()`
 `closeBracket()` |  see `Select::closeBracket()`
 
+Single row update
+```php
+$db->update
+	->table('table_to_update')
+	->set(['col_to_update' => 'val1'])
+	->where('row_id', 1)
+	->query();
+```
+
+Update multiple rows
+```php
+$values = [
+	// [col_to_update, row_id]
+	['val1', 1],
+	['val2', 2],
+	['val3', 3],
+];
+
+$db->update
+	->table('table_to_update')
+	->set(['col_to_update' => '?'], false) // disable value binding here
+	->where('row_id', '?', '=', false) // also disable binding here
+	->multi($values);
+```
+
+The generated SQL for both examples would look like the following, the difference is that one performs a single query, while the other loops through the given value array in the open prepared statement.
+```mysql
+UPDATE `table_to_update` SET `col_to_update` = ? WHERE `row_id` = ?
+```
 
 ### `Delete`
 
