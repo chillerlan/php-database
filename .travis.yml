@@ -3,23 +3,19 @@ language: php
 php:
   - 7.2
 
-services:
-  - mysql
-  - postgresql
-  - sqlite3
+matrix:
+  include:
+  - php: 7.2
+  - php: nightly
+  allow_failures:
+  - php: nightly
 
-before_install:
-  - pip install --user codecov
-
-install:
-  - travis_retry composer install --no-interaction --prefer-source
+install: travis_retry composer install --no-interaction --prefer-source
 
 before_script:
   - mysql -e 'create database dbtest;'
   - psql -c 'create database dbtest;' -U postgres
 
-script:
-  - vendor/bin/phpunit --configuration phpunit.xml --coverage-clover clover.xml
+script: vendor/bin/phpunit --configuration phpunit.xml --coverage-clover clover.xml
 
-after_success:
-  - codecov
+after_success: bash <(curl -s https://codecov.io/bash)

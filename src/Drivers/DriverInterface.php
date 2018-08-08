@@ -13,7 +13,7 @@
 namespace chillerlan\Database\Drivers;
 
 use chillerlan\Database\Dialects\Dialect;
-use chillerlan\Traits\ContainerInterface;
+use chillerlan\Traits\ImmutableSettingsInterface;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
 
@@ -22,11 +22,11 @@ interface DriverInterface{
 	/**
 	 * Constructor.
 	 *
-	 * @param \chillerlan\Traits\ContainerInterface $options
+	 * @param \chillerlan\Traits\ImmutableSettingsInterface $options
 	 * @param \Psr\SimpleCache\CacheInterface|null  $cache
 	 * @param \Psr\Log\LoggerInterface|null         $logger
 	 */
-	public function __construct(ContainerInterface $options, CacheInterface $cache = null, LoggerInterface $logger = null);
+	public function __construct(ImmutableSettingsInterface $options, CacheInterface $cache = null, LoggerInterface $logger = null);
 
 	/**
 	 * Establishes a database connection and returns the connection object

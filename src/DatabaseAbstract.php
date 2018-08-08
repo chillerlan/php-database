@@ -16,7 +16,7 @@ use chillerlan\Database\{
 	Drivers\DriverInterface, Query\QueryBuilder
 };
 use chillerlan\Traits\{
-	ClassLoader, ContainerInterface
+	ClassLoader, ImmutableSettingsInterface
 };
 use Psr\Log\{
 	LoggerAwareInterface, LoggerAwareTrait, LoggerInterface, NullLogger
@@ -49,11 +49,11 @@ abstract class DatabaseAbstract implements LoggerAwareInterface{
 	/**
 	 * Database constructor.
 	 *
-	 * @param \chillerlan\Traits\ContainerInterface $options
+	 * @param \chillerlan\Traits\ImmutableSettingsInterface $options
 	 * @param \Psr\SimpleCache\CacheInterface|null $cache
 	 * @param \Psr\Log\LoggerInterface|null        $logger
 	 */
-	public function __construct(ContainerInterface $options, CacheInterface $cache = null, LoggerInterface $logger = null){
+	public function __construct(ImmutableSettingsInterface $options, CacheInterface $cache = null, LoggerInterface $logger = null){
 		$this->options = $options;
 		$this->cache   = $cache;
 

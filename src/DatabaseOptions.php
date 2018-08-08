@@ -12,7 +12,7 @@
 
 namespace chillerlan\Database;
 
-use chillerlan\Traits\ContainerAbstract;
+use chillerlan\Traits\ImmutableSettingsAbstract;
 
 /**
  * @property string $driver
@@ -41,6 +41,6 @@ use chillerlan\Traits\ContainerAbstract;
  * @property string $cachekey_hash_algo
  * @property string $storage_path
  */
-class DatabaseOptions extends ContainerAbstract{
+class DatabaseOptions extends ImmutableSettingsAbstract{
 	use DatabaseOptionsTrait;
 }

@@ -48,7 +48,7 @@ A PHP 7.2+ SQL client and querybuilder for the most common databases.
 {
 	"require": {
 		"php": ">=7.2.0",
-		"chillerlan/database": "dev-master"
+		"chillerlan/database": "^2.1"
 	}
 }
 ```
@@ -185,7 +185,9 @@ method | return | description
 ------ | ------ | -----------
 `sql()` | `string` | returns the SQL for the current statement
 `bindValues()` | `array` | returns the values for each '?' parameter in the SQL
-`execute(string $index = null, array $values = null, $callback = null)` | `Result` | Executes the current statement. `$index` is being used in "SELECT" statements to determine a column to index the `Result` by. `$values` and `$callback` can be used to provide multiple values on multi row "INSERT" or "UPDATE" queries.
+`query(string $index = null` | `Result` | Executes the current statement. `$index` is being used in "SELECT" statements to determine a column to index the `Result` by. `$values`.
+`multi(array $values = null)` | bool | Executes the current statement as multi query. `$values` needs to be a multi dimensional array with each row.
+`callback(array $values = null, $callback = null)` | bool | Executes the current statement. `$index` is being used in "SELECT" statements to determine a column to index the `Result` by. `$values` and `$callback` can be used to provide multiple values on multi row "INSERT" or "UPDATE" queries.
 
 
 ### `Create`
@@ -208,7 +210,7 @@ $conn->create
 	->database('test')
 	->ifNotExists()
 	->charset('utf8mb4_bin')
-	->execute();
+	->query();
 ```
 ```mysql
 CREATE DATABASE IF NOT EXISTS `test` CHARACTER SET utf8mb4 COLLATE utf8mb4_bin
@@ -240,7 +242,7 @@ $conn->create
 	->decimal('weight', '8,3')
 	->int('added', 10, 0, null, 'UNSIGNED')
 	->primaryKey('id')
-	->execute();
+	->query();
 ```
 The generated Query will look something like this
 ```mysql
@@ -283,13 +285,13 @@ method | description
 $conn->insert
 	->into('products')
 	->values(['name' => 'product1', 'type' => 'a', 'price' => 3.99, 'weight' => 0.1, 'added' => time()])
-	->execute();
+	->query();
 ```
 ```mysql
 INSERT INTO `products` (`name`, `type`, `price`, `weight`, `added`) VALUES (?,?,?,?,?)
 ```
 
-An array with multiple rows will automatically perform a multi insert
+
 ```php
 $values = [
 	['name' => 'product2', 'type' => 'b', 'price' => 4.20, 'weight' => 2.35, 'added' => time()],
@@ -298,8 +300,7 @@ $values = [
 
 $conn->insert
 	->into('products')
-	->values($values)
-	->execute();
+	->multi($values);
 ```
 As an alternative, you can provide the values via a callback
 ```php
@@ -311,8 +312,8 @@ $values = [
 
 $conn->insert
 	->into('products')
-	->values(['name' => '?', 'type' => '?', 'price' => '?', 'weight' => '?', 'added' => '?'])
-	->execute(null, $values, function($row){
+	->values([['name' => '?', 'type' => '?', 'price' => '?', 'weight' => '?', 'added' => '?']])
+	->callback($values, function($row){
 		return [
 			$row[0],
 			$row[1],

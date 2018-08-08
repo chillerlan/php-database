@@ -15,7 +15,7 @@ namespace chillerlan\Database\Drivers;
 use chillerlan\Database\{
 	Dialects\Dialect, Result
 };
-use chillerlan\Traits\ContainerInterface;
+use chillerlan\Traits\ImmutableSettingsInterface;
 use Psr\Log\{
 	LoggerAwareInterface, LoggerAwareTrait, LoggerInterface
 };
@@ -60,11 +60,11 @@ abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 	/**
 	 * Constructor.
 	 *
-	 * @param \chillerlan\Traits\ContainerInterface $options
+	 * @param \chillerlan\Traits\ImmutableSettingsInterface $options
 	 * @param \Psr\SimpleCache\CacheInterface|null $cache
 	 * @param \Psr\Log\LoggerInterface|null        $logger
 	 */
-	public function __construct(ContainerInterface $options, CacheInterface $cache = null, LoggerInterface $logger = null){
+	public function __construct(ImmutableSettingsInterface $options, CacheInterface $cache = null, LoggerInterface $logger = null){
 		$this->options = $options;
 		$this->cache   = $cache;
 		$this->logger  = $logger;

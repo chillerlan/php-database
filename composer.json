@@ -22,14 +22,14 @@
 	},
 	"require": {
 		"php": "^7.2",
-		"chillerlan/php-traits": "^1.1",
+		"chillerlan/php-traits": "^2.0",
 		"psr/simple-cache": "^1.0",
 		"psr/log": "^1.0"
 	},
 	"require-dev": {
-		"chillerlan/php-cache": "^1.0",
-		"chillerlan/php-log": "^1.0",
-		"phpunit/phpunit": "^7.1"
+		"chillerlan/php-cache": "^2.0",
+		"chillerlan/php-log": "^2.0",
+		"phpunit/phpunit": "^7.3"
 	},
 	"autoload": {
 		"psr-4": {
