@@ -38,9 +38,9 @@ trait OnConflictTrait{
 	 * @throws \chillerlan\Database\Query\QueryException
 	 */
 	public function name(string $name, string $on_conflict = null, string $conflict_target = null){
-		$this->name  = trim($name);
-		$on_conflict = trim(strtoupper($on_conflict));
-		$on_conflict = trim(strtoupper($conflict_target));
+		$this->name      = trim($name);
+		$on_conflict     = trim(strtoupper($on_conflict));
+		$conflict_target = trim(strtoupper($conflict_target));
 
 		if(empty($this->name)){
 			throw new QueryException('no name specified');
