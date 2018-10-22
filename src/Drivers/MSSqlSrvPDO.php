@@ -13,7 +13,7 @@
 namespace chillerlan\Database\Drivers;
 
 use chillerlan\Database\Dialects\MSSQL;
-use chillerlan\Traits\ImmutableSettingsInterface;
+use chillerlan\Settings\SettingsContainerInterface;
 use PDO;
 use Psr\{
 	Log\LoggerInterface, SimpleCache\CacheInterface
@@ -30,11 +30,11 @@ class MSSqlSrvPDO extends PDODriverAbstract{
 	/**
 	 * MSSqlSrvPDO constructor.
 	 *
-	 * @param \chillerlan\Traits\ImmutableSettingsInterface $options
+	 * @param \chillerlan\Settings\SettingsContainerInterface $options
 	 * @param \Psr\SimpleCache\CacheInterface|null $cache
 	 * @param \Psr\Log\LoggerInterface|null        $log
 	 */
-	public function __construct(ImmutableSettingsInterface $options, CacheInterface $cache = null, LoggerInterface $log = null){
+	public function __construct(SettingsContainerInterface $options, CacheInterface $cache = null, LoggerInterface $log = null){
 		unset($this->pdo_options[PDO::ATTR_EMULATE_PREPARES]);
 
 		// @todo

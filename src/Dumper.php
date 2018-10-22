@@ -12,7 +12,7 @@
 
 namespace chillerlan\Database;
 
-use chillerlan\Traits\ImmutableSettingsInterface;
+use chillerlan\Settings\SettingsContainerInterface;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
 
@@ -28,7 +28,7 @@ class Dumper extends DatabaseAbstract{
 	 */
 	protected $dialect;
 
-	public function __construct(ImmutableSettingsInterface $options, CacheInterface $cache = null, LoggerInterface $logger = null){
+	public function __construct(SettingsContainerInterface $options, CacheInterface $cache = null, LoggerInterface $logger = null){
 		parent::__construct($options, $cache, $logger);
 
 		$this->dialect = $this->driver->getDialect();
