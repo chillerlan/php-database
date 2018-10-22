@@ -16,7 +16,7 @@ use chillerlan\Database\{
 	Drivers\DriverInterface, Query\QueryBuilder
 };
 use chillerlan\Traits\{
-	ClassLoader, ImmutableSettingsInterface
+	ImmutableSettingsInterface
 };
 use Psr\Log\{
 	LoggerAwareInterface, LoggerAwareTrait, LoggerInterface, NullLogger
@@ -24,7 +24,7 @@ use Psr\Log\{
 use Psr\SimpleCache\CacheInterface;
 
 abstract class DatabaseAbstract implements LoggerAwareInterface{
-	use ClassLoader, LoggerAwareTrait;
+	use LoggerAwareTrait;
 
 	/**
 	 * @var \chillerlan\Database\DatabaseOptions
@@ -52,6 +52,8 @@ abstract class DatabaseAbstract implements LoggerAwareInterface{
 	 * @param \chillerlan\Traits\ImmutableSettingsInterface $options
 	 * @param \Psr\SimpleCache\CacheInterface|null $cache
 	 * @param \Psr\Log\LoggerInterface|null        $logger
+	 *
+	 * @throws \chillerlan\Database\DatabaseException
 	 */
 	public function __construct(ImmutableSettingsInterface $options, CacheInterface $cache = null, LoggerInterface $logger = null){
 		$this->options = $options;
@@ -59,8 +61,12 @@ abstract class DatabaseAbstract implements LoggerAwareInterface{
 
 		// set a default logger
 		$this->logger  = $logger ?? new NullLogger;
+		$this->driver  = new $this->options->driver($this->options, $this->cache, $this->logger);
 
-		$this->driver  = $this->loadClass($this->options->driver, DriverInterface::class, $this->options, $this->cache, $this->logger);
+		if(!$this->driver instanceof DriverInterface){
+			throw new DatabaseException('invalid driver interface');
+		}
+
 		$this->query   = new QueryBuilder($this->driver, $this->logger);
 	}
 
