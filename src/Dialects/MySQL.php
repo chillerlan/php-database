@@ -70,7 +70,7 @@ class MySQL extends DialectAbstract{
 	}
 
 	/** @inheritdoc */
-	public function createTable(string $table, array $cols, string $primaryKey = null, bool $ifNotExists, bool $temp, string $dir = null):array {
+	public function createTable(string $table, array $cols, string $primaryKey = null, bool $ifNotExists = null, bool $temp = null, string $dir = null):array {
 		$sql = ['CREATE'];
 
 		if($temp){

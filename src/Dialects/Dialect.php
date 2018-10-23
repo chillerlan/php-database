@@ -33,7 +33,7 @@ interface Dialect{
 	 *
 	 * @return array
 	 */
-	public function select(array $cols, array $from, string $where = null, $limit = null, $offset = null, bool $distinct = null, array $groupby, array $orderby):array;
+	public function select(array $cols, array $from, string $where = null, $limit = null, $offset = null, bool $distinct = null, array $groupby = null, array $orderby = null):array;
 
 	/**
 	 * @param array $expressions
@@ -112,7 +112,7 @@ interface Dialect{
 	 *
 	 * @return array
 	 */
-	public function createTable(string $table, array $cols, string $primaryKey = null, bool $ifNotExists, bool $temp, string $dir = null):array;
+	public function createTable(string $table, array $cols, string $primaryKey = null, bool $ifNotExists = null, bool $temp = null, string $dir = null):array;
 
 	/**
 	 * @param string $dbname
