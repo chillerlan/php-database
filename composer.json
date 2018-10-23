@@ -23,14 +23,14 @@
 	"require": {
 		"php": "^7.2",
 		"chillerlan/php-settings-container": "^1.0",
+		"chillerlan/php-traits": "^3.0",
 		"psr/simple-cache": "^1.0",
 		"psr/log": "^1.0"
 	},
 	"require-dev": {
 		"chillerlan/php-dotenv": "^1.0",
-		"chillerlan/php-traits": "^2.0",
-		"chillerlan/php-cache": "^2.0",
-		"chillerlan/php-log": "^2.0",
+		"chillerlan/php-cache": "dev-master",
+		"chillerlan/php-log": "^3.0",
 		"phpunit/phpunit": "^7.4"
 	},
 	"autoload": {

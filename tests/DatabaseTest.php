@@ -22,13 +22,11 @@ use chillerlan\Database\Drivers\{
 	DriverInterface, FirebirdPDO, MSSqlSrv, MSSqlSrvPDO, MySQLiDrv, MySQLPDO, PostgreSQL, PostgreSQLPDO, SQLitePDO
 };
 use chillerlan\Database\Query\QueryBuilder;
+use chillerlan\DotEnv\DotEnv;
 use chillerlan\Logger\{
 	Log, LogOptions, Output\LogOutputAbstract
 };
-use chillerlan\SimpleCache\{
-	Cache, Drivers\MemoryCacheDriver
-};
-use chillerlan\Traits\DotEnv;
+use chillerlan\SimpleCache\MemoryCache;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 use ReflectionClass, ReflectionMethod;
@@ -81,7 +79,7 @@ class DatabaseTest extends TestCase{
 	protected $dialect;
 
 	/**
-	 * @var \chillerlan\Traits\DotEnv
+	 * @var \chillerlan\DotEnv\DotEnv
 	 */
 	protected $env;
 
@@ -174,15 +172,15 @@ class DatabaseTest extends TestCase{
 
 		$this->options = new DatabaseOptions(array_merge([
 			'driver'   => $driver,
-			'host'     => $this->env->get($env_prefix.'_HOST'),
-			'port'     => $this->env->get($env_prefix.'_PORT'),
-			'socket'   => $this->env->get($env_prefix.'_SOCKET'),
-			'database' => $this->env->get($env_prefix.'_DATABASE'),
-			'username' => $this->env->get($env_prefix.'_USERNAME'),
-			'password' => $this->env->get($env_prefix.'_PASSWORD'),
+			'host'     => $this->env->{$env_prefix.'_HOST'},
+			'port'     => $this->env->{$env_prefix.'_PORT'},
+			'socket'   => $this->env->{$env_prefix.'_SOCKET'},
+			'database' => $this->env->{$env_prefix.'_DATABASE'},
+			'username' => $this->env->{$env_prefix.'_USERNAME'},
+			'password' => $this->env->{$env_prefix.'_PASSWORD'},
 		], $options));
 
-		$this->cache  = new Cache(new MemoryCacheDriver);
+		$this->cache  = new MemoryCache;
 		$this->db     = new Database($this->options, $cached ? $this->cache : null);
 		$this->db->setLogger($this->logger);
 
