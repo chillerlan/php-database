@@ -54,17 +54,17 @@ A PHP 7.2+ SQL client and querybuilder for the most common databases.
 ```
 
 ### Manual installation
-Download the desired version of the package from [master](https://github.com/chillerlan/php-database/archive/master.zip) or 
+Download the desired version of the package from [master](https://github.com/chillerlan/php-database/archive/master.zip) or
 [release](https://github.com/chillerlan/php-database/releases) and extract the contents to your project folder. After that:
 - run `composer install` to install the required dependencies and generate `/vendor/autoload.php`.
-- if you use a custom autoloader, point the namespace `chillerlan\Database` to the folder `src` of the package 
+- if you use a custom autoloader, point the namespace `chillerlan\Database` to the folder `src` of the package
 
 Profit!
 
 ## Usage
 
 ### Getting started
-Both, the `DriverInterface` and `QueryBuilder` can be instanced on their own. 
+Both, the `DriverInterface` and `QueryBuilder` can be instanced on their own.
 However, since the `QueryBuilder` requires an instance of `DriverInterface` it's recommended to just use `Database` which instances both and provides all of their methods.
 A `DriverInterface` requires a `DatabaseOptions` object and accepts a `Psr\SimpleCache\CacheInterface` and a `Psr\Log\LoggerInterface` as optional parameters, the `QueryBuilder` accepts a `LoggerInterface` as additional parameter.
 
@@ -95,7 +95,7 @@ via the querybuilder
 ```php
 $querybuilder = new QueryBuilder($mysql, $log)
 
-$result = $querybuilder->select->from('sometable')->query();
+$result = $querybuilder->select->from(['sometable'])->query();
 ```
 recommended way via `Database`, which provides all methods of `DriverInterface` and `QueryBuilder`
 ```php
@@ -106,7 +106,7 @@ $db->connect();
 
 $result = $db->raw('SELECT * FROM sometable');
 // is equivalent to
-$result = $db->select->from('sometable')->query();
+$result = $db->select->from(['sometable'])->query();
 ```
 
 ###  Properties of `DatabaseOptions`
@@ -139,7 +139,7 @@ property | type | default | allowed | description
 
 ### Methods of `DriverInterface`
 
-method | return 
+method | return
 ------ | ------
 `__construct(DatabaseOptions $options, CacheInterface $cache = null)` | -
 `connect()` | `DriverInterface`
@@ -159,7 +159,7 @@ method | return
 All methods of `QueryBuilder` are also accessible as properties via magic methods.
 The returned object is a `Statement` of `\chillerlan\Database\Query\*` interfaces.
 
-method | return 
+method | return
 ------ | ------
 `__construct(DriverInterface $db, LoggerInterface $logger = null)` | -
 `select()` | `Select`
@@ -173,7 +173,7 @@ method | return
 ### Methods of `Database`
 in addition to `DriverInterface` and `QueryBuilderInterface` methods
 
-method | return 
+method | return
 ------ | ------
 `__construct(DatabaseOptions $options, CacheInterface $cache = null, LoggerInterface $logger = null)` | -
 `getDriver()` | `DriverInterface`
@@ -181,7 +181,7 @@ method | return
 
 ## The `Statement` interface
 
-method | return | description 
+method | return | description
 ------ | ------ | -----------
 `sql()` | `string` | returns the SQL for the current statement
 `bindValues()` | `array` | returns the values for each '?' parameter in the SQL
@@ -192,18 +192,18 @@ method | return | description
 
 ### `Create`
 
-method | return 
+method | return
 ------ | ------
 `database(string $dbname = null)` | `CreateDatabase`
 `table(string $tablename = null)` | `CreateTable`
 
 #### `CreateDatabase`
 
-method | description 
+method | description
 ------ | -----------
-`ifNotExists()` | 
-`name(string $dbname = null)` | 
-`charset(string $collation)` | 
+`ifNotExists()` |
+`name(string $dbname = null)` |
+`charset(string $collation)` |
 
 ```php
 $conn->create
@@ -218,16 +218,16 @@ CREATE DATABASE IF NOT EXISTS `test` CHARACTER SET utf8mb4 COLLATE utf8mb4_bin
 
 #### `CreateTable`
 
-method | description 
+method | description
 ------ | -----------
 `ifNotExists()` |
-`name(string $tablename = null)` | 
-`charset(string $collation)` | 
-`primaryKey(string $field)` | 
+`name(string $tablename = null)` |
+`charset(string $collation)` |
+`primaryKey(string $field)` |
 `field(string $name, string $type, $length = null, string $attribute = null, string $collation = null, bool $isNull = null, string $defaultType = null, $defaultValue = null, string $extra = null)` |
 `int(string $name, int $length = null,  $defaultValue = null , bool $isNull = null, string $attribute = null)` | convenience shortcut for `field()`, also `tinyint(...)`
-`varchar(string $name, int $length,  $defaultValue = null , bool $isNull = null)` | 
-`decimal(string $name, string $length,  $defaultValue = null , bool $isNull = null)` | 
+`varchar(string $name, int $length,  $defaultValue = null , bool $isNull = null)` |
+`decimal(string $name, string $length,  $defaultValue = null , bool $isNull = null)` |
 `text(string $name,  $defaultValue = null , bool $isNull = true)` | also `tinytext()`
 `enum(string $name, array $values, $defaultValue = null , bool $isNull = null)` | currently the only way to create an "ENUM" field
 
@@ -258,7 +258,7 @@ CREATE TABLE IF NOT EXISTS `products` (
 	PRIMARY KEY (`id`)
 )
 ```
-Note that additional constraints and attributes will be appended regardless of the Query dialect 
+Note that additional constraints and attributes will be appended regardless of the Query dialect
 ```postgresql
 -- postgres: attributes UNSIGNED and AUTO_INCREMENT are invalid
 
@@ -276,7 +276,7 @@ CREATE TABLE IF NOT EXISTS "products" (
 
 ### `Insert`
 
-method | description 
+method | description
 ------ | -----------
 `into(string $table)` | The table where to insert data
 `values(array $values)` | An array of values where each row represents a row to insert `[['column' => 'value', ...], ...]`
@@ -327,7 +327,7 @@ $conn->insert
 
 ### `Select`
 
-method | description 
+method | description
 ------ | -----------
 `distinct()` | sets the "DISTINCT" statement (if the Query dialect supports it)
 `cols(array $expressions)` | An array of column expressions. If omitted, a `SELECT * ...` will be performed. Example: `['col', 'alias' => 'col', 'alias' => ['col', 'sql_function']]`
@@ -353,7 +353,7 @@ $result = $conn->select
 	->from(['t1' => 'products'])
 	->where('t1.type', 'a')
 	->orderBy(['t1.price' => 'asc'])
-	->execute('uid')
+	->query('uid')
 	->__toArray();
 ```
 
@@ -397,10 +397,10 @@ array(2) {
 
 ### `Update`
 
-method | description 
+method | description
 ------ | -----------
 `table(string $tablename)` | The table to update
-`set(array $set, bool $bind = true)` | `$set` is a key/value array to update the table with. `$bind` determines whether the values should be inserted into the Query (unsafe! use only for aliases) or be replaced by parameters (the default). 
+`set(array $set, bool $bind = true)` | `$set` is a key/value array to update the table with. `$bind` determines whether the values should be inserted into the Query (unsafe! use only for aliases) or be replaced by parameters (the default).
 `where($val1, $val2, $operator = '=', $bind = true, $join = 'AND')` | see `Select::where()`
 `openBracket($join = null)` |  see `Select::openBracket()`
 `closeBracket()` |  see `Select::closeBracket()`
@@ -437,9 +437,9 @@ UPDATE `table_to_update` SET `col_to_update` = ? WHERE `row_id` = ?
 
 ### `Delete`
 
-method | description 
+method | description
 ------ | -----------
-`from(string $table)` | The table to delete from
+`from(string $table)` | The table to delete from (multi table not supported yet)
 `where($val1, $val2, $operator = '=', $bind = true, $join = 'AND')` | see `Select::where()`
 `openBracket($join = null)` |  see `Select::openBracket()`
 `closeBracket()` |  see `Select::closeBracket()`
@@ -450,13 +450,13 @@ method | description
 
 ### `Result`
 
-property | description 
+property | description
 -------- | -----------
-`length` | 
+`length` |
 
 #### methods in addition to `\SeekableIterator`, `\ArrayAccess` and `\Countable`
 
-method | description 
+method | description
 ------ | -----------
 `__construct($data = null, $sourceEncoding = null, $destEncoding = 'UTF-8')` | If `$data` is of type `\Traversable`, `\stdClass` or `array`, the `Result` will be filled with its values. If `$sourceEncoding` is present, the values will be converted to `$destEncoding` via `mb_convert_encoding()`.
 `__merge(Result $result)` | merges one `Result` object into another (using `array_merge()`)
@@ -464,7 +464,7 @@ method | description
 
 #### methods from `Enumerable`
 
-method | description 
+method | description
 ------ | -----------
 `__toArray()` | returns an `array` representation of the `Result`
 `__map($callback)` | collects the result of `$callback` for each value of `Result` and returns it as `array`
@@ -472,7 +472,7 @@ method | description
 `__reverse()` | reverses the order of the `Result` (using `array_reverse()`)
 
 ### `ResultRow`
-`ResultRow` allows to call the result fields as magic methods or properties. 
+`ResultRow` allows to call the result fields as magic methods or properties.
 If called as method, you may supply a `callable` as argument which then takes the field value as argument. Fancy, huh?
 
 ### `Result` and `ResultRow` examples
@@ -483,7 +483,7 @@ If called as method, you may supply a `callable` as argument which then takes th
 $values = $result->__map(function($row){
 
 	// ...
-	
+
 	return [
 		$row->id,
 		$row->name('trim'),
@@ -500,7 +500,7 @@ $result2 = new Result([['id' => 2]]);
 
 $result1->__merge($result2);
 
-var_dump($result1->__toArray()); 
+var_dump($result1->__toArray());
 // -> [['id' => 1], ['id' => 2]]
 
 var_dump($result1->__reverse()->__chunk(1)[0]);
