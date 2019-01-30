@@ -37,7 +37,7 @@ $db->create
 	->primaryKey('id')
 	->query();
 
-$db->raw('TRUNCATE TABLE products');
+$db->truncate->table('products')->query();
 
 
 // single row insert
@@ -68,7 +68,9 @@ $values = [
 
 $db->insert
 	->into('products')
-	->values(['name' => '?', 'type' => '?', 'price' => '?', 'weight' => '?', 'added' => '?'])
+	->values([
+		['name' => '?', 'type' => '?', 'price' => '?', 'weight' => '?', 'added' => '?']
+	])
 	->callback($values, function($row){
 		return [
 			$row[0],

@@ -15,17 +15,15 @@ use chillerlan\Database\{
 use chillerlan\Logger\Log;
 use chillerlan\Logger\LogOptions;
 use chillerlan\Logger\Output\ConsoleLog;
-use chillerlan\SimpleCache\{
-	Cache, Drivers\MemoryCacheDriver
-};
-use chillerlan\Traits\DotEnv;
+use chillerlan\SimpleCache\MemoryCache;
+use chillerlan\DotEnv\DotEnv;
 use Psr\Log\LogLevel;
 
 require_once __DIR__.'/../vendor/autoload.php';
 
 $env = (new DotEnv(__DIR__.'/../config', '.env'))->load();
 
-$cache = new Cache(new MemoryCacheDriver);
+$cache = new MemoryCache;
 
 $options = new DatabaseOptions([
 	'driver'       => MySQLiDrv::class,
@@ -37,6 +35,6 @@ $options = new DatabaseOptions([
 	'password'     => $env->get('DB_MYSQLI_PASSWORD'),
 ]);
 
-$log = (new Log)->addInstance(new ConsoleLog(new LogOptions(['minLogLevel' => LogLevel::INFO])), 'console');
+$log = (new Log)->addInstance(new ConsoleLog(new LogOptions(['minLogLevel' => LogLevel::DEBUG])), 'console');
 
 
