@@ -12,4 +12,6 @@
 
 namespace chillerlan\Database;
 
-class DatabaseException extends \Exception{}
+use Exception;
+
+class DatabaseException extends Exception{}
