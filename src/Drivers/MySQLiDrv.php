@@ -103,8 +103,8 @@ class MySQLiDrv extends DriverAbstract{
 
 		if(is_bool($result)){
 
-			if(!$result){
-				throw new DriverException($this->db->error);
+			if($this->db->errno !== 0 || !$result){
+				throw new DriverException($this->db->error, $this->db->errno);
 			}
 
 			return $result; // @codeCoverageIgnore
@@ -122,6 +122,7 @@ class MySQLiDrv extends DriverAbstract{
 		$assoc = $assoc ?? true;
 		$stmt = $this->db->stmt_init();
 		$stmt->prepare($sql);
+		$this->stmtError($this->db->errno, $this->db->error);
 
 		if(count($values) > 0){
 			call_user_func_array([$stmt, 'bind_param'], $this->getReferences($values));
@@ -177,6 +178,7 @@ class MySQLiDrv extends DriverAbstract{
 	protected function multi_query(string $sql, array $values){
 		$stmt = $this->db->stmt_init();
 		$stmt->prepare($sql);
+		$this->stmtError($this->db->errno, $this->db->error);
 
 		foreach($values as $row){
 			call_user_func_array([$stmt, 'bind_param'], $this->getReferences($row));
@@ -193,6 +195,7 @@ class MySQLiDrv extends DriverAbstract{
 	protected function multi_callback_query(string $sql, iterable $data, $callback){
 		$stmt = $this->db->stmt_init();
 		$stmt->prepare($sql);
+		$this->stmtError($this->db->errno, $this->db->error);
 
 		foreach($data as $k => $row){
 			$row = call_user_func_array($callback, [$row, $k]);
@@ -207,6 +210,20 @@ class MySQLiDrv extends DriverAbstract{
 		$stmt->close();
 
 		return true;
+	}
+
+	/**
+	 * @param int    $errno
+	 * @param string $errstr
+	 *
+	 * @throws \chillerlan\Database\Drivers\DriverException
+	 */
+	protected function stmtError(int $errno, string $errstr):void{
+
+		if($errno !== 0){
+			throw new DriverException($errstr, $errno);
+		}
+
 	}
 
 	/**
