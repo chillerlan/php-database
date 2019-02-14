@@ -29,7 +29,8 @@ trait WhereTrait{
 		'%', '^', '<=>', '~', '!', 'DIV', 'MOD',
 		'IS', 'IS NOT', 'IN', 'NOT IN', 'LIKE',
 		'NOT LIKE', 'REGEXP', 'NOT REGEXP',
-		'BETWEEN', 'NOT BETWEEN', 'EXISTS'
+		'EXISTS', 'ANY', 'SOME',
+//		'BETWEEN', 'NOT BETWEEN',
 	];
 
 	private $joinArgs = ['AND', 'OR', 'XOR'];
@@ -61,28 +62,28 @@ trait WhereTrait{
 					: $this->dialect->quote($val1)
 			];
 
-			if(in_array($operator, ['IN', 'NOT IN'], true)){
+			if(in_array($operator, ['IN', 'NOT IN', 'ANY', 'SOME',], true)){
 
 				if(is_array($val2)){
 
 					if($bind){
-						$where[] = 'IN('.implode(',', array_fill(0, count($val2), '?')).')';
+						$where[] = $operator.'('.implode(',', array_fill(0, count($val2), '?')).')';
 						$this->bindValues = array_merge($this->bindValues, $val2);
 					}
 					else{
-						$where[] = 'IN('.implode(',', array_map([$this->db, 'escape'], $val2)).')'; // @todo: quote
+						$where[] = $operator.'('.implode(',', array_map([$this->db, 'escape'], $val2)).')'; // @todo: quote
 					}
 
 				}
 				else if($val2 instanceof Statement){
-					$where[] = 'IN('.$val2->sql().')';
+					$where[] = $operator.'('.$val2->sql().')';
 					$this->bindValues = array_merge($this->bindValues, $val2->bindValues());
 				}
 
 			}
-			else if(in_array($operator, ['BETWEEN', 'NOT BETWEEN'], true)){
+//			else if(in_array($operator, ['BETWEEN', 'NOT BETWEEN'], true)){
 				// @todo
-			}
+//			}
 			else{
 				$where[] = $operator;
 
