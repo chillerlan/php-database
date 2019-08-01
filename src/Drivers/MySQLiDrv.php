@@ -53,7 +53,7 @@ class MySQLiDrv extends DriverAbstract{
 				$this->options->username,
 				$this->options->password,
 				$this->options->database,
-				(int)$this->options->port,
+				!empty($this->options->port) ? (int)$this->options->port : null,
 				$this->options->socket
 			);
 
@@ -133,6 +133,8 @@ class MySQLiDrv extends DriverAbstract{
 		$result = $stmt->result_metadata();
 
 		if(is_bool($result)){
+			// https://www.php.net/manual/mysqli-stmt.result-metadata.php#97338
+			// the query did not produce a result, everything ok.
 			return true;
 		}
 
