@@ -6,11 +6,13 @@ language: php
 
 matrix:
   include:
-  - php: 7.2
-  - php: 7.3
-  - php: nightly
+    - php: 7.2
+    - php: 7.3
+    - php: 7.4snapshot
+    - php: nightly
   allow_failures:
-  - php: nightly
+    - php: 7.4snapshot
+    - php: nightly
 
 install: travis_retry composer install --no-interaction --prefer-source
 
