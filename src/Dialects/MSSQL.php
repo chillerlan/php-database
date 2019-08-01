@@ -121,6 +121,9 @@ class MSSQL extends DialectAbstract{
 
 			// @todo
 			switch(true){
+				case $type === 'BOOLEAN':
+					$field[] = 'DEFAULT '.(preg_match('/^1|T|TRUE|YES$/i', $defaultValue) ? '1' : '0');
+					break;
 				default:
 					$field[] = 'DEFAULT \''.$defaultValue.'\'';
 			}

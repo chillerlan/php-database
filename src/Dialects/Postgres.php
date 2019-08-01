@@ -178,7 +178,7 @@ class Postgres extends DialectAbstract{
 					$field[] = 'DEFAULT b\''.preg_replace('/[^01]/', '0', $defaultValue).'\'';
 					break;
 				case $type === 'BOOLEAN':
-					$field[] = 'DEFAULT '.preg_match('/^1|T|TRUE|YES$/i', $defaultValue) ? 'TRUE' : 'FALSE';
+					$field[] = 'DEFAULT '.(preg_match('/^1|T|TRUE|YES$/i', $defaultValue) ? 'TRUE' : 'FALSE');
 					break;
 				case strtoupper($defaultValue) === 'NULL' && $isNull === true:
 					$field[] = 'DEFAULT NULL';
