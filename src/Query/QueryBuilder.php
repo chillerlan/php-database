@@ -158,7 +158,7 @@ class QueryBuilder implements LoggerAwareInterface{
 					/** @inheritdoc */
 					public function field(string $name, string $type, $length = null, string $attribute = null, string $collation = null, bool $isNull = null, string $defaultType = null, $defaultValue = null, string $extra = null):CreateTable{
 
-						if(is_scalar($defaultValue) && $defaultType !== null){
+						if(is_scalar($defaultValue) && $defaultType === null){
 							$defaultType = 'USER_DEFINED';
 						}
 
