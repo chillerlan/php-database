@@ -1,3 +1,7 @@
+services:
+  - mysql
+  - postgresql
+
 language: php
 
 matrix:
