@@ -169,7 +169,7 @@ class MySQL extends DialectAbstract{
 					$field[] = 'DEFAULT NULL';
 					break;
 				default:
-					$field[] = 'DEFAULT '.(is_int($defaultValue) || is_float($defaultValue) ? $defaultValue : '\''.$defaultValue.'\'') ;
+					$field[] = 'DEFAULT \''.$defaultValue.'\'';
 			}
 
 		}
