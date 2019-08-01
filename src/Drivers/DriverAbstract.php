@@ -161,7 +161,10 @@ abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 			return $this->raw_query($sql, $index, $assoc !== null ? $assoc : true);
 		}
 		catch(\Exception $e){
-			throw new DriverException('sql error: ['.get_called_class().'::raw()] '.$e->getMessage());
+			$msg = 'sql error: ['.get_called_class().'::raw()] '.$e->getMessage();
+			$this->logger->error($msg);
+
+			throw new DriverException($msg);
 		}
 
 	}
@@ -180,7 +183,10 @@ abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 			);
 		}
 		catch(\Exception $e){
-			throw new DriverException('sql error: ['.get_called_class().'::prepared()] '.$e->getMessage());
+			$msg = 'sql error: ['.get_called_class().'::prepared()] '.$e->getMessage();
+			$this->logger->error($msg);
+
+			throw new DriverException($msg);
 		}
 
 	}
@@ -200,7 +206,10 @@ abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 			return $this->multi_query($sql, $values);
 		}
 		catch(\Exception $e){
-			throw new DriverException('sql error: ['.get_called_class().'::multi()] '.$e->getMessage());
+			$msg = 'sql error: ['.get_called_class().'::multi()] '.$e->getMessage();
+			$this->logger->error($msg);
+
+			throw new DriverException($msg);
 		}
 
 	}
@@ -225,7 +234,10 @@ abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 			return $this->multi_callback_query($sql, $data, $callback);
 		}
 		catch(\Exception $e){
-			throw new DriverException('sql error: ['.get_called_class().'::multiCallback()] '.$e->getMessage());
+			$msg = 'sql error: ['.get_called_class().'::multiCallback()] '.$e->getMessage();
+			$this->logger->error($msg);
+
+			throw new DriverException($msg);
 		}
 
 	}
