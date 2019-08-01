@@ -12,14 +12,12 @@
 
 namespace chillerlan\DatabaseTest;
 
-use chillerlan\Database\{
-	Database, DatabaseOptions
-};
+use chillerlan\Database\{Database, DatabaseOptions, Query\QueryException};
 use chillerlan\Database\Dialects\{
 	Dialect, Firebird, MSSQL, MySQL, Postgres, SQLite
 };
 use chillerlan\Database\Drivers\{
-	DriverInterface, FirebirdPDO, MSSqlSrv, MSSqlSrvPDO, MySQLiDrv, MySQLPDO, PostgreSQL, PostgreSQLPDO, SQLitePDO
+	DriverException, DriverInterface, FirebirdPDO, MSSqlSrv, MSSqlSrvPDO, MySQLiDrv, MySQLPDO, PostgreSQL, PostgreSQLPDO, SQLitePDO
 };
 use chillerlan\Database\Query\QueryBuilder;
 use chillerlan\DotEnv\DotEnv;
@@ -98,7 +96,7 @@ class DatabaseTest extends TestCase{
 	/**
 	 *
 	 */
-	protected function setUp(){
+	protected function setUp():void{
 		$this->env = (new DotEnv(__DIR__.'/../config', file_exists(__DIR__.'/../config/.env') ? '.env' : '.env_travis'))->load();
 
 		$this->isCI = $this->env->get('IS_CI') === 'TRUE';
@@ -128,7 +126,7 @@ class DatabaseTest extends TestCase{
 	/**
 	 *
 	 */
-	protected function tearDown(){
+	protected function tearDown():void{
 
 		if(isset($this->db) && $this->db instanceof Database){
 			$this->assertTrue($this->db->disconnect());
@@ -592,240 +590,263 @@ class DatabaseTest extends TestCase{
 	// exceptions galore!
 
 	/**
-	 * @dataProvider             driverProvider
-	 * @expectedException \chillerlan\Database\Drivers\DriverException
-	 * @expectedExceptionMessage db error:
+	 * @dataProvider driverProvider
 	 */
 	public function testConnectError(string $driver, string $env_prefix, bool $skip_on_ci){
+		$this->expectException(DriverException::class);
+		$this->expectExceptionMessage('db error:');
+
 		$this->dbInstance($driver, $env_prefix, $skip_on_ci, ['host' => '...', 'database' => '...']);
 	}
 
 	/**
-	 * @dataProvider             driverProvider
-	 * @expectedException \chillerlan\Database\Query\QueryException
-	 * @expectedExceptionMessage invalid statement
+	 * @dataProvider driverProvider
 	 */
 	public function testInvalidStatement(string $driver, string $env_prefix, bool $skip_on_ci){
+		$this->expectException(QueryException::class);
+		$this->expectExceptionMessage('invalid statement');
+
 		$this->dbInstance($driver, $env_prefix, $skip_on_ci);
 		$this->db->foo;
 	}
 
 	/**
-	 * @dataProvider             driverProvider
-	 * @expectedException \chillerlan\Database\Query\QueryException
-	 * @expectedExceptionMessage no name specified
+	 * @dataProvider driverProvider
 	 */
 	public function testCreateDatabaseNoName(string $driver, string $env_prefix, bool $skip_on_ci){
+		$this->expectException(QueryException::class);
+		$this->expectExceptionMessage('no name specified');
+
 		$this->dbInstance($driver, $env_prefix, $skip_on_ci);
 		$this->db->create->database('')->sql();
 	}
 
 	/**
-	 * @dataProvider             driverProvider
-	 * @expectedException \chillerlan\Database\Query\QueryException
-	 * @expectedExceptionMessage no name specified
+	 * @dataProvider driverProvider
 	 */
 	public function testCreateTableNoName(string $driver, string $env_prefix, bool $skip_on_ci){
+		$this->expectException(QueryException::class);
+		$this->expectExceptionMessage('no name specified');
+
 		$this->dbInstance($driver, $env_prefix, $skip_on_ci);
 		$this->db->create->table('')->sql();
 	}
 
 	/**
 	 * @dataProvider driverProvider
-	 * @expectedException \chillerlan\Database\Query\QueryException
-	 * @expectedExceptionMessage no name specified
 	 */
 	public function testDropDatabaseNoName(string $driver, string $env_prefix, bool $skip_on_ci){
+		$this->expectException(QueryException::class);
+		$this->expectExceptionMessage('no name specified');
+
 		$this->dbInstance($driver, $env_prefix, $skip_on_ci);
 		$this->db->drop->database('')->sql();
 	}
 
 	/**
 	 * @dataProvider driverProvider
-	 * @expectedException \chillerlan\Database\Query\QueryException
-	 * @expectedExceptionMessage no name specified
 	 */
 	public function testDropTableNoName(string $driver, string $env_prefix, bool $skip_on_ci){
+		$this->expectException(QueryException::class);
+		$this->expectExceptionMessage('no name specified');
+
 		$this->dbInstance($driver, $env_prefix, $skip_on_ci);
 		$this->db->drop->table('')->sql();
 	}
 
 	/**
-	 * @dataProvider             driverProvider
-	 * @expectedException \chillerlan\Database\Query\QueryException
-	 * @expectedExceptionMessage no name specified
+	 * @dataProvider driverProvider
 	 */
 	public function testInsertNoTable(string $driver, string $env_prefix, bool $skip_on_ci){
+		$this->expectException(QueryException::class);
+		$this->expectExceptionMessage('no name specified');
+
 		$this->dbInstance($driver, $env_prefix, $skip_on_ci);
 		$this->db->insert->into('')->sql();
 	}
 
 	/**
-	 * @dataProvider             driverProvider
-	 * @expectedException \chillerlan\Database\Query\QueryException
-	 * @expectedExceptionMessage no values given
+	 * @dataProvider driverProvider
 	 */
 	public function testInsertInvalidData(string $driver, string $env_prefix, bool $skip_on_ci){
+		$this->expectException(QueryException::class);
+		$this->expectExceptionMessage('no values given');
+
 		$this->dbInstance($driver, $env_prefix, $skip_on_ci);
 		$this->db->insert->into('foo')->values([])->sql();
 	}
 
 	/**
-	 * @dataProvider             driverProvider
-	 * @expectedException \chillerlan\Database\Query\QueryException
-	 * @expectedExceptionMessage no FROM expression specified
+	 * @dataProvider driverProvider
 	 */
 	public function testSelectEmptyFrom(string $driver, string $env_prefix, bool $skip_on_ci){
+		$this->expectException(QueryException::class);
+		$this->expectExceptionMessage('no FROM expression specified');
+
 		$this->dbInstance($driver, $env_prefix, $skip_on_ci);
 		$this->db->select->from([])->sql();
 	}
 
 	/**
-	 * @dataProvider             driverProvider
-	 * @expectedException \chillerlan\Database\Query\QueryException
-	 * @expectedExceptionMessage no name specified
+	 * @dataProvider driverProvider
 	 */
 	public function testUpdateNoTable(string $driver, string $env_prefix, bool $skip_on_ci){
+		$this->expectException(QueryException::class);
+		$this->expectExceptionMessage('no name specified');
+
 		$this->dbInstance($driver, $env_prefix, $skip_on_ci);
 		$this->db->update->table('')->sql();
 	}
 
 	/**
-	 * @dataProvider             driverProvider
-	 * @expectedException \chillerlan\Database\Query\QueryException
-	 * @expectedExceptionMessage no fields to update specified
+	 * @dataProvider driverProvider
 	 */
 	public function testUpdateNoSet(string $driver, string $env_prefix, bool $skip_on_ci){
+		$this->expectException(QueryException::class);
+		$this->expectExceptionMessage('no fields to update specified');
+
 		$this->dbInstance($driver, $env_prefix, $skip_on_ci);
 		$this->db->update->table('foo')->set([])->sql();
 	}
 
 	/**
-	 * @dataProvider             driverProvider
-	 * @expectedException \chillerlan\Database\Query\QueryException
-	 * @expectedExceptionMessage no name specified
+	 * @dataProvider driverProvider
 	 */
 	public function testDeleteNoTable(string $driver, string $env_prefix, bool $skip_on_ci){
+		$this->expectException(QueryException::class);
+		$this->expectExceptionMessage('no name specified');
+
 		$this->dbInstance($driver, $env_prefix, $skip_on_ci);
 		$this->db->delete->from('')->sql();
 	}
 
 	/**
-	 * @dataProvider             driverProvider
-	 * @expectedException \chillerlan\Database\Drivers\DriverException
-	 * @expectedExceptionMessage sql error: empty sql
+	 * @dataProvider driverProvider
 	 */
 	public function testRawEmptySQL(string $driver, string $env_prefix, bool $skip_on_ci){
+		$this->expectException(DriverException::class);
+		$this->expectExceptionMessage('sql error: empty sql');
+
 		$this->dbInstance($driver, $env_prefix, $skip_on_ci);
 
 		$this->db->raw('');
 	}
 
 	/**
-	 * @dataProvider             driverProvider
-	 * @expectedException \chillerlan\Database\Drivers\DriverException
-	 * @expectedExceptionMessage sql error:
+	 * @dataProvider driverProvider
 	 */
 	public function testRawSQLError(string $driver, string $env_prefix, bool $skip_on_ci){
+		$this->expectException(DriverException::class);
+		$this->expectExceptionMessage('sql error:');
+
 		$this->dbInstance($driver, $env_prefix, $skip_on_ci);
 
 		$this->db->raw('SELECT foo bar');
 	}
 
 	/**
-	 * @dataProvider             driverProvider
-	 * @expectedException \chillerlan\Database\Drivers\DriverException
-	 * @expectedExceptionMessage sql error: empty sql
+	 * @dataProvider driverProvider
 	 */
 	public function testPreparedEmptySQL(string $driver, string $env_prefix, bool $skip_on_ci){
+		$this->expectException(DriverException::class);
+		$this->expectExceptionMessage('sql error: empty sql');
+
 		$this->dbInstance($driver, $env_prefix, $skip_on_ci);
 
 		$this->db->prepared('');
 	}
 
 	/**
-	 * @dataProvider             driverProvider
-	 * @expectedException \chillerlan\Database\Drivers\DriverException
-	 * @expectedExceptionMessage sql error:
+	 * @dataProvider driverProvider
 	 */
 	public function testPreparedSQLError(string $driver, string $env_prefix, bool $skip_on_ci){
+		$this->expectException(DriverException::class);
+		$this->expectExceptionMessage('sql error:');
+
 		$this->dbInstance($driver, $env_prefix, $skip_on_ci);
 
 		$this->db->prepared('SELECT foo bar ???');
 	}
 
 	/**
-	 * @dataProvider             driverProvider
-	 * @expectedException \chillerlan\Database\Drivers\DriverException
-	 * @expectedExceptionMessage sql error: empty sql
+	 * @dataProvider driverProvider
 	 */
 	public function testMultiEmptySQL(string $driver, string $env_prefix, bool $skip_on_ci){
+		$this->expectException(DriverException::class);
+		$this->expectExceptionMessage('sql error: empty sql');
+
 		$this->dbInstance($driver, $env_prefix, $skip_on_ci);
 
 		$this->db->multi('', []);
 	}
 
 	/**
-	 * @dataProvider             driverProvider
-	 * @expectedException \chillerlan\Database\Drivers\DriverException
-	 * @expectedExceptionMessage sql error:
+	 * @dataProvider driverProvider
 	 */
 	public function testMultiSQLError(string $driver, string $env_prefix, bool $skip_on_ci){
+		$this->expectException(DriverException::class);
+		$this->expectExceptionMessage('sql error:');
+
 		$this->dbInstance($driver, $env_prefix, $skip_on_ci);
 
 		$this->db->multi('UPDATE foo bar ???', [[0]]);
 	}
 
 	/**
-	 * @dataProvider             driverProvider
-	 * @expectedException \chillerlan\Database\Drivers\DriverException
-	 * @expectedExceptionMessage invalid data
+	 * @dataProvider driverProvider
 	 */
 	public function testMultiInvalidData(string $driver, string $env_prefix, bool $skip_on_ci){
+		$this->expectException(DriverException::class);
+		$this->expectExceptionMessage('invalid data');
+
 		$this->dbInstance($driver, $env_prefix, $skip_on_ci);
 
 		$this->db->multi('UPDATE foo bar ???', []);
 	}
 
 	/**
-	 * @dataProvider             driverProvider
-	 * @expectedException \chillerlan\Database\Drivers\DriverException
-	 * @expectedExceptionMessage sql error: empty sql
+	 * @dataProvider driverProvider
 	 */
 	public function testMultiCallbackEmptySQL(string $driver, string $env_prefix, bool $skip_on_ci){
+		$this->expectException(DriverException::class);
+		$this->expectExceptionMessage('sql error: empty sql');
+
 		$this->dbInstance($driver, $env_prefix, $skip_on_ci);
 
 		$this->db->multiCallback('', [], function(){});
 	}
 
 	/**
-	 * @dataProvider             driverProvider
-	 * @expectedException \chillerlan\Database\Drivers\DriverException
-	 * @expectedExceptionMessage invalid callback
+	 * @dataProvider driverProvider
 	 */
 	public function testMultiCallbackInvalidCallback(string $driver, string $env_prefix, bool $skip_on_ci){
+		$this->expectException(DriverException::class);
+		$this->expectExceptionMessage('invalid callback');
+
 		$this->dbInstance($driver, $env_prefix, $skip_on_ci);
 
 		$this->db->multiCallback('UPDATE foo bar ???', [[0]], [$this, 'foo']);
 	}
 
 	/**
-	 * @dataProvider             driverProvider
-	 * @expectedException \chillerlan\Database\Drivers\DriverException
-	 * @expectedExceptionMessage sql error:
+	 * @dataProvider driverProvider
 	 */
 	public function testMultiCallbackSQLError(string $driver, string $env_prefix, bool $skip_on_ci){
+		$this->expectException(DriverException::class);
+		$this->expectExceptionMessage('sql error:');
+
 		$this->dbInstance($driver, $env_prefix, $skip_on_ci);
 
 		$this->db->multiCallback('UPDATE foo bar ???', [[0]], function($r){ return $r; });
 	}
 
 	/**
-	 * @dataProvider             driverProvider
-	 * @expectedException \chillerlan\Database\Drivers\DriverException
-	 * @expectedExceptionMessage invalid data
+	 * @dataProvider driverProvider
 	 */
 	public function testMultiCallbackInvalidData(string $driver, string $env_prefix, bool $skip_on_ci){
+		$this->expectException(DriverException::class);
+		$this->expectExceptionMessage('invalid data');
+
 		$this->dbInstance($driver, $env_prefix, $skip_on_ci);
 
 		$this->db->multiCallback('UPDATE foo bar ???', [], function($r){ return $r; });

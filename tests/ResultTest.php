@@ -25,7 +25,7 @@ class ResultTest extends TestCase{
 	 */
 	protected $result;
 
-	protected function setUp(){
+	protected function setUp():void{
 		$this->result = new Result;
 
 		foreach(range(0, 9) as $k){
