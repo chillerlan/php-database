@@ -14,15 +14,12 @@ namespace chillerlan\Database\Query;
 
 trait IfNotExistsTrait{
 
-	/**
-	 * @var bool
-	 */
-	protected $ifNotExists = false;
+	protected bool $ifNotExists = false;
 
 	/**
 	 * @return $this
 	 */
-	public function ifNotExists(){
+	public function ifNotExists():Statement{
 		$this->ifNotExists = true;
 
 		return $this;

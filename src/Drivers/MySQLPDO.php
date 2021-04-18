@@ -8,6 +8,8 @@
  * @author       Smiley <smiley@chillerlan.net>
  * @copyright    2017 Smiley
  * @license      MIT
+ *
+ * @noinspection PhpComposerExtensionStubsInspection
  */
 
 namespace chillerlan\Database\Drivers;
@@ -19,8 +21,8 @@ use chillerlan\Database\Dialects\MySQL;
  */
 class MySQLPDO extends PDODriverAbstract{
 
-	protected $drivername = 'mysql';
-	protected $dialect    = MySQL::class;
+	protected string $drivername = 'mysql';
+	protected string $dialect    = MySQL::class;
 
 	/** @inheritdoc */
 	protected function getDSN():string {

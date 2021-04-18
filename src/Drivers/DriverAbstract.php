@@ -39,23 +39,23 @@ abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 	 *
 	 * @var \chillerlan\Database\DatabaseOptions
 	 */
-	protected $options;
+	protected SettingsContainerInterface $options;
 
 	/**
-	 * @var \Psr\SimpleCache\CacheInterface
+	 * @var \Psr\SimpleCache\CacheInterface|null
 	 */
-	protected $cache;
+	protected ?CacheInterface $cache = null;
 
 	/**
 	 * The dialect to use (FQCN)
 	 *
 	 * @var string
 	 */
-	protected $dialect;
+	protected string $dialect;
 
-	protected $cachekey_hash_algo;
-	protected $convert_encoding_src;
-	protected $convert_encoding_dest;
+	protected string $cachekey_hash_algo;
+	protected ?string $convert_encoding_src;
+	protected ?string $convert_encoding_dest;
 
 	/**
 	 * Constructor.
@@ -86,7 +86,7 @@ abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 
 	/**
 	 * @param string      $sql
-	 * @param array       $values
+	 * @param array|null  $values
 	 * @param string|null $index
 	 * @param bool        $assoc
 	 *
@@ -127,7 +127,7 @@ abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 	}
 
 	public function getDialect():Dialect{
-		return new $this->dialect($this);
+		return new $this->dialect();
 	}
 
 	public function escape($data = null){

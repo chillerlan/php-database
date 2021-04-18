@@ -16,8 +16,6 @@ use chillerlan\Database\Query\QueryException;
 
 class Postgres extends DialectAbstract{
 
-	protected $quotes = ['"', '"'];
-
 	/** @inheritdoc */
 	public function select(array $cols, array $from, string $where = null, $limit = null, $offset = null, bool $distinct = null, array $groupby = null, array $orderby = null):array{
 		$sql = ['SELECT'];
@@ -252,10 +250,10 @@ class Postgres extends DialectAbstract{
 	 * @param string $table
 	 *
 	 * @return array
+	 * @noinspection SqlResolve
 	 */
-	public function showCreateTable(string $table):array{
+/*	public function showCreateTable(string $table):array{
 
-		/** @noinspection SqlResolve */
 		$def = $this->db->prepared('SELECT
 				a.attnum AS "id",
 				a.attname AS "name",
@@ -332,7 +330,7 @@ class Postgres extends DialectAbstract{
 			$fields[] = $this->fieldspec(trim($field->name), trim($field->type), null, null, null, $field->isnull !== 'NOT NULL', null, null, trim($field->default));
 		}
 
-		$create = sprintf(/** @lang text */'CREATE TABLE %1$s (%2$s)', $this->quote($table), PHP_EOL.implode(','.PHP_EOL, $fields).PHP_EOL);
+		$create = sprintf('CREATE TABLE %1$s (%2$s)', $this->quote($table), PHP_EOL.implode(','.PHP_EOL, $fields).PHP_EOL);
 
 		$this->db->prepared('CREATE TEMPORARY TABLE IF NOT EXISTS TEMP$SQL_CREATE ("name" TEXT, "create" TEXT) ON COMMIT PRESERVE ROWS');
 		$this->db->prepared('TRUNCATE TEMP$SQL_CREATE');
@@ -340,5 +338,5 @@ class Postgres extends DialectAbstract{
 
 		return ['SELECT "name" AS "Table", "create" AS "Create Table" FROM TEMP$SQL_CREATE'];
 	}
-
+*/
 }

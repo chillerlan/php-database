@@ -12,9 +12,65 @@
 
 namespace chillerlan\Database;
 
-use chillerlan\Traits\EnumerableInterface;
+interface ResultInterface{
 
-interface ResultInterface extends EnumerableInterface{
+	/**
+	 * @return array
+	 */
+	public function __toArray():array;
+
+	/**
+	 * @param callable $callback
+	 *
+	 * @return mixed
+	 */
+	public function __each($callback);
+
+	/**
+	 * @param callable $callback
+	 *
+	 * @return array
+	 */
+	public function __map($callback):array;
+
+	/**
+	 * @return \chillerlan\Database\ResultInterface
+	 */
+	public function __reverse():ResultInterface;
+
+	/**
+	 * @return mixed
+	 */
+	public function __first();
+
+	/**
+	 * @return mixed
+	 */
+	public function __last();
+
+	/**
+	 * @return \chillerlan\Database\ResultInterface
+	 */
+	public function __clear():ResultInterface;
+
+	/**
+	 * @return string
+	 */
+	public function __inspect():string;
+
+	/**
+	 * @param callable $callback
+	 *
+	 * @return array
+	 */
+	public function __findAll($callback):array;
+
+	/**
+	 * @param callable $callback
+	 *
+	 * @return array
+	 */
+	public function __reject($callback):array;
 
 	/**
 	 * Result constructor.

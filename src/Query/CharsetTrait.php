@@ -14,17 +14,14 @@ namespace chillerlan\Database\Query;
 
 trait CharsetTrait{
 
-	/**
-	 * @var string
-	 */
-	protected $charset;
+	protected string $charset;
 
 	/**
 	 * @param string $charset
 	 *
 	 * @return $this
 	 */
-	public function charset(string $charset){
+	public function charset(string $charset):Statement{
 		$this->charset = trim($charset);
 
 		return $this;

@@ -14,8 +14,8 @@ namespace chillerlan\Database\Dialects;
 
 class MySQL extends DialectAbstract{
 
-	protected $quotes = ['`', '`'];
-	protected $charset = 'utf8mb4_bin';
+	protected array $quotes = ['`', '`'];
+	protected string $charset = 'utf8mb4_bin';
 
 	/** @inheritdoc */
 	public function insert(string $table, array $fields, string $onConflict = null, string $conflictTarget = null):array{

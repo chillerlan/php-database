@@ -8,6 +8,8 @@
  * @author       Smiley <smiley@chillerlan.net>
  * @copyright    2017 Smiley
  * @license      MIT
+ *
+ * @noinspection PhpComposerExtensionStubsInspection
  */
 
 namespace chillerlan\Database\Drivers;
@@ -24,8 +26,8 @@ use Psr\{
  */
 class MSSqlSrvPDO extends PDODriverAbstract{
 
-	protected $drivername = 'sqlsrv';
-	protected $dialect    = MSSQL::class;
+	protected string $drivername = 'sqlsrv';
+	protected string $dialect    = MSSQL::class;
 
 	/**
 	 * MSSqlSrvPDO constructor.

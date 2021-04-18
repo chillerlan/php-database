@@ -26,45 +26,18 @@ use chillerlan\Database\Dialects\{
  */
 trait QueryTrait{
 
-	/**
-	 * @var array
-	 */
-	protected $sql = [];
-
-	/**
-	 * @var bool
-	 */
-	protected $multi = false;
-
-	/**
-	 * @var bool
-	 */
-	protected $cached = false;
-
-	/**
-	 * @var int
-	 */
-	protected $ttl = 300;
-
-	/**
-	 * @var int
-	 */
-	protected $limit;
-
-	/**
-	 * @var int
-	 */
-	protected $offset;
+	protected array $sql = [];
+	protected bool $multi = false;
+	protected bool $cached = false;
+	protected int $ttl = 300;
+	protected ?int $limit = null;
+	protected ?int $offset = null;
+	protected array $bindValues = [];
 
 	/**
 	 * @return array
 	 */
 	abstract protected function getSQL():array;
-
-	/**
-	 * @var array
-	 */
-	protected $bindValues = [];
 
 	/**
 	 * @param bool|null $multi
@@ -114,28 +87,28 @@ trait QueryTrait{
 	}
 
 	/** @inheritdoc */
-	protected function addBindValue(string $key, $value){
+	protected function addBindValue(string $key, $value):Statement{
 		$this->bindValues[$key] = $value;
 
 		return $this;
 	}
 
 	/** @inheritdoc */
-	public function limit(int $limit){
+	public function limit(int $limit):Statement{
 		$this->limit = $limit >= 0 ? $limit : 0;
 
 		return $this;
 	}
 
 	/** @inheritdoc */
-	public function offset(int $offset){
+	public function offset(int $offset):Statement{
 		$this->offset = $offset >= 0 ? $offset : 0;
 
 		return $this;
 	}
 
 	/** @inheritdoc */
-	public function cached(int $ttl = null){
+	public function cached(int $ttl = null):Statement{
 		$this->cached = true;
 
 		if($ttl > 0){

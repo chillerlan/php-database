@@ -14,20 +14,9 @@ namespace chillerlan\Database\Query;
 
 trait OnConflictTrait{
 
-	/**
-	 * @var string
-	 */
-	protected $name;
-
-	/**
-	 * @var string
-	 */
-	protected $on_conflict;
-
-	/**
-	 * @var string
-	 */
-	protected $conflict_target;
+	protected string $name;
+	protected ?string $on_conflict = null;
+	protected ?string $conflict_target = null;
 
 	/**
 	 * @param string      $name
@@ -37,7 +26,7 @@ trait OnConflictTrait{
 	 * @return $this
 	 * @throws \chillerlan\Database\Query\QueryException
 	 */
-	public function name(string $name, string $on_conflict = null, string $conflict_target = null){
+	public function name(string $name, string $on_conflict = null, string $conflict_target = null):Statement{
 		$this->name      = trim($name);
 		$on_conflict     = trim(strtoupper($on_conflict));
 		$conflict_target = trim(strtoupper($conflict_target));

@@ -176,11 +176,4 @@ interface Dialect{
 	 */
 	public function showTables(string $database = null, string $pattern = null, string $where = null):array;
 
-	/**
-	 * @param string $table
-	 *
-	 * @return array
-	 */
-	public function showCreateTable(string $table):array;
-
 }

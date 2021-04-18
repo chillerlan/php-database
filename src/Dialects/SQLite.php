@@ -14,8 +14,6 @@ namespace chillerlan\Database\Dialects;
 
 class SQLite extends DialectAbstract{
 
-	protected $quotes = ['"', '"'];
-
 	/** @inheritdoc */
 	public function fieldspec(string $name, string $type, $length = null, string $attribute = null, string $collation = null, bool $isNull = null, string $defaultType = null, $defaultValue = null, string $extra = null):string{
 		$type      = strtoupper(trim($type));

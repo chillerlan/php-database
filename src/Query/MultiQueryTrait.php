@@ -19,7 +19,7 @@ trait MultiQueryTrait{
 	use QueryTrait;
 
 	/** @inheritdoc */
-	public function multi(array $values = null){
+	public function multi(array $values = null):bool{
 		$sql    = $this->sql(true);
 		$values = $values ?? ($this instanceof BindValues ? $this->getBindValues() : []);
 
@@ -29,7 +29,7 @@ trait MultiQueryTrait{
 	}
 
 	/** @inheritdoc */
-	public function callback(iterable $values, callable $callback){
+	public function callback(iterable $values, callable $callback):bool{
 		$sql    = $this->sql(true);
 
 		$this->logger->debug('MultiQueryTrait::callback()', ['method' => __METHOD__, 'sql' => $sql, 'val' => $values]);

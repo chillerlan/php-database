@@ -8,6 +8,8 @@
  * @author       Smiley <smiley@chillerlan.net>
  * @copyright    2017 Smiley
  * @license      MIT
+ *
+ * @noinspection PhpComposerExtensionStubsInspection
  */
 
 namespace chillerlan\Database\Drivers;
@@ -19,7 +21,7 @@ use chillerlan\Database\Dialects\Postgres;
  */
 class PostgreSQLPDO extends PDODriverAbstract{
 
-	protected $drivername = 'pgsql';
-	protected $dialect    = Postgres::class;
+	protected string $drivername = 'pgsql';
+	protected string $dialect    = Postgres::class;
 
 }

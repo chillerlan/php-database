@@ -8,6 +8,8 @@
  * @author       Smiley <smiley@chillerlan.net>
  * @copyright    2017 Smiley
  * @license      MIT
+ *
+ * @noinspection PhpComposerExtensionStubsInspection
  */
 
 namespace chillerlan\Database\Drivers;
@@ -20,8 +22,8 @@ use Exception, PDO;
  */
 class FirebirdPDO extends PDODriverAbstract{
 
-	protected $drivername = 'firebird';
-	protected $dialect    = Firebird::class;
+	protected string $drivername = 'firebird';
+	protected string $dialect    = Firebird::class;
 
 	/**
 	 * @inheritdoc

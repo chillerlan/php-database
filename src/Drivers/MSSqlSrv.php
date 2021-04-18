@@ -8,6 +8,8 @@
  * @author       Smiley <smiley@chillerlan.net>
  * @copyright    2017 Smiley
  * @license      MIT
+ *
+ * @noinspection PhpComposerExtensionStubsInspection
  */
 
 namespace chillerlan\Database\Drivers;
@@ -19,7 +21,7 @@ use chillerlan\Database\Dialects\MSSQL;
  */
 class MSSqlSrv extends DriverAbstract{
 
-	protected $dialect = MSSQL::class;
+	protected string $dialect = MSSQL::class;
 
 	/** @inheritdoc */
 	protected function raw_query(string $sql, string $index = null, bool $assoc = null){

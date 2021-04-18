@@ -11,10 +11,6 @@
  */
 
 namespace chillerlan\Database;
-
-use chillerlan\Traits\{
-	Enumerable, Interfaces\ArrayAccessTrait, Magic, SPL\CountableTrait, SPL\SeekableIteratorTrait
-};
 use ArrayAccess, Countable, SeekableIterator;
 
 /**
@@ -22,9 +18,6 @@ use ArrayAccess, Countable, SeekableIterator;
  * @property \chillerlan\Database\ResultRow[] $array
  */
 class Result implements ResultInterface, SeekableIterator, ArrayAccess, Countable{
-	use ArrayAccessTrait, SeekableIteratorTrait, CountableTrait, Magic, Enumerable{
-		__toArray as __EnumerableToArray;
-	}
 
 	/**
 	 * @var null|string
@@ -70,6 +63,296 @@ class Result implements ResultInterface, SeekableIterator, ArrayAccess, Countabl
 		$this->offset = 0;
 	}
 
+
+	/**
+	 * @var array
+	 */
+	protected $array = [];
+
+	/**
+	 * @var int
+	 */
+	protected $offset = 0;
+
+	/**
+	 * @link http://api.prototypejs.org/language/Enumerable/prototype/toArray/
+	 *
+	 * @return array
+	 *
+	 * @codeCoverageIgnore
+	 */
+	public function __EnumerableToArray():array {
+		return $this->array;
+	}
+
+	/**
+	 * @link http://api.prototypejs.org/language/Enumerable/prototype/each/
+	 *
+	 * @param callable $callback
+	 *
+	 * @return $this
+	 */
+	public function __each($callback){
+		$this->__map($callback);
+
+		return $this;
+	}
+
+	/**
+	 * @link http://api.prototypejs.org/language/Enumerable/prototype/collect/
+	 * @link http://api.prototypejs.org/language/Enumerable/prototype/map/
+	 *
+	 * @param callable $callback
+	 *
+	 * @return array
+	 * @throws \chillerlan\Database\DatabaseException
+	 */
+	public function __map($callback):array {
+
+		if(!\is_callable($callback)){
+			throw new DatabaseException('invalid callback');
+		}
+
+		$return = [];
+
+		foreach($this->array as $index => $element){
+			$return[$index] = \call_user_func_array($callback, [$element, $index]);
+		}
+
+		return $return;
+	}
+
+	/**
+	 * @link http://api.prototypejs.org/language/Array/prototype/reverse/
+	 */
+	public function __reverse():ResultInterface{
+		$this->array  = \array_reverse($this->array);
+		$this->offset = 0;
+
+		return $this;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function __first(){
+		return $this->array[0] ?? null;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function __last(){
+		return $this->array[\count($this->array) - 1] ?? null;
+	}
+
+	/**
+	 *
+	 */
+	public function __clear():ResultInterface{
+		$this->array = [];
+
+		return $this;
+	}
+
+	/**
+	 * @link http://api.prototypejs.org/language/Array/prototype/inspect/
+	 *
+	 * @return string
+	 */
+	public function __inspect():string {
+		return \print_r($this->array, true);
+	}
+
+	/**
+	 * @link http://api.prototypejs.org/language/Enumerable/prototype/findAll/
+	 *
+	 * @param callable $callback
+	 *
+	 * @return array
+	 * @throws \chillerlan\Database\DatabaseException
+	 */
+	public function __findAll($callback):array{
+
+		if(!\is_callable($callback)){
+			throw new DatabaseException('invalid callback');
+		}
+
+		$return = [];
+
+		foreach($this->array as $index => $element){
+
+			if(\call_user_func_array($callback, [$element, $index]) === true){
+				$return[] = $element;
+			}
+
+		}
+
+		return $return;
+	}
+
+	/**
+	 * @link http://api.prototypejs.org/language/Enumerable/prototype/reject/
+	 *
+	 * @param callable $callback
+	 *
+	 * @return array
+	 * @throws \chillerlan\Database\DatabaseException
+	 */
+	public function __reject($callback):array{
+
+		if(!\is_callable($callback)){
+			throw new DatabaseException('invalid callback');
+		}
+
+		$return = [];
+
+		foreach($this->array as $index => $element){
+
+			if(\call_user_func_array($callback, [$element, $index]) !== true){
+				$return[] = $element;
+			}
+
+		}
+
+		return $return;
+	}
+
+	/**
+	 * @param string $name
+	 *
+	 * @return mixed|null
+	 */
+	public function __get(string $name){
+		return $this->get($name);
+	}
+
+	/**
+	 * @param string $name
+	 * @param mixed  $value
+	 *
+	 * @return void
+	 */
+	public function __set(string $name, $value):void{
+		$this->set($name, $value);
+	}
+
+	/**
+	 * @param string $name
+	 *
+	 * @return mixed|null
+	 */
+	private function get(string $name){
+		$method = 'magic_get_'.$name;
+
+		return \method_exists($this, $method) ? $this->$method() : null;
+	}
+
+	/**
+	 * @param string $name
+	 * @param        $value
+	 *
+	 * @return void
+	 */
+	private function set(string $name, $value):void{
+		$method = 'magic_set_'.$name;
+
+		if(\method_exists($this, $method)){
+			$this->$method($value);
+		}
+
+	}
+
+	/**
+	 * @link  http://php.net/manual/arrayaccess.offsetexists.php
+	 * @inheritdoc
+	 */
+	public function offsetExists($offset):bool{
+		return \array_key_exists($offset, $this->array);
+	}
+
+	/**
+	 * @link  http://php.net/manual/arrayaccess.offsetget.php
+	 * @inheritdoc
+	 */
+	public function offsetGet($offset){
+		return $this->array[$offset] ?? null;
+	}
+
+	/**
+	 * @link  http://php.net/manual/arrayaccess.offsetunset.php
+	 * @inheritdoc
+	 */
+	public function offsetUnset($offset):void{
+		unset($this->array[$offset]);
+	}
+
+
+	/**
+	 * @link http://php.net/manual/countable.count.php
+	 * @inheritdoc
+	 */
+	public function count():int{
+		return \count($this->array);
+	}
+
+	/**
+	 * @link  http://php.net/manual/iterator.current.php
+	 * @inheritdoc
+	 */
+	public function current(){
+		return $this->array[$this->offset] ?? null;
+	}
+
+	/**
+	 * @link  http://php.net/manual/iterator.next.php
+	 * @inheritdoc
+	 */
+	public function next():void{
+		$this->offset++;
+	}
+
+	/**
+	 * @link  http://php.net/manual/iterator.key.php
+	 * @inheritdoc
+	 */
+	public function key(){
+		return $this->offset;
+	}
+
+	/**
+	 * @link  http://php.net/manual/iterator.valid.php
+	 * @inheritdoc
+	 */
+	public function valid():bool{
+		return \array_key_exists($this->offset, $this->array);
+	}
+
+	/**
+	 * @link  http://php.net/manual/iterator.rewind.php
+	 * @inheritdoc
+	 */
+	public function rewind():void{
+		$this->offset = 0;
+	}
+
+	/**
+	 * @link  http://php.net/manual/seekableiterator.seek.php
+	 * @inheritdoc
+	 */
+	public function seek($pos):void{
+		$this->rewind();
+
+		for( ; $this->offset < $pos; ){
+
+			if(!\next($this->array)) {
+				throw new \OutOfBoundsException('invalid seek position: '.$pos);
+			}
+
+			$this->offset++;
+		}
+
+	}
 	/** @inheritdoc */
 	public function __toJSON(bool $prettyprint = null):string{
 		return json_encode($this->__toArray(), $prettyprint === true ? JSON_PRETTY_PRINT : null);

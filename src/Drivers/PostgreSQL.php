@@ -8,6 +8,8 @@
  * @author       Smiley <smiley@chillerlan.net>
  * @copyright    2017 Smiley
  * @license      MIT
+ *
+ * @noinspection PhpComposerExtensionStubsInspection
  */
 
 namespace chillerlan\Database\Drivers;
@@ -21,7 +23,7 @@ use chillerlan\Database\{
  */
 class PostgreSQL extends DriverAbstract{
 
-	protected $dialect = Postgres::class;
+	protected string $dialect = Postgres::class;
 
 	/** @inheritdoc */
 	public function connect():DriverInterface{

@@ -12,11 +12,7 @@
 
 namespace chillerlan\Database\Dialects;
 
-use chillerlan\Database\ResultInterface;
-
 class Firebird extends DialectAbstract{
-
-	protected $quotes = ['"', '"'];
 
 	/** @inheritdoc */
 	public function select(array $cols, array $from, string $where = null, $limit = null, $offset = null, bool $distinct = null, array $groupby = null, array $orderby = null):array{
@@ -216,13 +212,13 @@ END ^
 	 * @param string $table
 	 *
 	 * @return array
+	 * @noinspection SqlResolve
 	 */
-	public function showCreateTable(string $table):array{
+/*	public function showCreateTable(string $table):array{
 
-		/** @noinspection SqlResolve */
 		$def = $this->db->prepared('
-			SELECT 
-				RF.RDB$FIELD_POSITION AS "id", 
+			SELECT
+				RF.RDB$FIELD_POSITION AS "id",
 				TRIM(RF.RDB$FIELD_NAME) AS "name",
 				(CASE F.RDB$FIELD_TYPE
 					WHEN 7 THEN
@@ -270,7 +266,6 @@ END ^
 			ORDER BY RF.RDB$FIELD_POSITION
 			', [$table]);
 
-		/** @noinspection SqlResolve */
 		$idx = $this->db->prepared('SELECT S.RDB$FIELD_POSITION AS "pos", S.RDB$FIELD_NAME AS "field", I.RDB$INDEX_ID AS "id", I.RDB$UNIQUE_FLAG AS "unique" FROM RDB$INDEX_SEGMENTS AS S, RDB$INDICES AS I WHERE S.RDB$INDEX_NAME = I.RDB$INDEX_NAME AND I.RDB$RELATION_NAME = ?', [$table]);
 
 		$fields = [];
@@ -290,13 +285,11 @@ END ^
 
 		$this->db->prepared('RECREATE GLOBAL TEMPORARY TABLE TEMP$SQL_CREATE ("name" BLOB SUB_TYPE TEXT CHARACTER SET UTF8 NOT NULL, "create" BLOB SUB_TYPE TEXT CHARACTER SET UTF8 NOT NULL) ON COMMIT PRESERVE ROWS');
 
-		$create = sprintf(/** @lang text */'CREATE TABLE %1$s (%2$s)', $this->quote($table), PHP_EOL.implode(','.PHP_EOL, $fields).PHP_EOL);
+		$create = sprintf('CREATE TABLE %1$s (%2$s)', $this->quote($table), PHP_EOL.implode(','.PHP_EOL, $fields).PHP_EOL);
 
-		/** @noinspection SqlResolve */
 		$this->db->prepared('INSERT INTO TEMP$SQL_CREATE ("name", "create") VALUES (?, ?)', [$table, $create]);
 
-		/** @noinspection SqlResolve */
 		return ['SELECT "name" AS "Table", "create" AS "Create Table" FROM TEMP$SQL_CREATE'];
 	}
-
+*/
 }

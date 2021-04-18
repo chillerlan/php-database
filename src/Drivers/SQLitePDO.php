@@ -8,6 +8,8 @@
  * @author       Smiley <smiley@chillerlan.net>
  * @copyright    2018 Smiley
  * @license      MIT
+ *
+ * @noinspection PhpComposerExtensionStubsInspection
  */
 
 namespace chillerlan\Database\Drivers;
@@ -21,8 +23,8 @@ use Exception, PDO;
  */
 class SQLitePDO extends PDODriverAbstract{
 
-	protected $drivername = 'sqlite';
-	protected $dialect    = SQLite::class;
+	protected string $drivername = 'sqlite';
+	protected string $dialect    = SQLite::class;
 
 	/**
 	 * @inheritdoc

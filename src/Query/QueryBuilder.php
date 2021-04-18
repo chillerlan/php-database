@@ -12,9 +12,7 @@
 
 namespace chillerlan\Database\Query;
 
-use chillerlan\Database\{
-	Drivers\DriverInterface, ResultInterface
-};
+use chillerlan\Database\{Dialects\Dialect, Drivers\DriverInterface, ResultInterface};
 use Psr\Log\{
 	LoggerAwareInterface, LoggerAwareTrait, LoggerInterface
 };
@@ -37,14 +35,8 @@ class QueryBuilder implements LoggerAwareInterface{
 
 	protected const STATEMENTS = ['alter', 'create', 'delete', 'drop', 'insert', 'select', 'show', 'truncate', 'update'];
 
-	/**
-	 * @var \chillerlan\Database\Drivers\DriverInterface
-	 */
-	protected $db;
-	/**
-	 * @var \chillerlan\Database\Dialects\Dialect
-	 */
-	protected $dialect;
+	protected DriverInterface $db;
+	protected Dialect $dialect;
 
 	/**
 	 * QueryBuilder constructor.
@@ -123,17 +115,10 @@ class QueryBuilder implements LoggerAwareInterface{
 				return (new class($this->db, $this->dialect, $this->logger) extends StatementAbstract implements CreateTable, Query{
 					use CharsetTrait, IfNotExistsTrait, NameTrait, QueryTrait;
 
-					/** @var bool */
-					protected $temp = false;
-
-					/** @var string */
-					protected $primaryKey;
-
-					/*** @var array */
-					protected $cols = [];
-
-					/*** @var string */
-					protected $dir;
+					protected bool $temp = false;
+					protected ?string $primaryKey = null;
+					protected array $cols = [];
+					protected ?string $dir = null;
 
 					/** @inheritdoc */
 					protected function getSQL():array{
@@ -307,20 +292,11 @@ class QueryBuilder implements LoggerAwareInterface{
 		return new class($this->db, $this->dialect, $this->logger) extends StatementAbstract implements Select, Where, BindValues, Query{
 			use QueryTrait, WhereTrait;
 
-			/** @var bool */
-			protected $distinct = false;
-
-			/** @var array */
-			protected $cols = [];
-
-			/** @var array */
-			protected $from = [];
-
-			/** @var array */
-			protected $orderby = [];
-
-			/** @var array */
-			protected $groupby = [];
+			protected bool $distinct = false;
+			protected array $cols = [];
+			protected array $from = [];
+			protected array $orderby = [];
+			protected array $groupby = [];
 
 			/** @inheritdoc */
 			protected function getSQL():array{
@@ -433,7 +409,7 @@ class QueryBuilder implements LoggerAwareInterface{
 						name as from;
 					}
 
-					protected $pattern;
+					protected ?string $pattern = null;
 
 					/** @inheritdoc */
 					protected function getSQL():array{
@@ -517,10 +493,7 @@ class QueryBuilder implements LoggerAwareInterface{
 				name as table;
 			}
 
-			/**
-			 * @var array
-			 */
-			protected $set = [];
+			protected array $set = [];
 
 			/** @inheritdoc */
 			protected function getSQL():array{

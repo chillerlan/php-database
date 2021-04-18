@@ -12,7 +12,6 @@
 
 namespace chillerlan\Database\Dialects;
 
-use chillerlan\Database\Drivers\DriverInterface;
 use chillerlan\Database\Query\QueryException;
 
 /**
@@ -26,26 +25,12 @@ abstract class DialectAbstract implements Dialect{
 	/**
 	 * @var string[]
 	 */
-	protected $quotes;
+	protected array $quotes = ['"', '"'];
 
 	/**
 	 * @var string
 	 */
-	protected $charset = 'utf8';
-
-	/**
-	 * @var \chillerlan\Database\Drivers\DriverInterface
-	 */
-	protected $db;
-
-	/**
-	 * Dialect constructor.
-	 *
-	 * @param \chillerlan\Database\Drivers\DriverInterface $driver
-	 */
-	public function __construct(DriverInterface $driver){
-		$this->db = $driver;
-	}
+	protected string $charset = 'utf8';
 
 	/** @inheritdoc */
 	public function select(array $cols, array $from, string $where = null, $limit = null, $offset = null, bool $distinct = null, array $groupby = null, array $orderby = null):array{
@@ -205,6 +190,8 @@ abstract class DialectAbstract implements Dialect{
 	/** @inheritdoc */
 	public function cols(array $expressions):array {
 
+		// @todo: fixme, cleanup
+		// errors on [alias => col, alias, alias => col...]
 		$_col = function ($expr1, $expr2 = null, $func = null):string {
 			switch(true){
 				case  $expr2 && $func:

@@ -23,7 +23,7 @@ namespace chillerlan\Database\Query;
  */
 trait WhereTrait{
 
-	private $operators = [
+	private array $operators = [
 		'=', '>=', '>', '<=', '<', '<>', '!=',
 		'|', '&', '<<', '>>', '+', '-', '*', '/',
 		'%', '^', '<=>', '~', '!', 'DIV', 'MOD',
@@ -33,11 +33,8 @@ trait WhereTrait{
 //		'BETWEEN', 'NOT BETWEEN',
 	];
 
-	private $joinArgs = ['AND', 'OR', 'XOR'];
-	/**
-	 * @var array
-	 */
-	protected $where = [];
+	private array $joinArgs = ['AND', 'OR', 'XOR'];
+	protected array $where = [];
 
 	/**
 	 * @param mixed       $val1
@@ -48,7 +45,7 @@ trait WhereTrait{
 	 *
 	 * @return $this
 	 */
-	public function where($val1, $val2 = null, string $operator = null, bool $bind = null, string $join = null){
+	public function where($val1, $val2 = null, string $operator = null, bool $bind = null, string $join = null):Statement{
 		$operator = $operator !== null ? strtoupper(trim($operator)) : '=';
 		$bind     = $bind ?? true;
 
@@ -131,7 +128,7 @@ trait WhereTrait{
 	 *
 	 * @return $this
 	 */
-	public function openBracket(string $join = null){
+	public function openBracket(string $join = null):Statement{
 		$join = strtoupper(trim($join));
 
 		if(in_array($join, $this->joinArgs, true)){
@@ -146,7 +143,7 @@ trait WhereTrait{
 	/**
 	 * @return $this
 	 */
-	public function closeBracket(){
+	public function closeBracket():Statement{
 		$this->where[] = ')';
 
 		return $this;
@@ -155,7 +152,7 @@ trait WhereTrait{
 	/**
 	 * @return string
 	 */
-	protected function _getWhere():string {
+	protected function _getWhere():string{
 		$where = [];
 
 		foreach($this->where as $k => $v){

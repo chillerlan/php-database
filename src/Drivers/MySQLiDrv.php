@@ -8,6 +8,8 @@
  * @author       Smiley <smiley@chillerlan.net>
  * @copyright    2017 Smiley
  * @license      MIT
+ *
+ * @noinspection PhpComposerExtensionStubsInspection
  */
 
 namespace chillerlan\Database\Drivers;
@@ -22,7 +24,7 @@ use mysqli;
  */
 class MySQLiDrv extends DriverAbstract{
 
-	protected $dialect = MySQL::class;
+	protected string $dialect = MySQL::class;
 
 	/** @inheritdoc */
 	public function connect():DriverInterface{

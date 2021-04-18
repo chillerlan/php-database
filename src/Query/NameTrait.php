@@ -14,10 +14,7 @@ namespace chillerlan\Database\Query;
 
 trait NameTrait{
 
-	/**
-	 * @var string
-	 */
-	protected $name;
+	protected ?string $name = null;
 
 	/**
 	 * @param string $name
@@ -25,7 +22,7 @@ trait NameTrait{
 	 * @return $this
 	 * @throws \chillerlan\Database\Query\QueryException
 	 */
-	public function name(string $name){
+	public function name(string $name):Statement{
 		$this->name = trim($name);
 
 		if(empty($this->name)){

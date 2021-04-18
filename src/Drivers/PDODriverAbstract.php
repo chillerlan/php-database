@@ -24,7 +24,7 @@ abstract class PDODriverAbstract extends DriverAbstract{
 	 *
 	 * @var string
 	 */
-	protected $drivername;
+	protected string $drivername;
 
 	/**
 	 * Some basic PDO options

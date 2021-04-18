@@ -164,9 +164,9 @@ trait DatabaseOptionsTrait{
 	/**
 	 * Specifies whether the communication with MS SQL Server is encrypted or unencrypted.
 	 *
-	 * @var bool
+	 * @var int
 	 */
-	protected $mssql_encrypt = false; // how???
+	protected $mssql_encrypt = 0; // how???
 
 	/**
 	 * Firebird connection encoding

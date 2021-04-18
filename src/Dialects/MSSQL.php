@@ -14,7 +14,7 @@ namespace chillerlan\Database\Dialects;
 
 class MSSQL extends DialectAbstract{
 
-	protected $quotes = ['[', ']'];
+	protected array $quotes = ['[', ']'];
 
 	/** @inheritdoc */
 	public function select(array $cols, array $from, string $where = null, $limit = null, $offset = null, bool $distinct = null, array $groupby = null, array $orderby = null):array{
