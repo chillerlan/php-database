@@ -1,0 +1,145 @@
+# https://help.github.com/en/categories/automating-your-workflow-with-github-actions
+# https://github.com/sebastianbergmann/phpunit/blob/master/.github/workflows/ci.yml
+
+name: "Continuous Integration"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+
+jobs:
+
+#  static-code-analysis:
+#    name: "Static Code Analysis"
+#
+#    runs-on: ubuntu-latest
+#
+#    env:
+#      PHAN_ALLOW_XDEBUG: 0
+#      PHAN_DISABLE_XDEBUG_WARN: 1
+#
+#    steps:
+#      - name: "Checkout"
+#        uses: actions/checkout@v2
+#
+#      - name: "Install PHP"
+#        uses: shivammathur/setup-php@v2
+#        with:
+#          php-version: "7.4"
+#          tools: pecl
+#          coverage: none
+#          extensions: ast, curl, json, simplexml, zlib
+#
+#      - name: "Update dependencies with composer"
+#        run: composer update --no-interaction --no-ansi --no-progress --no-suggest --prefer-source
+#
+#      - name: "Run phan"
+#        run: php vendor/bin/phan
+
+  tests:
+    name: "Unit Tests"
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-20.04
+          - windows-2019
+        php-version:
+          - "7.4"
+          - "8.0"
+
+    steps:
+      - name: "Configure git to avoid issues with line endings"
+        if: ${{ runner.os == 'Windows' }}
+        run: git config --global core.autocrlf false
+
+      - name: "Checkout"
+        uses: actions/checkout@v2
+
+      # pgsql is already installed on the runner, we just need to start the service
+      # https://www.cybertec-postgresql.com/en/postgresql-github-actions-continuous-integration/
+      - name: "Start PostgreSQL (Linux)"
+        if: ${{ runner.os == 'Linux' }}
+        # we also need to change the password for the default user under Linux to match the one under Windows
+        run: |
+          sudo systemctl start postgresql.service
+          pg_isready
+          sudo -u postgres psql --command="ALTER USER postgres PASSWORD 'root';"
+          sudo -u postgres createdb --echo --owner=postgres dbtest
+
+      - name: "Start PostgreSQL (Windows)"
+        if: ${{ runner.os == 'Windows' }}
+        run: |
+          $pgService = Get-Service -Name postgresql*
+          Set-Service -InputObject $pgService -Status running -StartupType automatic
+          Start-Process -FilePath "$env:PGBIN\pg_isready" -Wait -PassThru
+          & $env:PGBIN\createdb --echo --owner=postgres dbtest
+
+      - name: "Install MySQL"
+        uses: shogo82148/actions-setup-mysql@v1
+        with:
+          mysql-version: '5.7'
+          auto-start: true
+
+      - name: "Create MySQL test database"
+        run: mysql --user="root" --host="127.0.0.1" -e "CREATE DATABASE dbtest character set UTF8mb4 collate utf8mb4_bin;"
+
+      - name: "Install SQLite (Linux)"
+        if: ${{ runner.os == 'Linux' }}
+        run: sudo apt-get -y install sqlite3 libsqlite3-dev
+
+      - name: "Install SQLite (Windows)"
+        if: ${{ runner.os == 'Windows' }}
+        run: choco install sqlite
+
+#      - name: "Install Firebird (Linux)"
+#        if: ${{ runner.os == 'Linux' }}
+#        run: |
+#          sudo add-apt-repository ppa:mapopa/firebird3.0
+#          sudo apt-get update
+#          sudo apt-get install -y firebird2.5-superclassic
+#          sudo cp ./config/firebird.conf /etc/firebird/2.5/firebird.conf
+#          sudo service firebird2.5 restart
+
+#      - name: "Install Firebird (Windows)"
+#        if: ${{ runner.os == 'Windows' }}
+#        run: choco install firebird --version=2.5.8 -params '/ClientAndDevTools'
+
+#      - name: "Install MSSQL Server (Linux)"
+#        if: ${{ runner.os == 'Linux' }}
+#        run: sh ./scripts/install-mssql.sh
+
+#      - name: "Start SQL LocalDB (Windows)"
+#        if: ${{ runner.os == 'Windows' }}
+#        run: |
+#          # MSSQLLocalDB is the default SQL LocalDB instance
+#          SqlLocalDB start MSSQLLocalDB
+#          SqlLocalDB info MSSQLLocalDB
+#          sqlcmd -S "(localdb)\MSSQLLocalDB" -Q "create database dbtest;"
+
+      - name: "Install PHP with extensions"
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          coverage: pcov
+          extensions: mbstring, odbc, pdo_odbc, mysqli, pdo_mysql, pgsql, pdo_pgsql, sqlite3, pdo_sqlite, sqlsrv, pdo_sqlsrv, pdo_firebird
+#          ini-values:
+
+      - name: "Install dependencies with composer"
+        run: composer update --no-ansi --no-interaction --no-progress --no-suggest --prefer-source
+
+      - name: "Run tests with phpunit"
+        run: php vendor/phpunit/phpunit/phpunit --configuration=phpunit.xml.dist
+
+      - name: "Send code coverage report to Codecov.io"
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}

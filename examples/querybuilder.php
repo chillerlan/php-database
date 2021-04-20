@@ -17,12 +17,9 @@ $options = null;
 /** @var \Psr\SimpleCache\CacheInterface $cache */
 $cache   = null;
 
-/** @var \Psr\Log\LoggerInterface $log */
-$log = null;
-
 require_once __DIR__.'/common.php';
 
-$db = new Database($options, $cache, $log);
+$db = new Database($options, $cache);
 $db->connect();
 
 $db->create

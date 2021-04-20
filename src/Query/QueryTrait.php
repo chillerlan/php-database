@@ -61,12 +61,23 @@ trait QueryTrait{
 	/** @inheritdoc */
 	public function getBindValues():array{
 
-		if($this->dialect instanceof Firebird || $this->dialect instanceof MSSQL){
+		// @todo: cleanup/simplify
+		if($this->dialect instanceof Firebird){
 
 			if($this->limit !== null){
 				$this->bindValues = array_merge([
 					'limit'  => $this->limit,
 					'offset' => $this->offset ?? 0,
+				], $this->bindValues);
+			}
+
+		}
+		elseif($this->dialect instanceof MSSQL){
+
+			if($this->limit !== null){
+				$this->bindValues = array_merge([
+					'offset' => $this->offset ?? 0,
+					'limit'  => $this->limit,
 				], $this->bindValues);
 			}
 

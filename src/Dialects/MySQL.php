@@ -90,9 +90,7 @@ class MySQL extends DialectAbstract{
 			$sql[] = implode(', ', $cols);
 
 			if(!empty($primaryKey)){
-				$sql[] = ', PRIMARY KEY (';
-				$sql[] = $this->quote($primaryKey);
-				$sql[] =  ')';
+				$sql[] = ', PRIMARY KEY ('.$this->quote($primaryKey).')';
 			}
 
 			$sql[] = ')';

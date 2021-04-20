@@ -14,21 +14,25 @@ namespace chillerlan\DatabaseTest;
 
 use chillerlan\Database\{Database, DatabaseOptions, Query\QueryException};
 use chillerlan\Database\Dialects\{Dialect, Firebird, MSSQL, MySQL, Postgres, SQLite};
-use chillerlan\Database\Drivers\{DriverException, DriverInterface, MySQLiDrv, MySQLPDO, PostgreSQL, PostgreSQLPDO};
+use chillerlan\Database\Drivers\{DriverException, DriverInterface, FirebirdPDO, MSSqlSrv, MSSqlSrvPDO, MySQLiDrv, MySQLPDO, PostgreSQL, PostgreSQLPDO, SQLitePDO};
 use chillerlan\Database\Query\QueryBuilder;
 use chillerlan\DotEnv\DotEnv;
 use chillerlan\Settings\SettingsContainerInterface;
 use chillerlan\SimpleCache\MemoryCache;
+use Exception;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Psr\SimpleCache\CacheInterface;
 use ReflectionClass;
 use ReflectionMethod;
+use function var_dump;
+use const DIRECTORY_SEPARATOR;
 
 class DatabaseTest extends TestCase{
 
 	const TABLE = 'querytest';
+	const STORAGE = __DIR__.'/../storage';
 
 	protected const DRIVERS = [
 		// [driver, env_prefix, skip_on_ci]
@@ -36,12 +40,12 @@ class DatabaseTest extends TestCase{
 		'MySQLPDO'      => [MySQLPDO::class, 'DB_MYSQLI', false],
 		'PostgreSQL'    => [PostgreSQL::class, 'DB_POSTGRES', false],
 		'PostgreSQLPDO' => [PostgreSQLPDO::class, 'DB_POSTGRES', false],
-#		'SQLitePDO'     => [SQLitePDO::class, 'DB_SQLITE3', false],
-#		'SQLitePDOMem'  => [SQLitePDO::class, 'SQLITE_MEM', false],
-#		'FirebirdPDO'   => [FirebirdPDO::class, 'DB_FIREBIRD', true],
-#		'MSSqlSrv'      => [MSSqlSrv::class, 'DB_MSSQL', true],
-#		'MSSqlSrvPDO'   => [MSSqlSrvPDO::class, 'DB_MSSQL', true],
-		];
+		'SQLitePDO'     => [SQLitePDO::class, 'DB_SQLITE3', false],
+		'SQLitePDOMem'  => [SQLitePDO::class, 'SQLITE_MEM', false],
+#		'FirebirdPDO'   => [FirebirdPDO::class, 'DB_FIREBIRD', false],
+#		'MSSqlSrv'      => [MSSqlSrv::class, 'DB_MSSQL', false],
+#		'MSSqlSrvPDO'   => [MSSqlSrvPDO::class, 'DB_MSSQL', false],
+	];
 
 	/** @var \chillerlan\Database\DatabaseOptions */
 	protected SettingsContainerInterface $options;
@@ -58,22 +62,27 @@ class DatabaseTest extends TestCase{
 	 *
 	 * @var bool
 	 */
-	protected bool $isCI;
-
+	protected bool $is_ci;
 
 	/**
 	 *
 	 */
 	protected function setUp():void{
-		$this->env = (new DotEnv(__DIR__.'/../config', file_exists(__DIR__.'/../config/.env') ? '.env' : '.env_travis'))->load();
 
-		$this->isCI = $this->env->get('IS_CI') === 'TRUE';
+		foreach(['TEST_CFGDIR', 'TEST_ENVFILE', 'TEST_IS_CI'] as $constant){
+			if(!defined($constant)){
+				throw new Exception($constant.' not set -> see phpunit.xml');
+			}
+		}
 
-		// no log spam on travis
-#		if(!$this->isCI){}
+		// are we running on CI? (travis, github) -> see phpunit.xml
+		$this->is_ci = constant('TEST_IS_CI') === true;
 
-#		$this->logger = $logger;
-		$this->logger = new NullLogger;
+		// set the config dir and .env config before initializing the provider
+		$cfgdir    = realpath(__DIR__.'/../'.constant('TEST_CFGDIR'));
+		$this->env = (new DotEnv($cfgdir, constant('TEST_ENVFILE')))->load();
+
+		$this->logger = new DBTestLogger($this->is_ci ? 'none' : 'debug');
 	}
 
 	/**
@@ -111,27 +120,42 @@ class DatabaseTest extends TestCase{
 	 */
 	protected function dbInstance(string $driver, string $env_prefix, bool $skip_on_ci, array $options = [], bool $cached = false){
 
-		if($skip_on_ci === true && $this->isCI){
+		if($skip_on_ci === true && $this->is_ci){
 			$this->markTestSkipped('test on Vagrant/local: '.$driver);
+		}
+
+		if(($driver === MSSqlSrv::class || $driver === MSSqlSrvPDO::class) && PHP_OS_FAMILY === 'Windows'){
+			$this->markTestSkipped('MSSQL not yet on Windows');
 		}
 
 		if(isset($this->db) && $this->db instanceof Database){
 			$this->db->disconnect();
 		}
 
+		// fix database file names
+		if($driver === SQLitePDO::class || $driver === FirebirdPDO::class){
+			$this->env->set($env_prefix.'_DATABASE', str_replace('{STORAGE}', realpath($this::STORAGE).DIRECTORY_SEPARATOR, $this->env->get($env_prefix.'_DATABASE')));
+		}
+
 		$this->options = new DatabaseOptions(array_merge([
 			'driver'   => $driver,
-			'host'     => $this->env->{$env_prefix.'_HOST'},
-			'port'     => $this->env->{$env_prefix.'_PORT'},
-			'socket'   => $this->env->{$env_prefix.'_SOCKET'},
-			'database' => $this->env->{$env_prefix.'_DATABASE'},
-			'username' => $this->env->{$env_prefix.'_USERNAME'},
-			'password' => $this->env->{$env_prefix.'_PASSWORD'},
+			'host'     => $this->env->get($env_prefix.'_HOST'),
+			'port'     => $this->env->get($env_prefix.'_PORT'),
+			'database' => $this->env->get($env_prefix.'_DATABASE'),
+			'username' => $this->env->get($env_prefix.'_USERNAME'),
+			'password' => $this->env->get($env_prefix.'_PASSWORD'),
 		], $options));
+
+		$socket = $this->env->get($env_prefix.'_SOCKET');
+
+		if(PHP_OS_FAMILY === 'Linux' && $socket !== null){
+			$this->options->socket = $socket;
+		}
 
 		$this->cache  = new MemoryCache;
 		$this->db     = new Database($this->options, $cached ? $this->cache : null);
 		$this->db->setLogger($this->logger);
+
 
 		$this->driver = $this->db->getDriver();
 
@@ -147,6 +171,8 @@ class DatabaseTest extends TestCase{
 	 *
 	 */
 	protected function createTable(){
+		$this->db->drop->table($this::TABLE)->ifExists()->query();
+
 		$this->assertTrue(
 			$this->db->create
 				->table($this::TABLE)
@@ -234,6 +260,7 @@ class DatabaseTest extends TestCase{
 	 */
 	public function testEscapeString(string $driver, string $env_prefix, bool $skip_on_ci){
 		$this->dbInstance($driver, $env_prefix, $skip_on_ci);
+#		$this->db->drop->table('Students')->ifExists()->query();
 
 		$this->db->create
 			->table('Students')
@@ -257,7 +284,7 @@ class DatabaseTest extends TestCase{
 			$this->assertSame("'Robert''); DROP TABLE Students; --'", $str);
 		}
 		elseif($this->dialect instanceof MSSQL){
-#			$this->assertSame("'Robert''); DROP TABLE Students; --'", $str);
+			$this->assertSame("'Robert''); DROP TABLE Students; --'", $str);
 		}
 		else{
 			$this->markTestSkipped('https://xkcd.com/327/');
@@ -484,6 +511,7 @@ class DatabaseTest extends TestCase{
 		$r = $this->db->show->databases()->query()->__toArray();
 		$this->logger->debug('SHOW DATABASES:', $r);
 
+		var_dump($this->env->get($env_prefix.'_DATABASE'));
 		$this->assertTrue(in_array($this->env->get($env_prefix.'_DATABASE'), array_column($r, 'Database')));
 	}
 

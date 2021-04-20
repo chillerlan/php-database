@@ -17,6 +17,16 @@ class MSSQL extends DialectAbstract{
 	protected array $quotes = ['[', ']'];
 
 	/** @inheritdoc */
+	public function dropTable(string $table, bool $ifExists):array{
+		// @todo: if exists
+		$sql = ['DROP TABLE'];
+
+		$sql[] = $this->quote($table);
+
+		return $sql;
+	}
+
+	/** @inheritdoc */
 	public function select(array $cols, array $from, string $where = null, $limit = null, $offset = null, bool $distinct = null, array $groupby = null, array $orderby = null):array{
 		$sql = ['SELECT'];
 
@@ -56,7 +66,7 @@ class MSSQL extends DialectAbstract{
 
 	/** @inheritdoc */
 	public function createDatabase(string $dbname, bool $ifNotExists = null, string $collate = null):array{
-		$sql = [ 'CREATE DATABASE'];
+		$sql = ['CREATE DATABASE'];
 		$sql[] = $this->quote($dbname);
 
 		if($collate){
@@ -69,10 +79,16 @@ class MSSQL extends DialectAbstract{
 
 	/** @inheritdoc */
 	public function createTable(string $table, array $cols, string $primaryKey = null, bool $ifNotExists = null, bool $temp = null, string $dir = null):array{
-		$sql = ['CREATE TABLE'];
+
+		// @todo
+#		if($ifNotExists){
+#			$sql[] = 'IF OBJECT_ID(N\''.str_replace(['[', ']'], '', $table).'\', N\'U\') IS NULL' ;
+#		}
+
+		$sql[] = 'CREATE TABLE';
 		$sql[] = $this->quote($table);
 
-		if(!empty($this->cols)){
+		if(!empty($cols)){
 			$sql[] = '(';
 			$sql[] = implode(',', $cols);
 
@@ -93,8 +109,8 @@ class MSSQL extends DialectAbstract{
 		$field = [$this->quote(trim($name))];
 
 		$type_translation = [
-			'boolean'    => 'tinyint',
-			'bool   '    => 'tinyint',
+			'boolean'    => 'bit',
+			'bool   '    => 'bit',
 			'mediumint'  => 'int',
 			'double'     => 'float',
 			'tinytext'   => 'text',
@@ -121,7 +137,7 @@ class MSSQL extends DialectAbstract{
 
 			// @todo
 			switch(true){
-				case $type === 'BOOLEAN':
+				case $type_translation === 'bit':
 					$field[] = 'DEFAULT '.(preg_match('/^1|T|TRUE|YES$/i', $defaultValue) ? '1' : '0');
 					break;
 				default:
@@ -148,6 +164,11 @@ class MSSQL extends DialectAbstract{
 		// https://stackoverflow.com/questions/147659/get-list-of-databases-from-sql-server
 		// EXEC sp_databases
 		return ['SELECT name AS [Database] FROM master.dbo.sysdatabases WHERE name NOT IN (\'master\', \'tempdb\', \'model\', \'msdb\')'];
+	}
+
+	/** @inheritdoc */
+	public function showTables(string $database = null, string $pattern = null, string $where = null):array{
+		return ['SELECT Distinct TABLE_NAME FROM information_schema.TABLES'];
 	}
 
 }

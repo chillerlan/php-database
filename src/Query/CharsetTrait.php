@@ -14,7 +14,7 @@ namespace chillerlan\Database\Query;
 
 trait CharsetTrait{
 
-	protected string $charset;
+	protected ?string $charset = null;
 
 	/**
 	 * @param string $charset

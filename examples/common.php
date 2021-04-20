@@ -12,9 +12,7 @@ namespace chillerlan\DatabaseExample;
 use chillerlan\Database\{
 	Database,DatabaseOptions,Drivers\MySQLiDrv
 };
-use chillerlan\Logger\Log;
-use chillerlan\Logger\LogOptions;
-use chillerlan\Logger\Output\ConsoleLog;
+
 use chillerlan\SimpleCache\MemoryCache;
 use chillerlan\DotEnv\DotEnv;
 use Psr\Log\LogLevel;
@@ -35,6 +33,5 @@ $options = new DatabaseOptions([
 	'password'     => $env->get('DB_MYSQLI_PASSWORD'),
 ]);
 
-$log = (new Log)->addInstance(new ConsoleLog(new LogOptions(['minLogLevel' => LogLevel::DEBUG])), 'console');
 
 

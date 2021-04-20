@@ -86,6 +86,7 @@ class MSSqlSrvPDO extends PDODriverAbstract{
 
 	/** @inheritdoc */
 	public function raw(string $sql, string $index = null, bool $assoc = null){
+		$this->checkSQL($sql);
 
 		try{
 			return $this->raw_query($sql, $index, $assoc);
@@ -98,6 +99,7 @@ class MSSqlSrvPDO extends PDODriverAbstract{
 
 	/** @inheritdoc */
 	public function prepared(string $sql, array $values = null, string $index = null, bool $assoc = null){
+		$this->checkSQL($sql);
 
 		try{
 			return $this->prepared_query($sql, $values, $index, $assoc);

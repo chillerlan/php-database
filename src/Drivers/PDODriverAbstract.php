@@ -8,6 +8,8 @@
  * @author       Smiley <smiley@chillerlan.net>
  * @copyright    2017 Smiley
  * @license      MIT
+ *
+ * @noinspection PhpComposerExtensionStubsInspection
  */
 
 namespace chillerlan\Database\Drivers;
@@ -34,7 +36,7 @@ abstract class PDODriverAbstract extends DriverAbstract{
 	 *
 	 * @var array
 	 */
-	protected $pdo_options = [
+	protected array $pdo_options = [
 		PDO::ATTR_CASE              => PDO::CASE_NATURAL,
 		PDO::ATTR_ERRMODE           => PDO::ERRMODE_EXCEPTION,
 		PDO::ATTR_STRINGIFY_FETCHES => false,
@@ -44,7 +46,7 @@ abstract class PDODriverAbstract extends DriverAbstract{
 	/**
 	 * @var array
 	 */
-	protected $pdo_stmt_options = [];
+	protected array $pdo_stmt_options = [];
 
 	/**
 	 * Returns a DSN string using the given options

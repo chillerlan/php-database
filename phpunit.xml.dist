@@ -25,10 +25,10 @@
 	</logging>
 	<php>
 		<!-- whether the test runs on CI or not - set to false to allow live API tests to run -->
-		<const name="TEST_IS_CI" value="false"/>
+		<const name="TEST_IS_CI" value="true"/>
 		<!-- the config directory, where .env, cacert.pem and test oauth tokens reside, relative from project root -->
 		<const name="TEST_CFGDIR" value="./config"/>
 		<!-- the filename of your .env file -->
-		<const name="TEST_ENVFILE" value=".env"/>
+		<const name="TEST_ENVFILE" value=".env_travis"/>
 	</php>
 </phpunit>

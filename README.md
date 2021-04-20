@@ -1,63 +1,54 @@
 # chillerlan/php-database
 
-A PHP 7.2+ SQL client and querybuilder for the most common databases.
+A PHP 7.4+ SQL client and querybuilder for the most common databases.
 
+[![PHP Version Support][php-badge]][php]
 [![version][packagist-badge]][packagist]
 [![license][license-badge]][license]
-[![Travis][travis-badge]][travis]
 [![Coverage][coverage-badge]][coverage]
 [![Scrunitizer][scrutinizer-badge]][scrutinizer]
-[![Packagist downloads][downloads-badge]][downloads]
-[![PayPal donate][donate-badge]][donate]
+[![Packagist downloads][downloads-badge]][downloads]<br/>
+[![Continuous Integration][gh-action-badge]][gh-action]
 
-[packagist-badge]: https://img.shields.io/packagist/v/chillerlan/php-database.svg?style=flat-square
+[php-badge]: https://img.shields.io/packagist/php-v/chillerlan/php-oauth-core?logo=php&color=8892BF
+[php]: https://www.php.net/supported-versions.php
+[packagist-badge]: https://img.shields.io/packagist/v/chillerlan/php-database.svg?logo=packagist
 [packagist]: https://packagist.org/packages/chillerlan/php-database
-[license-badge]: https://img.shields.io/github/license/chillerlan/php-database.svg?style=flat-square
+[license-badge]: https://img.shields.io/github/license/chillerlan/php-database.svg?
 [license]: https://github.com/chillerlan/php-database/blob/master/LICENSE
-[travis-badge]: https://img.shields.io/travis/chillerlan/php-database.svg?style=flat-square
-[travis]: https://travis-ci.org/chillerlan/php-database
-[coverage-badge]: https://img.shields.io/codecov/c/github/chillerlan/php-database.svg?style=flat-square
+[coverage-badge]: https://img.shields.io/codecov/c/github/chillerlan/php-database.svg?logo=codecov
 [coverage]: https://codecov.io/github/chillerlan/php-database
-[scrutinizer-badge]: https://img.shields.io/scrutinizer/g/chillerlan/php-database.svg?style=flat-square
+[scrutinizer-badge]: https://img.shields.io/scrutinizer/g/chillerlan/php-database.svg?logo=scrutinizer
 [scrutinizer]: https://scrutinizer-ci.com/g/chillerlan/php-database
-[downloads-badge]: https://img.shields.io/packagist/dt/chillerlan/php-database.svg?style=flat-square
+[downloads-badge]: https://img.shields.io/packagist/dt/chillerlan/php-database.svg?logo=packagist
 [downloads]: https://packagist.org/packages/chillerlan/php-database/stats
-[donate-badge]: https://img.shields.io/badge/donate-paypal-ff33aa.svg?style=flat-square
-[donate]: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=WLYUNAT9ZTJZ4
+[gh-action-badge]: https://github.com/chillerlan/php-database/workflows/Continuous%20Integration/badge.svg
+[gh-action]: https://github.com/chillerlan/php-database/actions
 
 # Documentation
 
 ## Requirements
-- PHP 7.2+
-- one of the supported databases, set up to work with PHP
-
-## Supported databases
-- [MySQL](https://dev.mysql.com/doc/refman/5.6/en/) (5.5+) / [MariaDB](https://mariadb.com/kb/en/library/basic-sql-statements/)
-- [PostgreSQL](https://www.postgresql.org/docs/9.5/static/index.html) (9.5+)
-- [SQLite3](https://www.sqlite.org/lang.html)
-- [Firebird](https://www.firebirdsql.org/file/documentation/reference_manuals/fblangref25-en/html/fblangref25.html) (2.5+)
-- [Microsoft SQL Server](https://github.com/Microsoft/msphpsql) ([transact-sql](https://docs.microsoft.com/sql/t-sql/language-reference))
-- any other database supported via PDO, ODBC or native PHP extension
+- PHP 7.4+
+- one of the supported databases, set up to work with PHP:
+  - [MySQL](https://dev.mysql.com/doc/refman/5.6/en/) (5.5+) / [MariaDB](https://mariadb.com/kb/en/library/basic-sql-statements/)
+  - [PostgreSQL](https://www.postgresql.org/docs/9.5/static/index.html) (9.5+)
+  - [SQLite3](https://www.sqlite.org/lang.html)
+  - [Firebird](https://www.firebirdsql.org/file/documentation/reference_manuals/fblangref25-en/html/fblangref25.html) (2.5+)
+  - [Microsoft SQL Server](https://github.com/Microsoft/msphpsql) ([transact-sql](https://docs.microsoft.com/sql/t-sql/language-reference))
 
 ## Installation
 **requires [composer](https://getcomposer.org)**
 
 ### *composer.json*
- (note: replace `dev-master` with a [version boundary](https://getcomposer.org/doc/articles/versions.md#summary))
+ (note: replace `dev-main` with a [version boundary](https://getcomposer.org/doc/articles/versions.md#summary))
 ```json
 {
 	"require": {
-		"php": ">=7.2.0",
-		"chillerlan/database": "^2.1"
+		"php": "^7.4",
+		"chillerlan/database": "dev-main"
 	}
 }
 ```
-
-### Manual installation
-Download the desired version of the package from [master](https://github.com/chillerlan/php-database/archive/master.zip) or
-[release](https://github.com/chillerlan/php-database/releases) and extract the contents to your project folder. After that:
-- run `composer install` to install the required dependencies and generate `/vendor/autoload.php`.
-- if you use a custom autoloader, point the namespace `chillerlan\Database` to the folder `src` of the package
 
 Profit!
 

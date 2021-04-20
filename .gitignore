@@ -5,3 +5,4 @@ vendor
 config/.env
 storage
 *.phpunit.result.cache
+phpunit.xml
