@@ -2,9 +2,7 @@
 /**
  * Class MSSqlSrv
  *
- * @filesource   MSSqlSrv.php
  * @created      28.06.2017
- * @package      chillerlan\Database\Drivers
  * @author       Smiley <smiley@chillerlan.net>
  * @copyright    2017 Smiley
  * @license      MIT
@@ -14,86 +12,28 @@
 
 namespace chillerlan\Database\Drivers;
 
-use chillerlan\Database\Dialects\MSSQL;
+use chillerlan\Database\Dialects\{Dialect, MSSQL};
+
+use function array_values, bin2hex, call_user_func_array, gettype, implode, is_bool, is_numeric, sprintf, sqlsrv_client_info,
+	sqlsrv_close, sqlsrv_connect, sqlsrv_errors, sqlsrv_free_stmt, sqlsrv_query, sqlsrv_server_info;
+
+use const PHP_OS, SQLSRV_FETCH_ASSOC, SQLSRV_FETCH_NUMERIC;
 
 /**
- * @property resource $db
+ *
  */
-class MSSqlSrv extends DriverAbstract{
-
-	protected string $dialect = MSSQL::class;
-
-	/** @inheritdoc */
-	protected function raw_query(string $sql, string $index = null, bool $assoc = null){
-		return $this->__getResult(sqlsrv_query($this->db, $sql), $index, $assoc);
-	}
-
-	/** @inheritdoc */
-	protected function prepared_query(string $sql, array $values = null, string $index = null, bool $assoc = null){
-		return $this->__getResult(sqlsrv_query($this->db, $sql, $values), $index, $assoc);
-	}
-
-	/** @inheritdoc */
-	protected function multi_query(string $sql, array $values){
-		$r = [];
-
-		// @todo: sqlsrv_prepare/sqlsrv_execute
-		foreach($values as $row){
-			$r[] = $this->prepared_query($sql, $row);
-		}
-
-		foreach($r as $result){
-
-			if(!$result){
-				return false;
-			}
-
-		}
-
-		return true;
-	}
-
-	/** @inheritdoc */
-	protected function multi_callback_query(string $sql, iterable $data, $callback){
-		$r = [];
-
-		// @todo: sqlsrv_prepare/sqlsrv_execute
-		foreach($data as $i => $row){
-			$r[] = $this->prepared_query($sql, call_user_func_array($callback, [$row, $i]));
-		}
-
-		foreach($r as $result){
-
-			if(!$result){
-				return false;
-			}
-
-		}
-
-		return true;
-	}
+final class MSSqlSrv extends DriverAbstract{
 
 	/**
-	 * @param             $result
-	 * @param string|null $index
-	 * @param bool        $assoc
+	 * Holds the database resource object
 	 *
-	 * @return bool|\chillerlan\Database\Result
+	 * @var resource|null
 	 */
-	protected function __getResult($result, string $index = null, bool $assoc = null){
+	private $db = null;
 
-		if(is_bool($result)){
-			return $result;
-		}
-
-		$r = parent::getResult('sqlsrv_fetch_array', [$result, ($assoc ?? true) ? SQLSRV_FETCH_ASSOC : SQLSRV_FETCH_NUMERIC], $index, $assoc);
-
-		sqlsrv_free_stmt($result);
-
-		return $r;
-	}
-
-	/** @inheritdoc */
+	/**
+	 * @inheritdoc
+	 */
 	public function connect():DriverInterface{
 
 		if(gettype($this->db) === 'resource'){
@@ -101,8 +41,7 @@ class MSSqlSrv extends DriverAbstract{
 		}
 
 		$options = [];
-
-		$host = $this->options->host;
+		$host    = $this->options->host;
 
 		if(is_numeric($this->options->port)){
 			$host .= ', '.$this->options->port;
@@ -135,19 +74,15 @@ class MSSqlSrv extends DriverAbstract{
 		$this->db = sqlsrv_connect($host, $options);
 
 		if(!$this->db){
-			$errors = sqlsrv_errors();
-
-			if(is_array($errors) && isset($errors['SQLSTATE'], $errors['code'], $errors['message'])){
-				throw new DriverException('db error: [MSSqlSrv]: [SQLSTATE '.$errors['SQLSTATE'].'] ('.$errors['code'].') '.$errors['message']);
-			}
-
-			throw new DriverException('db error: [MSSqlSrv]: could not connect: '.print_r($errors, true));
+			throw new DriverException('db error: [MSSqlSrv]: could not connect: '.$this->parseErrors(sqlsrv_errors()));
 		}
 
 		return $this;
 	}
 
-	/** @inheritdoc */
+	/**
+	 * @inheritdoc
+	 */
 	public function disconnect():bool{
 
 		if(gettype($this->db) === 'resource'){
@@ -157,7 +92,23 @@ class MSSqlSrv extends DriverAbstract{
 		return true;
 	}
 
-	/** @inheritdoc */
+	/**
+	 * @inheritdoc
+	 */
+	public function getDBResource(){
+		return $this->db;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function getDialect():Dialect{
+		return new MSSQL;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
 	public function getClientInfo():string{
 
 		if(gettype($this->db) === 'resource'){
@@ -169,8 +120,10 @@ class MSSqlSrv extends DriverAbstract{
 		return 'disconnected, no info available';
 	}
 
-	/** @inheritdoc */
-	public function getServerInfo():?string{
+	/**
+	 * @inheritdoc
+	 */
+	public function getServerInfo():string{
 
 		if(gettype($this->db) === 'resource'){
 			$info = sqlsrv_server_info($this->db);
@@ -181,9 +134,130 @@ class MSSqlSrv extends DriverAbstract{
 		return 'disconnected, no info available';
 	}
 
-	/** @inheritdoc */
-	protected function __escape(string $data):string {
-		return $data;
+	/**
+	 * @inheritdoc
+	 *
+	 * @see https://docs.microsoft.com/sql/t-sql/data-types/constants-transact-sql?view=sql-server-ver15
+	 */
+	protected function escape_string(string $string):string{
+
+		if($string === ''){
+			return "''";
+		}
+
+		// convert to hex literal, sql server only accepts the 0x... format
+		return '0x'.bin2hex($string);
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	protected function raw_query(string $sql, string $index = null, bool $assoc = null){
+		return $this->get_result(sqlsrv_query($this->db, $sql), $index, $assoc);
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	protected function prepared_query(string $sql, array $values = null, string $index = null, bool $assoc = null){
+
+		// [SQLSTATE IMSSP] (-57) String keys are not allowed in parameters arrays.
+		if($values !== null){
+			$values = array_values($values);
+		}
+
+		return $this->get_result(sqlsrv_query($this->db, $sql, $values), $index, $assoc);
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	protected function multi_query(string $sql, array $values):bool{
+		$r = [];
+
+		// @todo: sqlsrv_prepare/sqlsrv_execute
+		foreach($values as $row){
+			$r[] = $this->prepared_query($sql, $row);
+		}
+
+		foreach($r as $result){
+
+			if(!$result){
+				return false;
+			}
+
+		}
+
+		return true;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	protected function multi_callback_query(string $sql, array $data, $callback):bool{
+		$r = [];
+
+		// @todo: sqlsrv_prepare/sqlsrv_execute
+		foreach($data as $i => $row){
+			$r[] = $this->prepared_query($sql, call_user_func_array($callback, [$row, $i]));
+		}
+
+		foreach($r as $result){
+
+			if(!$result){
+				return false;
+			}
+
+		}
+
+		return true;
+	}
+
+	/**
+	 * @return bool|\chillerlan\Database\Result
+	 * @throws \chillerlan\Database\Drivers\DriverException
+	 */
+	private function get_result($result, string $index = null, bool $assoc = null){
+
+		if(is_bool($result)){
+			$errors = sqlsrv_errors();
+
+			if(!$result && !empty($errors)){
+				throw new DriverException('sql error: '.$this->parseErrors($errors));
+			}
+
+			return $result;
+		}
+
+		$r = parent::getResult(
+			'sqlsrv_fetch_array',
+			[$result, ($assoc ?? true) ? SQLSRV_FETCH_ASSOC : SQLSRV_FETCH_NUMERIC],
+			$index,
+			$assoc
+		);
+
+		sqlsrv_free_stmt($result);
+
+		return $r;
+	}
+
+	/**
+	 *
+	 */
+	private function parseErrors(array $errors):string{
+		$tpl = '[SQLSTATE %s] (%s) %s';
+
+		if(isset($errors['SQLSTATE'], $errors['code'], $errors['message'])){
+			return sprintf($tpl, $errors['SQLSTATE'], $errors['code'], $errors['message']);
+		}
+
+		$msg = [];
+
+		foreach($errors as $error){
+			$msg[] = sprintf($tpl, $error['SQLSTATE'], $error['code'], $error['message']);
+		}
+
+		return implode("\n", $msg);
 	}
 
 }

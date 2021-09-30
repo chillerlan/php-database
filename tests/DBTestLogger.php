@@ -1,6 +1,6 @@
 <?php
 /**
- * Class OAuthTestLogger
+ * Class DBTestLogger
  *
  * @created      04.05.2019
  * @author       smiley <smiley@chillerlan.net>

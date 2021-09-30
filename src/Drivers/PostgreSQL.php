@@ -2,9 +2,7 @@
 /**
  * Class PostgreSQL
  *
- * @filesource   PostgreSQL.php
  * @created      28.06.2017
- * @package      chillerlan\Database\Drivers
  * @author       Smiley <smiley@chillerlan.net>
  * @copyright    2017 Smiley
  * @license      MIT
@@ -14,25 +12,33 @@
 
 namespace chillerlan\Database\Drivers;
 
-use chillerlan\Database\{
-	Dialects\Postgres, Result
-};
+use chillerlan\Database\Dialects\{Dialect, Postgres};
+use chillerlan\Database\Result;
+use Throwable;
+
+use function bin2hex, call_user_func_array, implode, in_array, is_bool, is_resource, pg_close, pg_connect,
+	pg_execute, pg_field_type, pg_free_result, pg_prepare, pg_query, pg_version, preg_replace_callback;
 
 /**
- * @property resource $db
+ *
  */
-class PostgreSQL extends DriverAbstract{
+final class PostgreSQL extends DriverAbstract{
 
-	protected string $dialect = Postgres::class;
+	/**
+	 * Holds the database resource object
+	 *
+	 * @var resource|null
+	 */
+	private $db = null;
 
-	/** @inheritdoc */
+	/**
+	 * @inheritdoc
+	 */
 	public function connect():DriverInterface{
 
-		if(gettype($this->db) === 'resource'){
+		if(is_resource($this->db)){
 			return $this;
 		}
-
-		// i am an ugly duckling. fix me please.
 
 		$options = [
 			'--client_encoding='.$this->options->pgsql_charset,
@@ -52,49 +58,130 @@ class PostgreSQL extends DriverAbstract{
 
 			return $this;
 		}
-		catch(\Exception $e){
+		catch(Throwable $e){
 			throw new DriverException('db error: [PostgreSQL]: '.$e->getMessage());
 		}
 
 	}
 
-	/** @inheritdoc */
+	/**
+	 * @inheritdoc
+	 */
 	public function disconnect():bool{
 
-		if(gettype($this->db) === 'resource'){
+		if(is_resource($this->db)){
 			return pg_close($this->db);
 		}
 
 		return true;
 	}
 
-	/** @inheritdoc */
+	/**
+	 * @inheritdoc
+	 *
+	 * @return resource|null
+	 */
+	public function getDBResource(){
+		return $this->db;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function getDialect():Dialect{
+		return new Postgres;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
 	public function getClientInfo():string{
+
+		if(!is_resource($this->db)){
+			return 'disconnected, no info available';
+		}
+
 		$ver = pg_version($this->db);
 
 		return 'PostgreSQL '.$ver['client'].' ('.$ver['client_encoding'].')';
 	}
 
-	/** @inheritdoc */
-	public function getServerInfo():?string{
+	/**
+	 * @inheritdoc
+	 */
+	public function getServerInfo():string{
+
+		if(!is_resource($this->db)){
+			return 'disconnected, no info available';
+		}
+
 		$ver = pg_version($this->db);
 
-		return 'PostgreSQL '.$ver['server'].' ('.$ver['server_encoding'].', date style: '.$ver['DateStyle'].', time zone: '.$ver['TimeZone'].')';
-	}
-
-	/** @inheritdoc */
-	protected function __escape(string $data):string{
-		return '\''.pg_escape_string($this->db, $data).'\''; // emulate PDO
+		return 'PostgreSQL '.$ver['server'].' ('.$ver['server_encoding'].', date style: '
+		       .$ver['DateStyle'].', time zone: '.$ver['TimeZone'].')';
 	}
 
 	/**
-	 * @param             $result
-	 * @param string|null $index
-	 * @param bool        $assoc
+	 * @inheritdoc
 	 *
+	 * @see https://stackoverflow.com/a/44814220
+	 */
+	protected function escape_string(string $string):string{
+
+		if($string === ''){
+			return "''";
+		}
+
+		// convert to hex literal, emulating mysql's UNHEX() (seriously pgsql??)
+		return "encode(decode('".bin2hex($string)."', 'hex'), 'escape')";
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	protected function raw_query(string $sql, string $index = null, bool $assoc = null){
+		return $this->get_result(pg_query($sql), $index, $assoc);
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	protected function prepared_query(string $sql, array $values = null, string $index = null, bool $assoc = null){
+		pg_prepare($this->db, '', $this->replaceParams($sql));
+
+		return $this->get_result(pg_execute($this->db, '', $values), $index, $assoc);
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	protected function multi_query(string $sql, array $values):bool{
+		pg_prepare($this->db, '', $this->replaceParams($sql));
+
+		foreach($values as $row){
+			pg_execute($this->db, '', $row);
+		}
+
+		return true;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	protected function multi_callback_query(string $sql, array $data, $callback):bool{
+		pg_prepare($this->db, '', $this->replaceParams($sql));
+
+		foreach($data as $k => $row){
+			pg_execute($this->db, '', call_user_func_array($callback, [$row, $k]));
+		}
+
+		return true;
+	}
+
+	/**
 	 * @return bool|\chillerlan\Database\Result
 	 */
-	protected function __getResult($result, string $index = null, bool $assoc = null){
+	private function get_result($result, string $index = null, bool $assoc = null){
 
 		if(is_bool($result)){
 			return $result; // @codeCoverageIgnore
@@ -103,23 +190,23 @@ class PostgreSQL extends DriverAbstract{
 		$out = new Result(null, $this->convert_encoding_src, $this->convert_encoding_dest);
 		$i   = 0;
 
-		while($row = call_user_func_array($assoc === true ? 'pg_fetch_assoc' : 'pg_fetch_row', [$result])){
+		/** @noinspection PhpAssignmentInConditionInspection */
+		while($row = call_user_func_array($assoc ? 'pg_fetch_assoc' : 'pg_fetch_row', [$result])){
 			$key = $i;
 
 			$j = 0;
-			foreach($row as $k => $item){
+			foreach($row as &$value){
 				// https://gitter.im/arenanet/api-cdi?at=594326ba31f589c64fafe554
 				$fieldType = pg_field_type($result, $j);
 
 				if($fieldType === 'bool'){
-					$row[$k] = $item === 't';
+					$value = $value === 't';
 				}
 				elseif(in_array($fieldType, ['int2', 'int4', 'int8'], true)){
-					$row[$k] = (int)$item;
-
+					$value = (int)$value;
 				}
 				elseif(in_array($fieldType, ['float4', 'float8'], true)){
-					$row[$k] = (float)$item; // @codeCoverageIgnore
+					$value = (float)$value; // @codeCoverageIgnore
 				}
 
 				$j++;
@@ -138,46 +225,14 @@ class PostgreSQL extends DriverAbstract{
 		return $i === 0 ? true : $out;
 	}
 
-	/** @inheritdoc */
-	protected function raw_query(string $sql, string $index = null, bool $assoc = null){
-		return $this->__getResult(pg_query($sql), $index, $assoc);
-	}
-
-	/** @inheritdoc */
-	protected function prepared_query(string $sql, array $values = null, string $index = null, bool $assoc = null){
-		pg_prepare($this->db, '', $this->replaceParams($sql));
-
-		return $this->__getResult(pg_execute($this->db, '', $values), $index, $assoc);
-	}
-
-	/** @inheritdoc */
-	protected function multi_query(string $sql, array $values){
-		pg_prepare($this->db, '', $this->replaceParams($sql));
-
-		foreach($values as $row){
-			pg_execute($this->db, '', $row);
-		}
-
-		return true;
-	}
-
-	/** @inheritdoc */
-	protected function multi_callback_query(string $sql, iterable $data, $callback){
-		pg_prepare($this->db, '', $this->replaceParams($sql));
-
-		foreach($data as $k => $row){
-			pg_execute($this->db, '', call_user_func_array($callback, [$row, $k]));
-		}
-
-		return true;
-	}
-
-	/** @inheritdoc */
-	protected function replaceParams(string $sql):string{
-		$i = 0;
+	/**
+	 *
+	 */
+	private function replaceParams(string $sql):string{
+		$i = 1;
 
 		return preg_replace_callback('/(\?)/', function() use (&$i){
-			return '$'.++$i;
+			return '$'.$i++;
 		}, $sql);
 	}
 

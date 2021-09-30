@@ -2,9 +2,7 @@
 /**
  * Class DriverAbstract
  *
- * @filesource   DriverAbstract.php
  * @created      28.06.2017
- * @package      chillerlan\Database\Drivers
  * @author       Smiley <smiley@chillerlan.net>
  * @copyright    2017 Smiley
  * @license      MIT
@@ -12,47 +10,24 @@
 
 namespace chillerlan\Database\Drivers;
 
-use chillerlan\Database\{
-	Dialects\Dialect, Result
-};
+use chillerlan\Database\Result;
 use chillerlan\Settings\SettingsContainerInterface;
-use Psr\Log\{
-	LoggerAwareInterface, LoggerAwareTrait, LoggerInterface
-};
+use Throwable;
+use Psr\Log\{LoggerAwareInterface, LoggerInterface, NullLogger};
 use Psr\SimpleCache\CacheInterface;
+
+use function bin2hex, call_user_func_array, count, floatval, get_called_class, hash, intval, is_array, is_bool,
+	is_callable, is_float, is_int, is_numeric, serialize, trim;
 
 /**
  *
  */
 abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
-	use LoggerAwareTrait;
 
-	/**
-	 * Holds the database resource object
-	 *
-	 * @var resource
-	 */
-	protected $db;
-
-	/**
-	 * Holds the settings
-	 *
-	 * @var \chillerlan\Database\DatabaseOptions
-	 */
+	/** @var \chillerlan\Database\DatabaseOptions */
 	protected SettingsContainerInterface $options;
-
-	/**
-	 * @var \Psr\SimpleCache\CacheInterface|null
-	 */
+	protected LoggerInterface $logger;
 	protected ?CacheInterface $cache = null;
-
-	/**
-	 * The dialect to use (FQCN)
-	 *
-	 * @var string
-	 */
-	protected string $dialect;
-
 	protected string $cachekey_hash_algo;
 	protected ?string $convert_encoding_src;
 	protected ?string $convert_encoding_dest;
@@ -67,7 +42,8 @@ abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 	public function __construct(SettingsContainerInterface $options, CacheInterface $cache = null, LoggerInterface $logger = null){
 		$this->options = $options;
 		$this->cache   = $cache;
-		$this->logger  = $logger;
+
+		$this->setLogger($logger ?? new NullLogger);
 
 		// avoid unnecessary getter calls in long loops
 		$this->cachekey_hash_algo    = $this->options->cachekey_hash_algo;
@@ -76,60 +52,42 @@ abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 	}
 
 	/**
-	 * @param string      $sql
-	 * @param string|null $index
-	 * @param bool        $assoc
-	 *
+	 * disconnect
+	 */
+	public function __destruct(){
+		$this->disconnect();
+	}
+
+	/**
 	 * @return bool|\chillerlan\Database\Result
 	 */
 	abstract protected function raw_query(string $sql, ?string $index, ?bool $assoc);
 
 	/**
-	 * @param string      $sql
-	 * @param array|null  $values
-	 * @param string|null $index
-	 * @param bool        $assoc
-	 *
 	 * @return bool|\chillerlan\Database\Result
 	 */
 	abstract protected function prepared_query(string $sql, ?array $values, ?string $index, ?bool $assoc);
 
 	/**
-	 * @param string   $sql
-	 * @param array    $values
 	 *
-	 * @return bool
 	 */
-	abstract protected function multi_query(string $sql, array $values);
+	abstract protected function multi_query(string $sql, array $values):bool;
 
 	/**
-	 * @param string   $sql
-	 * @param iterable $data
-	 * @param          $callback
 	 *
-	 * @return bool
 	 */
-	abstract protected function multi_callback_query(string $sql, iterable $data, $callback);
+	abstract protected function multi_callback_query(string $sql, array $data, $callback):bool;
 
 	/**
-	 * @param string $data
-	 *
-	 * @return string
+	 * Sets a logger.
 	 */
-	abstract protected function __escape(string $data):string;
+	public function setLogger(LoggerInterface $logger):void{
+		$this->logger = $logger;
+	}
 
 	/**
 	 * @inheritdoc
-	 * @codeCoverageIgnore
 	 */
-	public function getDBResource(){
-		return $this->db;
-	}
-
-	public function getDialect():Dialect{
-		return new $this->dialect();
-	}
-
 	public function escape($data = null){
 
 		if($data === null){
@@ -149,30 +107,57 @@ abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 			}
 		}
 
-		return $this->__escape($data);
+		return $this->escape_string($data);
 	}
 
-	/** @inheritdoc */
+	/**
+	 * Escape a string by converting it to a binary hex literal instead of relying on quotes
+	 *
+	 * @see https://stackoverflow.com/a/12710285
+	 * @see https://dev.mysql.com/doc/refman/5.7/en/hexadecimal-literals.html
+	 * @see https://mariadb.com/kb/en/hexadecimal-literals/
+	 * @see https://firebirdsql.org/refdocs/langrefupd25-hexbinstrings.html
+	 */
+	protected function escape_string(string $string):string{
+
+		if($string === ''){
+			return "''";
+		}
+
+		// convert to hex literal
+		return "x'".bin2hex($string)."'";
+	}
+
+	/**
+	 * @inheritdoc
+	 */
 	public function raw(string $sql, string $index = null, bool $assoc = null){
 		$this->checkSQL($sql);
-		$this->logger->debug('DriverAbstract::raw()', ['method' => __METHOD__, 'sql' => $sql, 'index' => $index, 'assoc' => $assoc]);
+
+		$this->logger->debug(
+			'DriverAbstract::raw()',
+			['method' => __METHOD__, 'sql' => $sql, 'index' => $index, 'assoc' => $assoc]
+		);
 
 		try{
 			return $this->raw_query($sql, $index, $assoc !== null ? $assoc : true);
 		}
-		catch(\Exception $e){
-			$msg = 'sql error: ['.get_called_class().'::raw()] '.$e->getMessage();
-			$this->logger->error($msg);
-
-			throw new DriverException($msg);
+		catch(Throwable $e){
+			throw new DriverException('sql error: ['.get_called_class().'::raw()] '.$e->getMessage());
 		}
 
 	}
 
-	/** @inheritdoc */
+	/**
+	 * @inheritdoc
+	 */
 	public function prepared(string $sql, array $values = null, string $index = null, bool $assoc = null){
 		$this->checkSQL($sql);
-		$this->logger->debug('DriverAbstract::prepared()', ['method' => __METHOD__, 'sql' => $sql, 'val' => $values, 'index' => $index, 'assoc' => $assoc]);
+
+		$this->logger->debug(
+			'DriverAbstract::prepared()',
+			['method' => __METHOD__, 'sql' => $sql, 'val' => $values, 'index' => $index, 'assoc' => $assoc]
+		);
 
 		try{
 			return $this->prepared_query(
@@ -182,11 +167,8 @@ abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 				$assoc  !== null ? $assoc  : true
 			);
 		}
-		catch(\Exception $e){
-			$msg = 'sql error: ['.get_called_class().'::prepared()] '.$e->getMessage();
-			$this->logger->error($msg);
-
-			throw new DriverException($msg);
+		catch(Throwable $e){
+			throw new DriverException('sql error: ['.get_called_class().'::prepared()] '.$e->getMessage());
 		}
 
 	}
@@ -195,7 +177,7 @@ abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 	 * @inheritdoc
 	 * @todo: return array of results
 	 */
-	public function multi(string $sql, array $values){
+	public function multi(string $sql, array $values):bool{
 		$this->checkSQL($sql);
 
 		if(!is_array($values) || count($values) < 1 || !is_array($values[0]) || count($values[0]) < 1){
@@ -205,11 +187,8 @@ abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 		try{
 			return $this->multi_query($sql, $values);
 		}
-		catch(\Exception $e){
-			$msg = 'sql error: ['.get_called_class().'::multi()] '.$e->getMessage();
-			$this->logger->error($msg);
-
-			throw new DriverException($msg);
+		catch(Throwable $e){
+			throw new DriverException('sql error: ['.get_called_class().'::multi()] '.$e->getMessage());
 		}
 
 	}
@@ -219,7 +198,7 @@ abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 	 * @todo: return array of results
 	 * @see determine callable type? http://php.net/manual/en/language.types.callable.php#118032
 	 */
-	public function multiCallback(string $sql, iterable $data, $callback){
+	public function multiCallback(string $sql, array $data, $callback):bool{
 		$this->checkSQL($sql);
 
 		if(count($data) < 1){
@@ -233,16 +212,15 @@ abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 		try{
 			return $this->multi_callback_query($sql, $data, $callback);
 		}
-		catch(\Exception $e){
-			$msg = 'sql error: ['.get_called_class().'::multiCallback()] '.$e->getMessage();
-			$this->logger->error($msg);
-
-			throw new DriverException($msg);
+		catch(Throwable $e){
+			throw new DriverException('sql error: ['.get_called_class().'::multiCallback()] '.$e->getMessage());
 		}
 
 	}
 
-	/** @inheritdoc */
+	/**
+	 * @inheritdoc
+	 */
 	public function rawCached(string $sql, string $index = null, bool $assoc = null, int $ttl = null){
 		$result = $this->cacheGet($sql, [], $index);
 
@@ -255,7 +233,9 @@ abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 		return $result;
 	}
 
-	/** @inheritdoc */
+	/**
+	 * @inheritdoc
+	 */
 	public function preparedCached(string $sql, array $values = null, string $index = null, bool $assoc = null, int $ttl = null){
 		$result = $this->cacheGet($sql, $values, $index);
 
@@ -270,11 +250,6 @@ abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 
 	/**
 	 * @todo return result only, Result::$isBool, Result::$success
-	 *
-	 * @param callable    $callable
-	 * @param array       $args
-	 * @param string|null $index
-	 * @param bool        $assoc
 	 *
 	 * @return bool|\chillerlan\Database\Result
 	 */
@@ -294,22 +269,14 @@ abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 	}
 
 	/**
-	 * @param string      $sql
-	 * @param array|null  $values
-	 * @param string|null $index
 	 *
-	 * @return string
 	 */
 	protected function cacheKey(string $sql, array $values = null, string $index = null):string{
 		return hash($this->cachekey_hash_algo, serialize([$sql, $values, $index]));
 	}
 
 	/**
-	 * @param string      $sql
-	 * @param array       $values
-	 * @param string|null $index
 	 *
-	 * @return bool|mixed
 	 */
 	protected function cacheGet(string $sql, array $values = null, string $index = null){
 
@@ -321,13 +288,7 @@ abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 	}
 
 	/**
-	 * @param string      $sql
-	 * @param             $result
-	 * @param array|null  $values
-	 * @param string|null $index
-	 * @param int|null    $ttl
 	 *
-	 * @return bool
 	 */
 	protected function cacheSet(string $sql, $result, array $values = null, string $index = null, int $ttl = null):bool{
 
@@ -339,8 +300,6 @@ abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 	}
 
 	/**
-	 * @param $sql
-	 *
 	 * @throws \chillerlan\Database\Drivers\DriverException
 	 */
 	protected function checkSQL(string $sql):void{

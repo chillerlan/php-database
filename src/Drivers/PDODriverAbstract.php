@@ -2,9 +2,7 @@
 /**
  * Class PDODriverAbstract
  *
- * @filesource   PDODriverAbstract.php
  * @created      28.06.2017
- * @package      chillerlan\Database\Drivers
  * @author       Smiley <smiley@chillerlan.net>
  * @copyright    2017 Smiley
  * @license      MIT
@@ -14,27 +12,25 @@
 
 namespace chillerlan\Database\Drivers;
 
-use PDO, PDOStatement;
+use PDO, PDOStatement, Throwable;
+
+use function call_user_func_array, explode, get_called_class, gettype, is_bool, trim;
 
 /**
- * @property \PDO $db
+ *
  */
 abstract class PDODriverAbstract extends DriverAbstract{
 
 	/**
-	 * The PDO drivername which is being used in the DSN
-	 *
-	 * @var string
+	 * Holds the database resource object
 	 */
-	protected string $drivername;
+	protected ?PDO $db = null;
 
 	/**
 	 * Some basic PDO options
 	 *
 	 * @link http://php.net/manual/pdo.getattribute.php
 	 * @link http://php.net/manual/pdo.constants.php
-	 *
-	 * @var array
 	 */
 	protected array $pdo_options = [
 		PDO::ATTR_CASE              => PDO::CASE_NATURAL,
@@ -43,37 +39,16 @@ abstract class PDODriverAbstract extends DriverAbstract{
 		PDO::ATTR_EMULATE_PREPARES  => false, // will break mssql
 	];
 
-	/**
-	 * @var array
-	 */
 	protected array $pdo_stmt_options = [];
 
 	/**
 	 * Returns a DSN string using the given options
-	 *
-	 * @return string DSN
 	 */
-	protected function getDSN():string{
-		$dsn = $this->drivername;
+	abstract protected function getDSN():string;
 
-		if($this->options->socket){
-			$dsn .= ':unix_socket='.$this->options->socket; // @codeCoverageIgnore
-		}
-		else{
-			$dsn .= ':host='.$this->options->host;
-
-			if(is_numeric($this->options->port)){
-				$dsn .= ';port='.$this->options->port;
-			}
-
-		}
-
-		$dsn .= ';dbname='.$this->options->database;
-
-		return $dsn;
-	}
-
-	/** @inheritdoc */
+	/**
+	 * @inheritdoc
+	 */
 	public function connect():DriverInterface{
 
 		if($this->db instanceof PDO){
@@ -81,118 +56,79 @@ abstract class PDODriverAbstract extends DriverAbstract{
 		}
 
 		try{
-			// @codeCoverageIgnoreStart
-			if($this->options->use_ssl){
-				$this->pdo_options += [
-					PDO::MYSQL_ATTR_SSL_KEY    => $this->options->ssl_key,
-					PDO::MYSQL_ATTR_SSL_CERT   => $this->options->ssl_cert,
-					PDO::MYSQL_ATTR_SSL_CA     => $this->options->ssl_ca,
-					PDO::MYSQL_ATTR_SSL_CAPATH => $this->options->ssl_capath,
-					PDO::MYSQL_ATTR_SSL_CIPHER => $this->options->ssl_cipher,
-				];
-			}
-			// @codeCoverageIgnoreEnd
-
 			$this->db = new PDO($this->getDSN(), $this->options->username, $this->options->password, $this->pdo_options);
 
 			return $this;
 		}
-		catch(\Exception $e){
-
-			// PDOMSSQL workaround
-			// @codeCoverageIgnoreStart
-			if(trim(explode(':', $e->getMessage(), 2)[0]) === 'SQLSTATE[IMSSP]'){
-				return $this;
-			}
-			// @codeCoverageIgnoreEnd
-
-			throw new DriverException('db error: [PDODriver '.$this->drivername.']: '.$e->getMessage());
+		catch(Throwable $e){
+			throw new DriverException('db error: [PDODriver '.get_called_class().']: '.$e->getMessage());
 		}
+
 	}
 
-	/** @inheritdoc */
+	/**
+	 * @inheritdoc
+	 */
 	public function disconnect():bool{
 		$this->db = null;
 
 		return true;
 	}
 
-	/** @inheritdoc */
+	/**
+	 * @inheritdoc
+	 */
+	public function getDBResource():?PDO{
+		return $this->db;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
 	public function getClientInfo():string{
+
+		if(!$this->db instanceof PDO){
+			return 'disconnected, no info available';
+		}
+
 		return $this->db->getAttribute(PDO::ATTR_CLIENT_VERSION);
 	}
 
-	/** @inheritdoc */
-	public function getServerInfo():?string{
-		return $this->db->getAttribute(PDO::ATTR_SERVER_INFO);
-	}
-
-	/** @inheritdoc */
-	protected function __escape(string $data):string {
-		return $this->db->quote($data);
-	}
-
 	/**
-	 * Returns the last insert id (if present)
-	 * @link http://php.net/manual/pdo.lastinsertid.php
-	 * @return string
-	 * @codeCoverageIgnore
+	 * @inheritdoc
 	 */
-	protected function insertID():string{
-		return $this->db->lastInsertId();
-	}
+	public function getServerInfo():string{
 
-	/**
-	 * @param \PDOStatement $stmt
-	 * @param array         $values
-	 *
-	 * @return void
-	 */
-	protected function bindParams(PDOStatement &$stmt, array $values){
-		$param_no = 1;
-
-		foreach($values as $v){
-			$t    = gettype($v);
-			$type = PDO::PARAM_STR;
-
-			if($t === 'boolean'){
-				$type = PDO::PARAM_BOOL; // @codeCoverageIgnore
-			}
-			elseif($t === 'integer'){
-				$type = PDO::PARAM_INT;
-			}
-			elseif($t === 'NULL'){
-				$type = PDO::PARAM_NULL; // @codeCoverageIgnore
-			}
-
-			$stmt->bindValue($param_no, $v, $type);
-			$param_no++;
+		if(!$this->db instanceof PDO){
+			return 'disconnected, no info available';
 		}
+
+		return (string)$this->db->getAttribute(PDO::ATTR_SERVER_INFO);
 	}
 
 	/**
-	 * @param             $stmt
-	 * @param string|null $index
-	 * @param bool        $assoc
-	 *
 	 * @return bool|\chillerlan\Database\Result
 	 */
-	protected function __getResult($stmt, string $index = null, bool $assoc = null){
+	protected function get_result($stmt, string $index = null, bool $assoc = null){
 		$assoc = $assoc ?? true;
 
 		if(is_bool($stmt)){
-			return $stmt; // @codeCoverageIgnore
+			return $stmt;
 		}
 
 		return parent::getResult([$stmt, 'fetch'], [$assoc ? PDO::FETCH_ASSOC : PDO::FETCH_NUM], $index, $assoc);
 	}
 
-	/** @inheritdoc */
+	/**
+	 * @inheritdoc
+	 */
 	protected function raw_query(string $sql, string $index = null, bool $assoc = null){
-		return $this->__getResult($this->db->query($sql), $index, $assoc);
+		return $this->get_result($this->db->query($sql), $index, $assoc);
 	}
 
-	/** @inheritdoc */
+	/**
+	 * @inheritdoc
+	 */
 	protected function prepared_query(string $sql, array $values = null, string $index = null, bool $assoc = null){
 		$stmt = $this->db->prepare($sql, $this->pdo_stmt_options);
 
@@ -202,11 +138,13 @@ abstract class PDODriverAbstract extends DriverAbstract{
 
 		$stmt->execute();
 
-		return $this->__getResult($stmt, $index, $assoc);
+		return $this->get_result($stmt, $index, $assoc);
 	}
 
-	/** @inheritdoc */
-	protected function multi_query(string $sql, array $values){
+	/**
+	 * @inheritdoc
+	 */
+	protected function multi_query(string $sql, array $values):bool{
 		$stmt = $this->db->prepare($sql, $this->pdo_stmt_options);
 
 		foreach($values as $row){
@@ -219,8 +157,10 @@ abstract class PDODriverAbstract extends DriverAbstract{
 		return true;
 	}
 
-	/** @inheritdoc */
-	protected function multi_callback_query(string $sql, iterable $data, $callback){
+	/**
+	 * @inheritdoc
+	 */
+	protected function multi_callback_query(string $sql, array $data, $callback):bool{
 		$stmt = $this->db->prepare($sql, $this->pdo_stmt_options);
 
 		foreach($data as $k => $row){
@@ -231,6 +171,39 @@ abstract class PDODriverAbstract extends DriverAbstract{
 		unset($stmt);
 
 		return true;
+	}
+
+	/**
+	 * Returns the last insert id (if present)
+	 * @link http://php.net/manual/pdo.lastinsertid.php
+	 */
+	protected function insertID():string{
+		return $this->db->lastInsertId();
+	}
+
+	/**
+	 *
+	 */
+	protected function bindParams(PDOStatement $stmt, array $values):void{
+		$param_no = 1;
+
+		foreach($values as $v){
+			$t    = gettype($v);
+			$type = PDO::PARAM_STR;
+
+			if($t === 'boolean'){
+				$type = PDO::PARAM_BOOL;
+			}
+			elseif($t === 'integer'){
+				$type = PDO::PARAM_INT;
+			}
+			elseif($t === 'NULL'){
+				$type = PDO::PARAM_NULL;
+			}
+
+			$stmt->bindValue($param_no, $v, $type);
+			$param_no++;
+		}
 	}
 
 }

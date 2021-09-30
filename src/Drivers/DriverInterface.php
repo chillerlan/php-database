@@ -2,9 +2,7 @@
 /**
  * Interface DriverInterface
  *
- * @filesource   DriverInterface.php
  * @created      28.06.2017
- * @package      chillerlan\Database\Drivers
  * @author       Smiley <smiley@chillerlan.net>
  * @copyright    2017 Smiley
  * @license      MIT
@@ -21,60 +19,49 @@ interface DriverInterface{
 
 	/**
 	 * Constructor.
-	 *
-	 * @param \chillerlan\Settings\SettingsContainerInterface $options
-	 * @param \Psr\SimpleCache\CacheInterface|null  $cache
-	 * @param \Psr\Log\LoggerInterface|null         $logger
 	 */
 	public function __construct(SettingsContainerInterface $options, CacheInterface $cache = null, LoggerInterface $logger = null);
 
 	/**
-	 * Establishes a database connection and returns the connection object
+	 * Establishes a database connection
 	 *
-	 * @return \chillerlan\Database\Drivers\DriverInterface
 	 * @throws \chillerlan\Database\Drivers\DriverException
 	 */
 	public function connect():DriverInterface;
 
 	/**
 	 * Closes a database connection
-	 *
-	 * @return bool
 	 */
 	public function disconnect():bool;
 
 	/**
-	 * Returns the connection object
+	 * Returns the database resource object
 	 *
-	 * @return mixed the database resource object
+	 * @return mixed (resource, PDO, mysqli, ...)
 	 */
 	public function getDBResource();
 
 	/**
-	 * @return \chillerlan\Database\Dialects\Dialect
+	 * Returns an SQL dialect object for the current driver
 	 */
 	public function getDialect():Dialect;
 
 	/**
 	 * Returns info about the used php client
-	 *
-	 * @return string php's database client string
 	 */
 	public function getClientInfo():string;
 
 	/**
 	 * Returns info about the database server
-	 *
-	 * @return string serverinfo string
 	 */
-	public function getServerInfo():?string;
+	public function getServerInfo():string;
 
 	/**
 	 * Sanitizer.
 	 *
 	 * @param mixed $data string to escape
 	 *
-	 * @return mixed escaped. obviously.
+	 * @return mixed escaped. obviously. (hopefully)
 	 */
 	public function escape($data = null);
 
@@ -87,9 +74,9 @@ interface DriverInterface{
 	 * If the query was successful it returns either an array of results or true
 	 * if it was a void query. On errors, a false will be returned, obviously.
 	 *
-	 * @param string $sql         The SQL statement
-	 * @param string $index       [optional] an index column to assingn as the result's keys
-	 * @param bool   $assoc       [optional] If true, the fields are named with the respective column names, otherwise numbered
+	 * @param string      $sql    The SQL statement
+	 * @param string|null $index  [optional] an index column to assingn as the result's keys
+	 * @param bool|null   $assoc  [optional] If true, the fields are named with the respective column names, otherwise numbered
 	 *
 	 * @return \chillerlan\Database\Result|bool array with results, true on void query success, otherwise false.
 	 * @throws \chillerlan\Database\Drivers\DriverException
@@ -101,7 +88,7 @@ interface DriverInterface{
 	 *
 	 * @param string      $sql
 	 * @param string|null $index
-	 * @param bool        $assoc
+	 * @param bool|null   $assoc
 	 * @param int|null    $ttl
 	 *
 	 * @return \chillerlan\Database\Result|bool
@@ -115,10 +102,10 @@ interface DriverInterface{
 	 * Does everything for you: prepares the statement and fetches the results as an object or array
 	 * just pass a query along with values and you're done. Not meant for multi-inserts.
 	 *
-	 * @param string $sql         The SQL statement to prepare
-	 * @param array  $values      [optional] the value for each parameter in the statement - in the respective order, of course
-	 * @param string $index       [optional] an index column to assingn as the result's keys
-	 * @param bool   $assoc       [optional] If true, the fields are named with the respective column names, otherwise numbered
+	 * @param string      $sql     The SQL statement to prepare
+	 * @param array|null  $values  [optional] the value for each parameter in the statement - in the respective order, of course
+	 * @param string|null $index   [optional] an index column to assingn as the result's keys
+	 * @param bool|null   $assoc   [optional] If true, the fields are named with the respective column names, otherwise numbered
 	 *
 	 * @return \chillerlan\Database\Result|bool Array with results, true on void query success, otherwise false
 	 * @throws \chillerlan\Database\Drivers\DriverException
@@ -129,9 +116,9 @@ interface DriverInterface{
 	 * same as DriverInterface::prepared(), but cached.
 	 *
 	 * @param string      $sql
-	 * @param array       $values
+	 * @param array|null  $values
 	 * @param string|null $index
-	 * @param bool        $assoc
+	 * @param bool|null   $assoc
 	 * @param int|null    $ttl
 	 *
 	 * @return \chillerlan\Database\Result|bool
@@ -150,7 +137,7 @@ interface DriverInterface{
 	 * @return bool true query success, otherwise false
 	 * @throws \chillerlan\Database\Drivers\DriverException
 	 */
-	public function multi(string $sql, array $values);
+	public function multi(string $sql, array $values):bool;
 
 	/**
 	 * Prepared multi line insert/update with callback
@@ -160,12 +147,12 @@ interface DriverInterface{
 	 * @link https://gist.github.com/krakjoe/9384409
 	 *
 	 * @param string         $sql      The SQL statement to prepare
-	 * @param iterable       $data     an array with the (raw) data to insert, each row represents one line to insert.
+	 * @param array          $data     an array with the (raw) data to insert, each row represents one line to insert.
 	 * @param callable|array $callback a callback that processes the values for each row.
 	 *
 	 * @return bool true query success, otherwise false
 	 * @throws \chillerlan\Database\Drivers\DriverException
 	 */
-	public function multiCallback(string $sql, iterable $data, $callback);
+	public function multiCallback(string $sql, array $data, $callback):bool;
 
 }

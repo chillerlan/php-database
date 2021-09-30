@@ -2,9 +2,7 @@
 /**
  * Class MySQLiDrv
  *
- * @filesource   MySQLphp
  * @created      28.06.2017
- * @package      chillerlan\Database\Drivers
  * @author       Smiley <smiley@chillerlan.net>
  * @copyright    2017 Smiley
  * @license      MIT
@@ -14,19 +12,29 @@
 
 namespace chillerlan\Database\Drivers;
 
-use chillerlan\Database\Dialects\MySQL;
+use chillerlan\Database\Dialects\{Dialect, MySQL};
 use chillerlan\Database\Result;
-use Exception;
-use mysqli;
+use Throwable, mysqli;
+
+use function array_unshift, call_user_func_array, count, gettype, implode, is_array, is_bool, mysqli_init;
+
+use const MYSQLI_OPT_CONNECT_TIMEOUT;
 
 /**
- * @property mysqli $db
+ *
  */
-class MySQLiDrv extends DriverAbstract{
+final class MySQLiDrv extends DriverAbstract{
 
-	protected string $dialect = MySQL::class;
+	/**
+	 * Holds the database resource object
+	 *
+	 * @var mysqli|null
+	 */
+	private ?mysqli $db = null;
 
-	/** @inheritdoc */
+	/**
+	 * @inheritdoc
+	 */
 	public function connect():DriverInterface{
 
 		if($this->db instanceof mysqli){
@@ -66,13 +74,15 @@ class MySQLiDrv extends DriverAbstract{
 
 			return $this;
 		}
-		catch(Exception $e){
+		catch(Throwable $e){
 			throw new DriverException('db error: [MySQLiDrv]: '.$e->getMessage());
 		}
 
 	}
 
-	/** @inheritdoc */
+	/**
+	 * @inheritdoc
+	 */
 	public function disconnect():bool{
 
 		if($this->db instanceof mysqli){
@@ -84,22 +94,47 @@ class MySQLiDrv extends DriverAbstract{
 		return true;
 	}
 
-	/** @inheritdoc */
+	/**
+	 * @inheritdoc
+	 */
+	public function getDBResource():?mysqli{
+		return $this->db;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function getDialect():Dialect{
+		return new MySQL;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
 	public function getClientInfo():string{
+
+		if(!$this->db instanceof mysqli){
+			return 'disconnected, no info available';
+		}
+
 		return $this->db->client_info;
 	}
 
-	/** @inheritdoc */
+	/**
+	 * @inheritdoc
+	 */
 	public function getServerInfo():string{
+
+		if(!$this->db instanceof mysqli){
+			return 'disconnected, no info available';
+		}
+
 		return $this->db->server_info;
 	}
 
-	/** @inheritdoc */
-	protected function __escape(string $data):string{
-		return '\''.$this->db->real_escape_string($data).'\''; // emulate PDO
-	}
-
-	/** @inheritdoc */
+	/**
+	 * @inheritdoc
+	 */
 	protected function raw_query(string $sql, string $index = null, bool $assoc = null){
 		$result = $this->db->query($sql);
 
@@ -119,7 +154,9 @@ class MySQLiDrv extends DriverAbstract{
 		return $r;
 	}
 
-	/** @inheritdoc */
+	/**
+	 * @inheritdoc
+	 */
 	protected function prepared_query(string $sql, array $values = null, string $index = null, bool $assoc = null){
 		$assoc = $assoc ?? true;
 		$stmt = $this->db->stmt_init();
@@ -178,8 +215,10 @@ class MySQLiDrv extends DriverAbstract{
 		return $i === 0 ? true : $output; // @todo: return proper Result object in all cases
 	}
 
-	/** @inheritdoc */
-	protected function multi_query(string $sql, array $values){
+	/**
+	 * @inheritdoc
+	 */
+	protected function multi_query(string $sql, array $values):bool{
 		$stmt = $this->db->stmt_init();
 		$stmt->prepare($sql);
 		$this->stmtError($this->db->errno, $this->db->error);
@@ -195,8 +234,10 @@ class MySQLiDrv extends DriverAbstract{
 		return true;
 	}
 
-	/** @inheritdoc */
-	protected function multi_callback_query(string $sql, iterable $data, $callback){
+	/**
+	 * @inheritdoc
+	 */
+	protected function multi_callback_query(string $sql, array $data, $callback):bool{
 		$stmt = $this->db->stmt_init();
 		$stmt->prepare($sql);
 		$this->stmtError($this->db->errno, $this->db->error);
@@ -204,7 +245,7 @@ class MySQLiDrv extends DriverAbstract{
 		foreach($data as $k => $row){
 			$row = call_user_func_array($callback, [$row, $k]);
 
-			if($row !== false && !empty($row)){
+			if(is_array($row) && !empty($row)){
 				call_user_func_array([$stmt, 'bind_param'], $this->getReferences($row));
 
 				$stmt->execute();
@@ -217,12 +258,9 @@ class MySQLiDrv extends DriverAbstract{
 	}
 
 	/**
-	 * @param int    $errno
-	 * @param string $errstr
-	 *
 	 * @throws \chillerlan\Database\Drivers\DriverException
 	 */
-	protected function stmtError(int $errno, string $errstr):void{
+	private function stmtError(int $errno, string $errstr):void{
 
 		if($errno !== 0){
 			throw new DriverException($errstr, $errno);
@@ -233,12 +271,9 @@ class MySQLiDrv extends DriverAbstract{
 	/**
 	 * Copies an array to an array of referenced values
 	 *
-	 * @param array $row
-	 *
-	 * @return array
 	 * @see http://php.net/manual/mysqli-stmt.bind-param.php
 	 */
-	protected function getReferences(array $row){
+	private function getReferences(array $row):array{
 		$references = [];
 		$types      = [];
 
