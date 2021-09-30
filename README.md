@@ -10,12 +10,12 @@ A PHP 7.4+ SQL client and querybuilder for the most common databases.
 [![Packagist downloads][downloads-badge]][downloads]<br/>
 [![Continuous Integration][gh-action-badge]][gh-action]
 
-[php-badge]: https://img.shields.io/packagist/php-v/chillerlan/php-oauth-core?logo=php&color=8892BF
+[php-badge]: https://img.shields.io/packagist/php-v/chillerlan/php-database?logo=php&color=8892BF
 [php]: https://www.php.net/supported-versions.php
 [packagist-badge]: https://img.shields.io/packagist/v/chillerlan/php-database.svg?logo=packagist
 [packagist]: https://packagist.org/packages/chillerlan/php-database
-[license-badge]: https://img.shields.io/github/license/chillerlan/php-database.svg?
-[license]: https://github.com/chillerlan/php-database/blob/master/LICENSE
+[license-badge]: https://img.shields.io/github/license/chillerlan/php-database.svg
+[license]: https://github.com/chillerlan/php-database/blob/main/LICENSE
 [coverage-badge]: https://img.shields.io/codecov/c/github/chillerlan/php-database.svg?logo=codecov
 [coverage]: https://codecov.io/github/chillerlan/php-database
 [scrutinizer-badge]: https://img.shields.io/scrutinizer/g/chillerlan/php-database.svg?logo=scrutinizer
@@ -45,7 +45,7 @@ A PHP 7.4+ SQL client and querybuilder for the most common databases.
 {
 	"require": {
 		"php": "^7.4",
-		"chillerlan/database": "dev-main"
+		"chillerlan/php-database": "dev-main"
 	}
 }
 ```
