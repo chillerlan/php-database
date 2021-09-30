@@ -2,9 +2,7 @@
 /**
  * Trait DatabaseOptionsTrait
  *
- * @filesource   DatabaseOptionsTrait.php
  * @created      24.01.2018
- * @package      chillerlan\Database
  * @author       Smiley <smiley@chillerlan.net>
  * @copyright    2018 Smiley
  * @license      MIT
@@ -16,173 +14,133 @@ trait DatabaseOptionsTrait{
 
 	/**
 	 * The database driver to use (FQCN)
-	 *
-	 * @var string
 	 */
-	protected $driver;
+	protected ?string $driver = null;
 
 	/**
 	 * The host to connect to
-	 *
-	 * @var string
 	 */
-	protected $host = 'localhost';
+	protected ?string $host = 'localhost';
 
 	/**
 	 * The port number
-	 *
-	 * @var int
 	 */
-	protected $port;
+	protected ?int $port = null;
 
 	/**
 	 * A socket
-	 *
-	 * @var string
 	 */
-	protected $socket;
+	protected ?string $socket = null;
 
 	/**
 	 * The database name
-	 *
-	 * @var string
 	 */
-	protected $database;
+	protected ?string $database = null;
 
 	/**
 	 * The username
-	 *
-	 * @var string
 	 */
-	protected $username;
+	protected ?string $username = null;
 
 	/**
 	 * The password
-	 *
-	 * @var string
 	 */
-	protected $password;
+	protected ?string $password = null;
 
 	/**
 	 * Indicates whether the connection should use SSL or not
-	 *
-	 * @var bool
 	 */
-	protected $use_ssl = false;
+	protected bool $use_ssl = false;
 
 	/**
 	 * The SSL key
-	 *
-	 * @var string
 	 */
-	protected $ssl_key;
+	protected ?string $ssl_key = null;
 
 	/**
 	 * The SSL certificate
-	 *
-	 * @var string
 	 */
-	protected $ssl_cert;
+	protected ?string $ssl_cert = null;
 
 	/**
 	 * The path to a SSL certificate authority file
-	 *
-	 * @var string
 	 */
-	protected $ssl_ca;
+	protected ?string $ssl_ca = null;
 
 	/**
 	 * The directory containing SSL certificate authority files
-	 *
-	 * @var string
 	 */
-	protected $ssl_capath;
+	protected ?string $ssl_capath = null;
 
 	/**
 	 * The SSL cipher
-	 *
-	 * @var string
 	 */
-	protected $ssl_cipher;
+	protected ?string $ssl_cipher = null;
 
 	/**
 	 * MySQLi connection timeout
-	 *
-	 * @var int
 	 */
-	protected $mysqli_timeout = 3;
+	protected int $mysqli_timeout = 3;
 
 	/**
 	 * MySQL connection character set
 	 *
 	 * @link https://mathiasbynens.be/notes/mysql-utf8mb4 How to support full Unicode in MySQL
-	 *
-	 * @var string
 	 */
-	protected $mysql_charset = 'utf8mb4';
+	protected string $mysql_charset = 'utf8mb4';
 
 	/**
 	 * PostgreSQL connection character set
+	 */
+	protected string $pgsql_charset = 'UTF8';
+
+	/**
+	 * The driver name to use for an ODBC connection (@todo)
+	 */
+	protected ?string $odbc_driver = null;
+
+	/**
+	 * atabase result encoding
 	 *
-	 * @var string
+	 * @see \mb_convert_encoding()
 	 */
-	protected $pgsql_charset = 'UTF8';
+	protected ?string $convert_encoding_src = null;
 
 	/**
-	 * The driver name to use for an ODBC connection
-	 *
-	 * @var string
+	 * @see \mb_convert_encoding()
 	 */
-	protected $odbc_driver;
-
-	/**
-	 * @var string database result encoding (mb_convert_encoding)
-	 */
-	protected $convert_encoding_src;
-
-	/**
-	 * @var string target encoding
-	 */
-	protected $convert_encoding_dest = 'UTF-8';
+	protected ?string $convert_encoding_dest = 'UTF-8';
 
 	/**
 	 * MS SQL Server connection timeout
 	 *
 	 * @link https://docs.microsoft.com/en-us/sql/connect/php/connection-options
-	 *
-	 * @var int
 	 */
-	protected $mssql_timeout = 3;
+	protected int $mssql_timeout = 3;
 
 	/**
 	 * MS SQL Server connection character set
-	 *
-	 * @var string
 	 */
-	protected $mssql_charset = 'UTF-8';
+	protected string $mssql_charset = 'UTF-8';
 
 	/**
 	 * Specifies whether the communication with MS SQL Server is encrypted or unencrypted.
-	 *
-	 * @var int
 	 */
-	protected $mssql_encrypt = 0; // how???
+	protected int $mssql_encrypt = 0; // @todo: how???
 
 	/**
 	 * Firebird connection encoding
-	 *
-	 * @var string
 	 */
-	protected $firebird_encoding = 'UTF8';
+	protected string $firebird_encoding = 'UTF8';
 
 	/**
-	 * @var string
+	 * a hash algorithm for the cache keys
 	 */
-	protected $cachekey_hash_algo = 'sha256';
+	protected string $cachekey_hash_algo = 'sha256';
 
 	/**
-	 * @var
+	 * @todo
 	 */
-	protected $storage_path;
+	protected string $storage_path;
 
 }

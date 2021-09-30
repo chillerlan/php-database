@@ -112,12 +112,12 @@ class Database extends DatabaseAbstract implements DriverInterface{
 	}
 
 	/** @inheritdoc */
-	public function multi(string $sql, array $values){
+	public function multi(string $sql, array $values):bool{
 		return $this->driver->multi($sql, $values);
 	}
 
 	/** @inheritdoc */
-	public function multiCallback(string $sql, iterable $data, $callback){
+	public function multiCallback(string $sql, array $data, $callback):bool{
 		return $this->driver->multiCallback($sql, $data, $callback);
 	}
 

@@ -13,9 +13,7 @@
 namespace chillerlan\Database\Query;
 
 use chillerlan\Database\{Dialects\Dialect, Drivers\DriverInterface, ResultInterface};
-use Psr\Log\{
-	LoggerAwareInterface, LoggerAwareTrait, LoggerInterface
-};
+use Psr\Log\{LoggerAwareInterface, LoggerAwareTrait, LoggerInterface};
 
 /**
  * one big ugly block of code
@@ -30,7 +28,7 @@ use Psr\Log\{
  * @property \chillerlan\Database\Query\Truncate $truncate
  * @property \chillerlan\Database\Query\Update   $update
  */
-class QueryBuilder implements LoggerAwareInterface{
+final class QueryBuilder implements LoggerAwareInterface{
 	use LoggerAwareTrait;
 
 	protected const STATEMENTS = ['alter', 'create', 'delete', 'drop', 'insert', 'select', 'show', 'truncate', 'update'];

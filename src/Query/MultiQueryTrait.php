@@ -13,7 +13,7 @@
 namespace chillerlan\Database\Query;
 
 /**
- * @implements \chillerlan\Database\MultiQuery
+ * @implements \chillerlan\Database\Query\MultiQuery
  */
 trait MultiQueryTrait{
 	use QueryTrait;
@@ -29,7 +29,7 @@ trait MultiQueryTrait{
 	}
 
 	/** @inheritdoc */
-	public function callback(iterable $values, callable $callback):bool{
+	public function callback(array $values, callable $callback):bool{
 		$sql    = $this->sql(true);
 
 		$this->logger->debug('MultiQueryTrait::callback()', ['method' => __METHOD__, 'sql' => $sql, 'val' => $values]);

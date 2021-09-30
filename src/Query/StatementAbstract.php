@@ -14,9 +14,7 @@ namespace chillerlan\Database\Query;
 
 use chillerlan\Database\Dialects\Dialect;
 use chillerlan\Database\Drivers\DriverInterface;
-use Psr\Log\{
-	LoggerAwareInterface, LoggerAwareTrait, LoggerInterface
-};
+use Psr\Log\{LoggerAwareInterface, LoggerAwareTrait, LoggerInterface};
 
 abstract class StatementAbstract implements Statement, LoggerAwareInterface{
 	use LoggerAwareTrait;

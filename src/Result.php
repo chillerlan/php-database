@@ -22,30 +22,30 @@ class Result implements ResultInterface, SeekableIterator, ArrayAccess, Countabl
 	/**
 	 * @var null|string
 	 */
-	protected $sourceEncoding;
+	protected ?string $sourceEncoding = null;
 
 	/**
 	 * @var string
 	 */
-	protected $destEncoding;
+	protected string $destEncoding;
 
 	/**
 	 * @todo
 	 * @var bool
 	 */
-	protected $isBool;
+	protected bool $isBool;
 
 	/**
 	 * @todo
 	 * @var bool
 	 */
-	protected $success = false;
+	protected bool $success = false;
 
 	/**
 	 * @todo
 	 * @var array
 	 */
-	protected $metadata = [];
+	protected array $metadata = [];
 
 	/** @inheritdoc */
 	public function __construct(iterable $data = null, string $sourceEncoding = null, string $destEncoding = null){
@@ -67,12 +67,12 @@ class Result implements ResultInterface, SeekableIterator, ArrayAccess, Countabl
 	/**
 	 * @var array
 	 */
-	protected $array = [];
+	protected array $array = [];
 
 	/**
 	 * @var int
 	 */
-	protected $offset = 0;
+	protected int $offset = 0;
 
 	/**
 	 * @link http://api.prototypejs.org/language/Enumerable/prototype/toArray/
@@ -92,7 +92,7 @@ class Result implements ResultInterface, SeekableIterator, ArrayAccess, Countabl
 	 *
 	 * @return $this
 	 */
-	public function __each($callback){
+	public function __each($callback):ResultInterface{
 		$this->__map($callback);
 
 		return $this;
@@ -107,7 +107,7 @@ class Result implements ResultInterface, SeekableIterator, ArrayAccess, Countabl
 	 * @return array
 	 * @throws \chillerlan\Database\DatabaseException
 	 */
-	public function __map($callback):array {
+	public function __map($callback):array{
 
 		if(!\is_callable($callback)){
 			throw new DatabaseException('invalid callback');
