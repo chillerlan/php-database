@@ -12,7 +12,7 @@
 
 namespace chillerlan\Database\Dialects;
 
-class Firebird extends DialectAbstract{
+final class Firebird extends DialectAbstract{
 
 	/** @inheritdoc */
 	public function select(array $cols, array $from, string $where = null, $limit = null, $offset = null, bool $distinct = null, array $groupby = null, array $orderby = null):array{

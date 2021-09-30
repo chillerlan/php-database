@@ -12,7 +12,7 @@
 
 namespace chillerlan\Database\Dialects;
 
-class MySQL extends DialectAbstract{
+final class MySQL extends DialectAbstract{
 
 	protected array $quotes = ['`', '`'];
 	protected string $charset = 'utf8mb4_bin';

@@ -12,7 +12,7 @@
 
 namespace chillerlan\Database\Dialects;
 
-class MSSQL extends DialectAbstract{
+final class MSSQL extends DialectAbstract{
 
 	protected array $quotes = ['[', ']'];
 

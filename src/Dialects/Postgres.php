@@ -14,7 +14,7 @@ namespace chillerlan\Database\Dialects;
 
 use chillerlan\Database\Query\QueryException;
 
-class Postgres extends DialectAbstract{
+final class Postgres extends DialectAbstract{
 
 	/** @inheritdoc */
 	public function select(array $cols, array $from, string $where = null, $limit = null, $offset = null, bool $distinct = null, array $groupby = null, array $orderby = null):array{
