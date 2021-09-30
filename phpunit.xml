@@ -24,7 +24,7 @@
 		<junit outputFile=".build/logs/junit.xml"/>
 	</logging>
 	<php>
-		<!-- whether the test runs on CI or not - set to false to allow live API tests to run -->
+		<!-- whether the test runs on CI or not - set to false to allow tests to run in your local setup -->
 		<const name="TEST_IS_CI" value="false"/>
 		<!-- the config directory, where .env, cacert.pem and test oauth tokens reside, relative from project root -->
 		<const name="TEST_CFGDIR" value="./config"/>
