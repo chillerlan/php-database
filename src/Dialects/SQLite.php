@@ -14,7 +14,11 @@ namespace chillerlan\Database\Dialects;
 
 final class SQLite extends DialectAbstract{
 
-	/** @inheritdoc */
+	/**
+	 * @inheritdoc
+	 *
+	 * @see https://www.sqlite.org/datatype3.html
+	 */
 	public function fieldspec(string $name, string $type, $length = null, string $attribute = null, string $collation = null, bool $isNull = null, string $defaultType = null, $defaultValue = null, string $extra = null):string{
 		$type      = strtoupper(trim($type));
 		$collation = strtoupper($collation);
@@ -22,8 +26,15 @@ final class SQLite extends DialectAbstract{
 		$field = [$this->quote(trim($name))];
 
 		$type_translation = [
+			'TINYINT'    => 'INTEGER',
+			'SMALLINT'   => 'INTEGER',
+			'MEDIUMINT'  => 'INTEGER',
+			'BIGINT'     => 'INTEGER',
+			'TINYTEXT'   => 'TEXT',
 			'MEDIUMTEXT' => 'TEXT',
 			'LONGTEXT'   => 'TEXT',
+			'DOUBLE'     => 'REAL',
+			'DECIMAL'    => 'REAL',
 		][$type] ?? $type;
 
 		if($length !== null && (in_array($type, ['CHAR', 'NCHAR', 'VARCHAR', 'NVARCHAR', 'CHARACTER'], true) || (is_string($length) && count(explode(',', $length)) === 2 && $type === 'DECIMAL'))){

@@ -102,7 +102,13 @@ final class MSSQL extends DialectAbstract{
 		return $sql;
 	}
 
-	/** @inheritdoc */
+	/**
+	 * @inheritdoc
+	 *
+	 * @see https://docs.microsoft.com/sql/t-sql/data-types/numeric-types
+	 * @see https://docs.microsoft.com/sql/t-sql/data-types/string-and-binary-types
+	 * [...]
+	 */
 	public function fieldspec(string $name, string $type, $length = null, string $attribute = null, string $collation = null, bool $isNull = null, string $defaultType = null, $defaultValue = null, string $extra = null):string{
 		$type = strtolower(trim($type));
 

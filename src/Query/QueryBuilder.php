@@ -150,41 +150,46 @@ final class QueryBuilder implements LoggerAwareInterface{
 						return $this;
 					}
 
-					/** @inheritdoc */
 					public function enum(string $name, array $values, $defaultValue = null, bool $isNull = null):CreateTable{
 						$this->cols[$name] = $this->dialect->enum($name, $values, $defaultValue, $isNull);
 
 						return $this;
 					}
 
-					/** @inheritdoc */
 					public function tinyint(string $name, int $length = null, $defaultValue = null, bool $isNull = null, string $attribute = null):CreateTable{
 						return $this->field($name, 'TINYINT', $length, $attribute, null, $isNull, null, $defaultValue);
 					}
 
-					/** @inheritdoc */
 					public function int(string $name, int $length = null, $defaultValue = null, bool $isNull = null, string $attribute = null):CreateTable{
 						return $this->field($name, 'INT', $length, $attribute, null, $isNull, null, $defaultValue);
 					}
 
-					/** @inheritdoc */
+					public function bigint(string $name, int $length = null, $defaultValue = null, bool $isNull = null, string $attribute = null):CreateTable{
+						return $this->field($name, 'BIGINT', $length, $attribute, null, $isNull, null, $defaultValue);
+					}
+
 					public function varchar(string $name, int $length, $defaultValue = null, bool $isNull = null):CreateTable{
 						return $this->field($name, 'VARCHAR', $length, null, null, $isNull, null, $defaultValue);
 					}
 
-					/** @inheritdoc */
 					public function decimal(string $name, string $length, $defaultValue = null, bool $isNull = null):CreateTable{
 						return $this->field($name, 'DECIMAL', $length, null, null, $isNull, null, $defaultValue);
 					}
 
-					/** @inheritdoc */
 					public function tinytext(string $name, $defaultValue = null, bool $isNull = null):CreateTable{
 						return $this->field($name, 'TINYTEXT', null, null, null, $isNull, null, $defaultValue);
 					}
 
-					/** @inheritdoc */
 					public function text(string $name, $defaultValue = null, bool $isNull = null):CreateTable{
 						return $this->field($name, 'TEXT', null, null, null, $isNull, null, $defaultValue);
+					}
+
+					public function mediumtext(string $name, $defaultValue = null, bool $isNull = null):CreateTable{
+						return $this->field($name, 'MEDIUMTEXT', null, null, null, $isNull, null, $defaultValue);
+					}
+
+					public function longtext(string $name, $defaultValue = null, bool $isNull = null):CreateTable{
+						return $this->field($name, 'LONGTEXT', null, null, null, $isNull, null, $defaultValue);
 					}
 
 				})->name($tablename);

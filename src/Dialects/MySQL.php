@@ -112,17 +112,19 @@ final class MySQL extends DialectAbstract{
 		return $sql;
 	}
 
-	/** @inheritdoc */
+	/**
+	 * @inheritdoc
+	 *
+	 * @see https://dev.mysql.com/doc/refman/8.0/en/data-types.html
+	 */
 	public function fieldspec(string $name, string $type, $length = null, string $attribute = null, string $collation = null, bool $isNull = null, string $defaultType = null, $defaultValue = null, string $extra = null):string {
-		$type = strtoupper(trim($type));
-		$defaultType = strtoupper($defaultType);
-
-
-		$field = [$this->quote(trim($name))];
-
-		// @todo: whitelist types?
-		$nolengthtypes = ['DATE', 'TINYBLOB', 'TINYTEXT', 'BLOB', 'TEXT', 'MEDIUMBLOB',
-		                  'MEDIUMTEXT', 'LONGBLOB', 'LONGTEXT', 'SERIAL', 'BOOLEAN', 'UUID'];
+		$type          = strtoupper(trim($type));
+		$defaultType   = strtoupper($defaultType);
+		$field         = [$this->quote(trim($name))];
+		$nolengthtypes = [
+			'DATE', 'TINYBLOB', 'TINYTEXT', 'BLOB', 'TEXT', 'MEDIUMBLOB',
+			'MEDIUMTEXT', 'LONGBLOB', 'LONGTEXT', 'SERIAL', 'BOOLEAN', 'UUID'
+		];
 
 		$field[] = (is_int($length) || (is_string($length) && count(explode(',', $length)) === 2)) && !in_array($type, $nolengthtypes, true)
 			? $type.'('. $length . ')'

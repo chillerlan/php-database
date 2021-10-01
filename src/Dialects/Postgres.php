@@ -125,7 +125,11 @@ final class Postgres extends DialectAbstract{
 		return $sql;
 	}
 
-	/** @inheritdoc */
+	/**
+	 * @inheritdoc
+	 *
+	 * @see https://www.postgresql.org/docs/9.5/datatype.html
+	 */
 	public function fieldspec(string $name, string $type, $length = null, string $attribute = null, string $collation = null, bool $isNull = null, string $defaultType = null, $defaultValue = null, string $extra = null):string{
 		$name = trim($name);
 		$type = strtoupper(trim($type));
@@ -136,7 +140,7 @@ final class Postgres extends DialectAbstract{
 			'TINYINT'    => 'SMALLINT',
 			'MEDIUMINT'  => 'INT',
 			'DOUBLE'     => 'DOUBLE PRECISION',
-			'TINYTEXT'   => 'VARCHAR(255)',
+			'TINYTEXT'   => 'TEXT',
 			'DATETIME'   => 'TIMESTAMP',
 			'IMAGE'      => 'BLOB',
 			'MEDIUMTEXT' => 'TEXT',
