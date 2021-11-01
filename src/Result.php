@@ -2,22 +2,21 @@
 /**
  * Class Result
  *
- * @filesource   Result.php
  * @created      28.06.2017
- * @package      chillerlan\Database
  * @author       Smiley <smiley@chillerlan.net>
  * @copyright    2017 Smiley
  * @license      MIT
  */
 
 namespace chillerlan\Database;
+
 use ArrayAccess, Countable, SeekableIterator;
 
 /**
  * @property int                              $length
  * @property \chillerlan\Database\ResultRow[] $array
  */
-class Result implements ResultInterface, SeekableIterator, ArrayAccess, Countable{
+class Result implements ResultInterface{
 
 	/**
 	 * @var null|string

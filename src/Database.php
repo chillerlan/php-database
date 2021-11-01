@@ -2,9 +2,7 @@
 /**
  * Class Database
  *
- * @filesource   Database.php
  * @created      27.06.2017
- * @package      chillerlan\Database
  * @author       Smiley <smiley@chillerlan.net>
  * @copyright    2017 Smiley
  * @license      MIT
@@ -12,49 +10,10 @@
 
 namespace chillerlan\Database;
 
-use chillerlan\Database\{
-	Dialects\Dialect, Drivers\DriverInterface, Query\QueryBuilder
-};
+use chillerlan\Database\Dialects\Dialect;
+use chillerlan\Database\Drivers\DriverInterface;
 
-/**
- * @property \chillerlan\Database\Query\Alter    $alter
- * @property \chillerlan\Database\Query\Create   $create
- * @property \chillerlan\Database\Query\Delete   $delete
- * @property \chillerlan\Database\Query\Drop     $drop
- * @property \chillerlan\Database\Query\Insert   $insert
- * @property \chillerlan\Database\Query\Select   $select
- * @property \chillerlan\Database\Query\Show     $show
- * @property \chillerlan\Database\Query\Truncate $truncate
- * @property \chillerlan\Database\Query\Update   $update
- */
 class Database extends DatabaseAbstract implements DriverInterface{
-
-	/**
-	 * @inheritdoc
-	 * @codeCoverageIgnore
-	 */
-	public function __destruct(){
-		$this->driver->disconnect();
-	}
-
-	/** @inheritdoc */
-	public function __get(string $name){
-		return $this->query->{$name};
-	}
-
-	/**
-	 * @return \chillerlan\Database\Drivers\DriverInterface
-	 */
-	public function getDriver():DriverInterface{
-		return $this->driver;
-	}
-
-	/**
-	 * @return \chillerlan\Database\Query\QueryBuilder
-	 */
-	public function getQueryBuilder():QueryBuilder{
-		return $this->query;
-	}
 
 	/**
 	 * @inheritdoc
@@ -123,7 +82,7 @@ class Database extends DatabaseAbstract implements DriverInterface{
 
 	/** @inheritdoc */
 	public function getDialect():Dialect{
-		return $this->driver->getDialect();
+		return $this->dialect;
 	}
 
 }

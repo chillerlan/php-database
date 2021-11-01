@@ -1,10 +1,8 @@
 <?php
 /**
- * Interface Insert
+ * Class Insert
  *
- * @filesource   Insert.php
  * @created      28.06.2017
- * @package      chillerlan\Database\Query
  * @author       Smiley <smiley@chillerlan.net>
  * @copyright    2017 Smiley
  * @license      MIT
@@ -12,35 +10,51 @@
 
 namespace chillerlan\Database\Query;
 
+use chillerlan\Database\ResultInterface;
+use function array_keys;
+
 /**
  * @link https://dev.mysql.com/doc/refman/5.7/en/insert.html
  * @link https://www.postgresql.org/docs/current/static/sql-insert.html
  * @link https://docs.microsoft.com/en-gb/sql/t-sql/statements/insert-transact-sql
  * @link https://www.firebirdsql.org/file/documentation/reference_manuals/fblangref25-en/html/fblangref25-dml-insert.html
  * @link https://www.sqlite.org/lang_insert.html
- *
- * @method string sql(bool $multi = null)
- * @method array  getBindValues()
- * @method mixed  query(string $index = null)
- * @method mixed  multi(iterable $values = null)
- * @method callback(iterable $values, \Closure $callback)
  */
-interface Insert extends Statement{
+class Insert extends Statement implements BindValues, MultiQuery{
 
-	/**
-	 * @param string      $table
-	 * @param string|null $on_conflict
-	 * @param string|null $conflict_target
-	 *
-	 * @return \chillerlan\Database\Query\Insert
-	 */
-	public function into(string $table, string $on_conflict = null, string $conflict_target = null);
+	public function into(string $table, string $on_conflict = null, string $conflict_target = null):Insert{
+		return $this->setOnConflict($table, $on_conflict, $conflict_target);
+	}
 
-	/**
-	 * @param iterable $values
-	 *
-	 * @return \chillerlan\Database\Query\Insert
-	 */
-	public function values(iterable $values):Insert;
+	public function values(iterable $values):Insert{
+
+		/** @noinspection PhpConditionAlreadyCheckedInspection - ResultInterface implements Iterator */
+		if($values instanceof ResultInterface){
+			$this->bindValues = $values->__toArray();
+
+			return $this;
+		}
+
+		foreach($values as $key => $value){
+			$this->addBindValue($key, $value);
+		}
+
+		return $this;
+	}
+
+	/** @inheritdoc */
+	protected function getSQL():array{
+
+		if(empty($this->bindValues)){
+			throw new QueryException('no values given');
+		}
+
+		return $this->dialect->insert(
+			$this->name,
+			array_keys($this->multi ? $this->bindValues[0] : $this->bindValues),
+			$this->on_conflict,
+			$this->conflict_target
+		);
+	}
 
 }

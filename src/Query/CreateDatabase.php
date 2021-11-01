@@ -1,10 +1,8 @@
 <?php
 /**
- * Interface CreateDatabase
+ * Class CreateDatabase
  *
- * @filesource   CreateDatabase.php
  * @created      28.06.2017
- * @package      chillerlan\Database\Query
  * @author       Smiley <smiley@chillerlan.net>
  * @copyright    2017 Smiley
  * @license      MIT
@@ -13,29 +11,28 @@
 namespace chillerlan\Database\Query;
 
 /**
- * @method string sql(bool $multi = null)
- * @method array  getBindValues()
- * @method mixed  query(string $index = null)
+ * @link https://dev.mysql.com/doc/refman/5.7/en/create-database.html
+ * @link https://www.postgresql.org/docs/current/static/sql-createdatabase.html
+ * @link https://docs.microsoft.com/en-gb/sql/t-sql/statements/create-database-sql-server-transact-sql
+ * @link https://www.firebirdsql.org/file/documentation/reference_manuals/fblangref25-en/html/fblangref25-ddl-db.html#fblangref25-ddl-db-create
  */
-interface CreateDatabase extends Statement{
+class CreateDatabase extends Statement implements Query, IfNotExists{
 
-	/**
-	 * @return \chillerlan\Database\Query\CreateDatabase
-	 */
-	public function ifNotExists();
+	public function name(string $dbname):CreateDatabase{
+		return $this->setName($dbname);
+	}
 
-	/**
-	 * @param string $dbname
-	 *
-	 * @return \chillerlan\Database\Query\CreateDatabase
-	 */
-	public function name(string $dbname);
+	public function charset(string $collation):CreateDatabase{
+		return $this->setCharset($collation);
+	}
 
-	/**
-	 * @param string $collation
-	 *
-	 * @return \chillerlan\Database\Query\CreateDatabase
-	 */
-	public function charset(string $collation);
+	public function ifNotExists():CreateDatabase{
+		return $this->setIfNotExists();
+	}
+
+	/** @inheritdoc */
+	protected function getSQL():array{
+		return $this->dialect->createDatabase($this->name, $this->ifNotExists, $this->charset);
+	}
 
 }

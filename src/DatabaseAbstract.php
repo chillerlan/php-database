@@ -2,9 +2,7 @@
 /**
  * Class DatabaseAbstract
  *
- * @filesource   DatabaseAbstract.php
  * @created      20.01.2018
- * @package      chillerlan\Database
  * @author       Smiley <smiley@chillerlan.net>
  * @copyright    2018 Smiley
  * @license      MIT
@@ -12,44 +10,48 @@
 
 namespace chillerlan\Database;
 
-use chillerlan\Database\{
-	Drivers\DriverInterface, Query\QueryBuilder
-};
+use chillerlan\Database\Dialects\Dialect;
+use chillerlan\Database\Drivers\DriverInterface;
+use chillerlan\Database\Query\{Alter, Create, Delete, Drop, Insert, QueryException, Select, Show, Truncate, Update};
 use chillerlan\Settings\SettingsContainerInterface;
-use Psr\Log\{
-	LoggerAwareInterface, LoggerAwareTrait, LoggerInterface, NullLogger
-};
+use Psr\Log\{LoggerAwareInterface, LoggerAwareTrait, LoggerInterface, NullLogger};
 use Psr\SimpleCache\CacheInterface;
 
+use function strtolower;
+
+/**
+ * @property \chillerlan\Database\Query\Alter    $alter
+ * @property \chillerlan\Database\Query\Create   $create
+ * @property \chillerlan\Database\Query\Delete   $delete
+ * @property \chillerlan\Database\Query\Drop     $drop
+ * @property \chillerlan\Database\Query\Insert   $insert
+ * @property \chillerlan\Database\Query\Select   $select
+ * @property \chillerlan\Database\Query\Show     $show
+ * @property \chillerlan\Database\Query\Truncate $truncate
+ * @property \chillerlan\Database\Query\Update   $update
+ */
 abstract class DatabaseAbstract implements LoggerAwareInterface{
 	use LoggerAwareTrait;
 
-	/**
-	 * @var \chillerlan\Database\DatabaseOptions
-	 */
-	protected $options;
+	protected const STATEMENTS = [
+		'alter'    => Alter::class,
+		'create'   => Create::class,
+		'delete'   => Delete::class,
+		'drop'     => Drop::class,
+		'insert'   => Insert::class,
+		'select'   => Select::class,
+		'show'     => Show::class,
+		'truncate' => Truncate::class,
+		'update'   => Update::class,
+	];
 
-	/**
-	 * @var \Psr\SimpleCache\CacheInterface
-	 */
-	protected $cache;
-
-	/**
-	 * @var \chillerlan\Database\Drivers\DriverInterface
-	 */
-	protected $driver;
-
-	/**
-	 * @var \chillerlan\Database\Query\QueryBuilder
-	 */
-	protected $query;
+	protected SettingsContainerInterface $options;
+	protected ?CacheInterface $cache = null;
+	protected DriverInterface $driver;
+	protected Dialect $dialect;
 
 	/**
 	 * Database constructor.
-	 *
-	 * @param \chillerlan\Settings\SettingsContainerInterface $options
-	 * @param \Psr\SimpleCache\CacheInterface|null $cache
-	 * @param \Psr\Log\LoggerInterface|null        $logger
 	 *
 	 * @throws \chillerlan\Database\DatabaseException
 	 */
@@ -65,18 +67,44 @@ abstract class DatabaseAbstract implements LoggerAwareInterface{
 			throw new DatabaseException('invalid driver interface');
 		}
 
-		$this->query   = new QueryBuilder($this->driver, $this->logger);
+		$this->dialect = $this->driver->getDialect();
 	}
 
 	/**
-	 * @param \Psr\Log\LoggerInterface $logger
+	 * @throws \chillerlan\Database\Query\QueryException
+	 */
+	public function __get(string $name){
+		$name = strtolower($name);
+
+		if(isset($this::STATEMENTS[$name])){
+			$statement = $this::STATEMENTS[$name];
+
+			return new $statement($this->driver, $this->dialect, $this->logger);
+		}
+
+		throw new QueryException('invalid statement');
+	}
+
+	/**
+	 * @codeCoverageIgnore
+	 */
+	public function __destruct(){
+		$this->driver->disconnect();
+	}
+
+	/**
+	 * @return \chillerlan\Database\Drivers\DriverInterface
+	 */
+	public function getDriver():DriverInterface{
+		return $this->driver;
+	}
+
+	/**
 	 *
-	 * @return void
 	 */
 	public function setLogger(LoggerInterface $logger):void{
 		$this->logger = $logger;
 		$this->driver->setLogger($logger);
-		$this->query->setLogger($logger);
 	}
 
 }

@@ -1,10 +1,8 @@
 <?php
 /**
- * Interface Select
+ * Class Select
  *
- * @filesource   Select.php
  * @created      28.06.2017
- * @package      chillerlan\Database\Query
  * @author       Smiley <smiley@chillerlan.net>
  * @copyright    2017 Smiley
  * @license      MIT
@@ -12,66 +10,105 @@
 
 namespace chillerlan\Database\Query;
 
+use chillerlan\Database\ResultInterface;
+use function implode;
+
 /**
  * @link https://dev.mysql.com/doc/refman/5.7/en/select.html
  * @link https://www.postgresql.org/docs/current/static/sql-select.html
  * @link https://docs.microsoft.com/de-de/sql/t-sql/queries/select-clause-transact-sql
  * @link https://www.firebirdsql.org/file/documentation/reference_manuals/fblangref25-en/html/fblangref25-dml-select.html
  * @link https://www.sqlite.org/lang_select.html
- *
- * @method \chillerlan\Database\Query\Select where($val1, $val2, string $operator = null, bool $bind = null, string $join = null)
- * @method \chillerlan\Database\Query\Select openBracket(string $join = null)
- * @method \chillerlan\Database\Query\Select closeBracket()
- * @method \chillerlan\Database\Query\Select limit(int $limit)
- * @method \chillerlan\Database\Query\Select offset(int $offset)
- * @method \chillerlan\Database\Query\Select cached(int $ttl = null)
- * @method string sql(bool $multi = null)
- * @method array  getBindValues()
- * @method mixed  query(string $index = null)
  */
-interface Select extends Statement{
+class Select extends Statement implements Where, Limit, BindValues, Query, CachedQuery{
 
-#	public function join():Select;
-#	public function having():Select;
-#	public function union():Select;
+	protected bool $distinct = false;
+	protected array $cols = [];
+	protected array $from = [];
+	protected array $orderby = [];
+	protected array $groupby = [];
 
-	/**
-	 * @return \chillerlan\Database\Query\Select
-	 */
-	public function distinct():Select;
+	public function where($val1, $val2 = null, string $operator = null, bool $bind = null, string $join = null):Select{
+		return $this->setWhere($val1, $val2, $operator, $bind, $join);
+	}
 
-	/**
-	 * @param array $expressions
-	 *
-	 * @return \chillerlan\Database\Query\Select
-	 */
-	public function cols(array $expressions):Select;
+	public function openBracket(string $join = null):Select{
+		return $this->setOpenBracket($join);
+	}
 
-	/**
-	 * @param array $expressions
-	 *
-	 * @return \chillerlan\Database\Query\Select
-	 */
-	public function from(array $expressions):Select;
+	public function closeBracket():Select{
+		return $this->setCloseBracket();
+	}
 
-	/**
-	 * @param array $expressions
-	 *
-	 * @return \chillerlan\Database\Query\Select
-	 */
-	public function groupBy(array $expressions):Select;
+	public function limit(int $limit):Select{
+		return $this->setLimit($limit);
+	}
 
-	/**
-	 * @param array $expressions
-	 *
-	 * @return \chillerlan\Database\Query\Select
-	 */
-	public function orderBy(array $expressions):Select;
+	public function offset(int $offset):Select{
+		return $this->setOffset($offset);
+	}
 
-	/**
-	 * @return int
-	 */
-	public function count():int;
+	public function cached(int $ttl = null):Select{
+		return $this->setCached($ttl);
+	}
 
+	/** @inheritdoc */
+	protected function getSQL():array{
+
+		if(empty($this->from)){
+			throw new QueryException('no FROM expression specified');
+		}
+
+		return $this->dialect->select($this->cols, $this->from, $this->_getWhere(), $this->limit, $this->offset, $this->distinct, $this->groupby, $this->orderby);
+	}
+
+	public function distinct():Select{
+		$this->distinct = true;
+
+		return $this;
+	}
+
+	public function cols(array $expressions):Select{
+		$this->cols = $this->dialect->cols($expressions);
+
+		return $this;
+	}
+
+	public function from(array $expressions):Select{
+		$this->from = $this->dialect->from($expressions);
+
+		return $this;
+	}
+
+	public function orderBy(array $expressions):Select{
+		$this->orderby = $this->dialect->orderby($expressions);
+
+		return $this;
+	}
+
+	public function groupBy(array $expressions):Select{
+
+		foreach($expressions as $expression){
+			$this->groupby[] = $this->dialect->quote($expression);
+		}
+
+		return $this;
+	}
+
+	public function count():int{
+
+		if(empty($this->from)){
+			throw new QueryException('no FROM expression specified');
+		}
+
+		$sql    = $this->dialect->selectCount($this->from, $this->_getWhere(), $this->distinct, $this->groupby);
+		$result = $this->db->prepared(implode(' ', $sql), $this->bindValues);
+
+		if($result instanceof ResultInterface && $result->length > 0){
+			return (int)$result[0]->count;
+		}
+
+		return -1;
+	}
 
 }

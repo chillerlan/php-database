@@ -2,9 +2,7 @@
 /**
  * Class Dumper
  *
- * @filesource   Dumper.php
  * @created      07.01.2018
- * @package      chillerlan\Database
  * @author       Smiley <smiley@chillerlan.net>
  * @copyright    2018 Smiley
  * @license      MIT
@@ -12,6 +10,7 @@
 
 namespace chillerlan\Database;
 
+use chillerlan\Database\Dialects\Dialect;
 use chillerlan\Settings\SettingsContainerInterface;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
@@ -23,10 +22,7 @@ class Dumper extends DatabaseAbstract{
 
 	const PAGESIZE = 100;
 
-	/**
-	 * @var \chillerlan\Database\Dialects\Dialect
-	 */
-	protected $dialect;
+	protected Dialect $dialect;
 
 	public function __construct(SettingsContainerInterface $options, CacheInterface $cache = null, LoggerInterface $logger = null){
 		parent::__construct($options, $cache, $logger);
@@ -42,7 +38,7 @@ class Dumper extends DatabaseAbstract{
 
 		foreach($tables as $table){
 			$this->logger->info('dumping table: '.$table);
-			fwrite($fh, PHP_EOL.'--'.PHP_EOL.'-- '.$table.PHP_EOL.'--'.PHP_EOL.PHP_EOL.$this->query->show->create->table($table)->query()[0]->{'Create Table'}.';'.PHP_EOL.PHP_EOL);
+			fwrite($fh, PHP_EOL.'--'.PHP_EOL.'-- '.$table.PHP_EOL.'--'.PHP_EOL.PHP_EOL.$this->query->show->createTable($table)->query()[0]->{'Create Table'}.';'.PHP_EOL.PHP_EOL);
 
 			$q = $this->query->select->from([$table]);
 			$pages = (int)floor($q->count() / $this::PAGESIZE);

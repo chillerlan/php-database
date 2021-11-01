@@ -1,10 +1,8 @@
 <?php
 /**
- * Interface Show
+ * Class Show
  *
- * @filesource   Show.php
  * @created      09.01.2018
- * @package      chillerlan\Database\Query
  * @author       Smiley <smiley@chillerlan.net>
  * @copyright    2018 Smiley
  * @license      MIT
@@ -12,34 +10,33 @@
 
 namespace chillerlan\Database\Query;
 
-
 /**
  * @link https://dev.mysql.com/doc/refman/5.7/en/show.html
- *
- * @property \chillerlan\Database\Query\ShowCreate create
  */
-interface Show extends Statement{
+class Show extends Statement{
 
-	/**
-	 * @return \chillerlan\Database\Query\ShowCreate
-	 */
-	public function create():ShowCreate;
+	public function createTable(string $tablename):ShowCreateTable{
+		return (new ShowCreateTable($this->db, $this->dialect, $this->logger))->name($tablename);
+	}
 
-	/**
-	 * @return \chillerlan\Database\Query\ShowItem
-	 */
-	public function databases():ShowItem;
+	public function databases():ShowDatabases{
+		return new ShowDatabases($this->db, $this->dialect, $this->logger);
+	}
 
-	/**
-	 * @param string|null $from
-	 *
-	 * @return \chillerlan\Database\Query\ShowItem
-	 */
-	public function tables(string $from = null):ShowItem;
-#	public function columns():ShowItem;
-#	public function index():ShowItem;
-#	public function collation():ShowItem;
-#	public function characterSet():ShowItem;
-#	public function tableStatus():ShowItem;
+	public function tables(string $from = null):ShowTables{
+		$showTables = new ShowTables($this->db, $this->dialect, $this->logger);
+
+		if(!empty($from)){
+			$showTables->from($from);
+		}
+
+		return $showTables;
+	}
+
+#	public function columns():ShowColumns;
+#	public function index():ShowIndex;
+#	public function collation():ShowCollation;
+#	public function characterSet():ShowCharacterSet;
+#	public function tableStatus():ShowTableStatus;
 
 }
