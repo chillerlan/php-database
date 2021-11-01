@@ -180,7 +180,7 @@ abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 	public function multi(string $sql, array $values):bool{
 		$this->checkSQL($sql);
 
-		if(!is_array($values) || count($values) < 1 || !is_array($values[0]) || count($values[0]) < 1){
+		if(count($values) < 1 || !is_array($values[0]) || count($values[0]) < 1){
 			throw new DriverException('invalid data');
 		}
 
