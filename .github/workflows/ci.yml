@@ -66,22 +66,22 @@ jobs:
 
       # pgsql is already installed on the runner, we just need to start the service
       # https://www.cybertec-postgresql.com/en/postgresql-github-actions-continuous-integration/
-      - name: "Start PostgreSQL (Linux)"
-        if: ${{ runner.os == 'Linux' }}
-        # we also need to change the password for the default user under Linux to match the one under Windows
-        run: |
-          sudo systemctl start postgresql.service
-          pg_isready
-          sudo -u postgres psql --command="ALTER USER postgres PASSWORD 'root';"
-          sudo -u postgres createdb --echo --owner=postgres dbtest
-
-      - name: "Start PostgreSQL (Windows)"
-        if: ${{ runner.os == 'Windows' }}
-        run: |
-          $pgService = Get-Service -Name postgresql*
-          Set-Service -InputObject $pgService -Status running -StartupType automatic
-          Start-Process -FilePath "$env:PGBIN\pg_isready" -Wait -PassThru
-          & $env:PGBIN\createdb --echo --owner=postgres dbtest
+#      - name: "Start PostgreSQL (Linux)"
+#        if: ${{ runner.os == 'Linux' }}
+#        # we also need to change the password for the default user under Linux to match the one under Windows
+#        run: |
+#          sudo systemctl start postgresql.service
+#          pg_isready
+#          sudo -u postgres psql --command="ALTER USER postgres PASSWORD 'root';"
+#          sudo -u postgres createdb --echo --owner=postgres dbtest
+#
+#      - name: "Start PostgreSQL (Windows)"
+#        if: ${{ runner.os == 'Windows' }}
+#        run: |
+#          $pgService = Get-Service -Name postgresql*
+#          Set-Service -InputObject $pgService -Status running -StartupType automatic
+#          Start-Process -FilePath "$env:PGBIN\pg_isready" -Wait -PassThru
+#          & $env:PGBIN\createdb --echo --owner=postgres dbtest
 
       - name: "Install MySQL"
         uses: shogo82148/actions-setup-mysql@v1
