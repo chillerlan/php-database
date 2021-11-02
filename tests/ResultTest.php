@@ -2,9 +2,7 @@
 /**
  * Class ResultTest
  *
- * @filesource   ResultTest.php
  * @created      28.06.2017
- * @package      chillerlan\DatabaseTest
  * @author       Smiley <smiley@chillerlan.net>
  * @copyright    2017 Smiley
  * @license      MIT
@@ -12,12 +10,11 @@
 
 namespace chillerlan\DatabaseTest;
 
-use chillerlan\Database\{
-	Result, ResultInterface, ResultRow
-};
+use chillerlan\Database\{Result, ResultInterface, ResultRow};
 use ArrayAccess, Countable, SeekableIterator;
 use PHPUnit\Framework\TestCase;
-use function json_encode;
+
+use function hex2bin, json_encode, md5, range;
 
 class ResultTest extends TestCase{
 

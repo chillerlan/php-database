@@ -17,5 +17,4 @@ final class PDOMySQLTest extends PDODriverTestAbstract{
 	protected string $envPrefix  = 'DB_MYSQLI';
 	protected string $driverFQCN = PDOMySQL::class;
 
-
 }

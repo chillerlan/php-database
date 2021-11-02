@@ -15,18 +15,14 @@ use chillerlan\Database\Drivers\DriverInterface;
 use chillerlan\DotEnv\DotEnv;
 use chillerlan\Settings\SettingsContainerInterface;
 use chillerlan\SimpleCache\MemoryCache;
-use Exception;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
-use ReflectionClass;
-use ReflectionMethod;
-use function constant;
-use function defined;
-use function realpath;
-use function str_replace;
-use const DIRECTORY_SEPARATOR;
-use const PHP_OS_FAMILY;
+use Exception, ReflectionClass, ReflectionMethod;
+
+use function constant, defined, realpath, str_replace;
+
+use const DIRECTORY_SEPARATOR, PHP_OS_FAMILY;
 
 abstract class DBTestAbstract extends TestCase{
 
