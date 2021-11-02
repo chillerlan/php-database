@@ -34,16 +34,16 @@ abstract class DriverTestAbstract extends DBTestAbstract{
 		$this->driver->disconnect();
 
 		// try to disconnect from a disconnected DB (should not throw any errors -> mysqli)
-		$this->assertTrue($this->driver->disconnect());
+		$this::assertTrue($this->driver->disconnect());
 
 		// reconnect
 		$this->driver->connect();
 
 		// connect while already connected (coverage)
-		$this->assertSame($this->driver, $this->driver->connect());
+		$this::assertSame($this->driver, $this->driver->connect());
 
-		$this->assertInstanceOf(DriverInterface::class, $this->driver);
-		$this->assertInstanceOf($this->driverFQCN, $this->driver);
+		$this::assertInstanceOf(DriverInterface::class, $this->driver);
+		$this::assertInstanceOf($this->driverFQCN, $this->driver);
 
 		$info = [
 			'driver' => (new ReflectionClass($this->driver))->getName(),
@@ -59,38 +59,38 @@ abstract class DriverTestAbstract extends DBTestAbstract{
 
 	public function testEscapeString():void{
 		// https://xkcd.com/327/
-		$this->assertSame(
+		$this::assertSame(
 			"x'526f6265727427293b2044524f50205441424c452053747564656e74733b202d2d'",
 			$this->driver->escape("Robert'); DROP TABLE Students; --")
 		);
 	}
 
 	public function testEscapeEmptyString():void{
-		$this->assertSame("''", $this->driver->escape(''));
+		$this::assertSame("''", $this->driver->escape(''));
 	}
 
 	public function testEscapeNull():void{
-		$this->assertSame('null', $this->driver->escape(null));
+		$this::assertSame('null', $this->driver->escape(null));
 	}
 
 	public function testEscapeBool():void{
-		$this->assertSame(1, $this->driver->escape(true));
-		$this->assertSame(0, $this->driver->escape(false));
+		$this::assertSame(1, $this->driver->escape(true));
+		$this::assertSame(0, $this->driver->escape(false));
 	}
 
 	public function testEscapeNumeric():void{
-		$this->assertSame(1337, $this->driver->escape('1337'));
-		$this->assertSame(13.37, $this->driver->escape('13.37'));
-		$this->assertSame(1330000000.0, $this->driver->escape('133e7'));
+		$this::assertSame(1337, $this->driver->escape('1337'));
+		$this::assertSame(13.37, $this->driver->escape('13.37'));
+		$this::assertSame(1330000000.0, $this->driver->escape('133e7'));
 	}
 
 	public function testGetInfoDisconnectedMessage():void{
-		$this->assertTrue($this->driver->disconnect());
+		$this::assertTrue($this->driver->disconnect());
 
 		$msg = 'disconnected, no info available';
 
-		$this->assertSame($msg, $this->driver->getClientInfo());
-		$this->assertSame($msg, $this->driver->getServerInfo());
+		$this::assertSame($msg, $this->driver->getClientInfo());
+		$this::assertSame($msg, $this->driver->getServerInfo());
 	}
 
 	public function testRawEmptySQLException():void{

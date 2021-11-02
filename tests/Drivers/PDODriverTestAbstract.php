@@ -18,7 +18,7 @@ use PDO;
 abstract class PDODriverTestAbstract extends DriverTestAbstract{
 
 	public function testGetDBResource():void{
-		$this->assertInstanceOf(PDO::class, $this->driver->getDBResource());
+		$this::assertInstanceOf(PDO::class, $this->driver->getDBResource());
 	}
 
 	public function testGetDsnNoDatabaseException():void{

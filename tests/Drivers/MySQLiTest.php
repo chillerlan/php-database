@@ -21,7 +21,7 @@ final class MySQLiTest extends DriverTestAbstract{
 	protected string $driverFQCN = MySQLiDrv::class;
 
 	public function testGetDBResource():void{
-		$this->assertInstanceOf(mysqli::class, $this->driver->getDBResource());
+		$this::assertInstanceOf(mysqli::class, $this->driver->getDBResource());
 	}
 
 }
