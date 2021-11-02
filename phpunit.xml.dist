@@ -18,6 +18,7 @@
 	<testsuites>
 		<testsuite name="php-database test suite">
 			<directory suffix=".php">./tests</directory>
+			<exclude>./tests/Drivers/PDOFirebirdTest.php</exclude>
 			<exclude>./tests/Drivers/MSSqlSrvTest.php</exclude>
 			<exclude>./tests/Drivers/PDOMSSqlSrvTest.php</exclude>
 			<exclude>./tests/Drivers/MySQLiTest.php</exclude>
