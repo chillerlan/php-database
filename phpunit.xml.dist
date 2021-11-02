@@ -20,6 +20,8 @@
 			<directory suffix=".php">./tests</directory>
 			<exclude>./tests/Drivers/MSSqlSrvTest.php</exclude>
 			<exclude>./tests/Drivers/PDOMSSqlSrvTest.php</exclude>
+			<exclude>./tests/Drivers/MySQLiTest.php</exclude>
+			<exclude>./tests/Drivers/PDOMySQLTest.php</exclude>
 			<exclude>./tests/Drivers/PostgreSQLTest.php</exclude>
 			<exclude>./tests/Drivers/PDOPostgreSQLTest.php</exclude>
 		</testsuite>
