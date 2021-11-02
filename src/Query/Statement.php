@@ -73,7 +73,7 @@ abstract class Statement implements LoggerAwareInterface{
 	protected function setOnConflict(string $name, string $on_conflict = null, string $conflict_target = null):Statement{
 		$this->name      = trim($name);
 		$on_conflict     = trim(strtoupper($on_conflict));
-		$conflict_target = trim(strtoupper($conflict_target));
+		$conflict_target = trim($conflict_target);
 
 		if(empty($this->name)){
 			throw new QueryException('no name specified');
