@@ -10,7 +10,10 @@
 
 namespace chillerlan\Database;
 
-use ArrayAccess, Countable, SeekableIterator;
+use OutOfBoundsException;
+
+use function array_chunk, array_column, array_key_exists, array_keys, array_merge, array_reverse,
+	array_values, call_user_func_array, count, is_callable, method_exists, next, print_r;
 
 /**
  * @property int                              $length
@@ -18,33 +21,15 @@ use ArrayAccess, Countable, SeekableIterator;
  */
 class Result implements ResultInterface{
 
-	/**
-	 * @var null|string
-	 */
 	protected ?string $sourceEncoding = null;
-
-	/**
-	 * @var string
-	 */
 	protected string $destEncoding;
+	protected array $array = [];
+	protected int $offset = 0;
 
-	/**
-	 * @todo
-	 * @var bool
-	 */
-	protected bool $isBool;
-
-	/**
-	 * @todo
-	 * @var bool
-	 */
-	protected bool $success = false;
-
-	/**
-	 * @todo
-	 * @var array
-	 */
-	protected array $metadata = [];
+	/** @todo */
+#	protected bool $isBool;
+#	protected bool $success = false;
+#	protected array $metadata = [];
 
 	/** @inheritdoc */
 	public function __construct(iterable $data = null, string $sourceEncoding = null, string $destEncoding = null){
@@ -62,23 +47,8 @@ class Result implements ResultInterface{
 		$this->offset = 0;
 	}
 
-
-	/**
-	 * @var array
-	 */
-	protected array $array = [];
-
-	/**
-	 * @var int
-	 */
-	protected int $offset = 0;
-
 	/**
 	 * @link http://api.prototypejs.org/language/Enumerable/prototype/toArray/
-	 *
-	 * @return array
-	 *
-	 * @codeCoverageIgnore
 	 */
 	public function __EnumerableToArray():array {
 		return $this->array;
@@ -88,8 +58,6 @@ class Result implements ResultInterface{
 	 * @link http://api.prototypejs.org/language/Enumerable/prototype/each/
 	 *
 	 * @param callable $callback
-	 *
-	 * @return $this
 	 */
 	public function __each($callback):ResultInterface{
 		$this->__map($callback);
@@ -103,19 +71,18 @@ class Result implements ResultInterface{
 	 *
 	 * @param callable $callback
 	 *
-	 * @return array
 	 * @throws \chillerlan\Database\DatabaseException
 	 */
 	public function __map($callback):array{
 
-		if(!\is_callable($callback)){
+		if(!is_callable($callback)){
 			throw new DatabaseException('invalid callback');
 		}
 
 		$return = [];
 
 		foreach($this->array as $index => $element){
-			$return[$index] = \call_user_func_array($callback, [$element, $index]);
+			$return[$index] = call_user_func_array($callback, [$element, $index]);
 		}
 
 		return $return;
@@ -125,29 +92,23 @@ class Result implements ResultInterface{
 	 * @link http://api.prototypejs.org/language/Array/prototype/reverse/
 	 */
 	public function __reverse():ResultInterface{
-		$this->array  = \array_reverse($this->array);
+		$this->array  = array_reverse($this->array);
 		$this->offset = 0;
 
 		return $this;
 	}
 
-	/**
-	 * @return mixed
-	 */
+	/** @inheritDoc */
 	public function __first(){
 		return $this->array[0] ?? null;
 	}
 
-	/**
-	 * @return mixed
-	 */
+	/** @inheritDoc */
 	public function __last(){
-		return $this->array[\count($this->array) - 1] ?? null;
+		return $this->array[count($this->array) - 1] ?? null;
 	}
 
-	/**
-	 *
-	 */
+	/** @inheritDoc */
 	public function __clear():ResultInterface{
 		$this->array = [];
 
@@ -156,11 +117,9 @@ class Result implements ResultInterface{
 
 	/**
 	 * @link http://api.prototypejs.org/language/Array/prototype/inspect/
-	 *
-	 * @return string
 	 */
 	public function __inspect():string {
-		return \print_r($this->array, true);
+		return print_r($this->array, true);
 	}
 
 	/**
@@ -168,12 +127,11 @@ class Result implements ResultInterface{
 	 *
 	 * @param callable $callback
 	 *
-	 * @return array
 	 * @throws \chillerlan\Database\DatabaseException
 	 */
 	public function __findAll($callback):array{
 
-		if(!\is_callable($callback)){
+		if(!is_callable($callback)){
 			throw new DatabaseException('invalid callback');
 		}
 
@@ -181,7 +139,7 @@ class Result implements ResultInterface{
 
 		foreach($this->array as $index => $element){
 
-			if(\call_user_func_array($callback, [$element, $index]) === true){
+			if(call_user_func_array($callback, [$element, $index]) === true){
 				$return[] = $element;
 			}
 
@@ -200,7 +158,7 @@ class Result implements ResultInterface{
 	 */
 	public function __reject($callback):array{
 
-		if(!\is_callable($callback)){
+		if(!is_callable($callback)){
 			throw new DatabaseException('invalid callback');
 		}
 
@@ -208,7 +166,7 @@ class Result implements ResultInterface{
 
 		foreach($this->array as $index => $element){
 
-			if(\call_user_func_array($callback, [$element, $index]) !== true){
+			if(call_user_func_array($callback, [$element, $index]) !== true){
 				$return[] = $element;
 			}
 
@@ -218,8 +176,6 @@ class Result implements ResultInterface{
 	}
 
 	/**
-	 * @param string $name
-	 *
 	 * @return mixed|null
 	 */
 	public function __get(string $name){
@@ -229,34 +185,25 @@ class Result implements ResultInterface{
 	/**
 	 * @param string $name
 	 * @param mixed  $value
-	 *
-	 * @return void
 	 */
 	public function __set(string $name, $value):void{
 		$this->set($name, $value);
 	}
 
 	/**
-	 * @param string $name
-	 *
 	 * @return mixed|null
 	 */
 	private function get(string $name){
 		$method = 'magic_get_'.$name;
 
-		return \method_exists($this, $method) ? $this->$method() : null;
+		return method_exists($this, $method) ? $this->$method() : null;
 	}
 
-	/**
-	 * @param string $name
-	 * @param        $value
-	 *
-	 * @return void
-	 */
+	/**  */
 	private function set(string $name, $value):void{
 		$method = 'magic_set_'.$name;
 
-		if(\method_exists($this, $method)){
+		if(method_exists($this, $method)){
 			$this->$method($value);
 		}
 
@@ -267,7 +214,7 @@ class Result implements ResultInterface{
 	 * @inheritdoc
 	 */
 	public function offsetExists($offset):bool{
-		return \array_key_exists($offset, $this->array);
+		return array_key_exists($offset, $this->array);
 	}
 
 	/**
@@ -292,7 +239,7 @@ class Result implements ResultInterface{
 	 * @inheritdoc
 	 */
 	public function count():int{
-		return \count($this->array);
+		return count($this->array);
 	}
 
 	/**
@@ -324,7 +271,7 @@ class Result implements ResultInterface{
 	 * @inheritdoc
 	 */
 	public function valid():bool{
-		return \array_key_exists($this->offset, $this->array);
+		return array_key_exists($this->offset, $this->array);
 	}
 
 	/**
@@ -339,22 +286,18 @@ class Result implements ResultInterface{
 	 * @link  http://php.net/manual/seekableiterator.seek.php
 	 * @inheritdoc
 	 */
-	public function seek($pos):void{
+	public function seek($offset):void{
 		$this->rewind();
 
-		for( ; $this->offset < $pos; ){
+		for( ; $this->offset < $offset; ){
 
-			if(!\next($this->array)) {
-				throw new \OutOfBoundsException('invalid seek position: '.$pos);
+			if(!next($this->array)) {
+				throw new OutOfBoundsException('invalid seek position: '.$offset);
 			}
 
 			$this->offset++;
 		}
 
-	}
-	/** @inheritdoc */
-	public function __toJSON(bool $prettyprint = null):string{
-		return json_encode($this->__toArray(), $prettyprint === true ? JSON_PRETTY_PRINT : null);
 	}
 
 	/** @inheritdoc */
@@ -380,28 +323,17 @@ class Result implements ResultInterface{
 		return $arr;
 	}
 
-	/**
-	 * @return array
-	 */
+	/** @inheritdoc */
 	public function __fields():array{
 		return array_keys($this->array);
 	}
 
-	/**
-	 * @param bool|null $to_array
-	 *
-	 * @return array
-	 */
+	/** @inheritdoc */
 	public function __values(bool $to_array = null):array{
 		return array_values($to_array === true ? $this->__toArray() : $this->array);
 	}
 
-	/**
-	 * @param string      $column
-	 * @param string|null $index_key
-	 *
-	 * @return array
-	 */
+	/** @inheritdoc */
 	public function __column(string $column, string $index_key = null):array{
 		return array_column($this->__toArray(), $column, $index_key);
 	}
@@ -410,13 +342,10 @@ class Result implements ResultInterface{
 	 * magic *
 	 *********/
 
-	/**
-	 * @return int
-	 */
+	/**  */
 	protected function magic_get_length():int{
 		return $this->count();
 	}
-
 
 	/***************
 	 * ArrayAccess *
@@ -430,6 +359,15 @@ class Result implements ResultInterface{
 		$offset !== null
 			? $this->array[$offset] = $row
 			: $this->array[] = $row;
+	}
+
+	/********************
+	 * JsonSerializable *
+	 ********************/
+
+	/** @inheritdoc */
+	public function jsonSerialize(){
+		return $this->__toArray();
 	}
 
 }

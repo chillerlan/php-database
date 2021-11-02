@@ -10,9 +10,9 @@
 
 namespace chillerlan\Database;
 
-use ArrayAccess,Countable,SeekableIterator;
+use ArrayAccess, Countable, JsonSerializable, SeekableIterator;
 
-interface ResultInterface extends SeekableIterator, ArrayAccess, Countable{
+interface ResultInterface extends SeekableIterator, ArrayAccess, Countable, JsonSerializable{
 
 	/** */
 	public function __toArray():array;
@@ -68,9 +68,6 @@ interface ResultInterface extends SeekableIterator, ArrayAccess, Countable{
 	 * Result constructor.
 	 */
 	public function __construct(iterable $data = null, string $sourceEncoding = null, string $destEncoding = null);
-
-	/** */
-	public function __toJSON(bool $prettyprint = null):string;
 
 	/** */
 	public function __merge(Result $DBResult):Result;

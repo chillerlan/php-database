@@ -17,6 +17,7 @@ use chillerlan\Database\{
 };
 use ArrayAccess, Countable, SeekableIterator;
 use PHPUnit\Framework\TestCase;
+use function json_encode;
 
 class ResultTest extends TestCase{
 
@@ -106,7 +107,7 @@ class ResultTest extends TestCase{
 	}
 
 	public function testToJSON(){
-		$this->assertSame('[{"id":1},{"id":2}]', (new Result([['id' => 1], ['id' => 2]]))->__toJSON());
+		$this->assertSame('[{"id":1},{"id":2}]', json_encode((new Result([['id' => 1], ['id' => 2]]))));
 	}
 
 	public function testRowOffsetSet(){

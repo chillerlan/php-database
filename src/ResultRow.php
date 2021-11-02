@@ -10,6 +10,8 @@
 
 namespace chillerlan\Database;
 
+use function call_user_func_array, is_callable, is_string, mb_convert_encoding;
+
 /**
  * @property mixed[] $array
  */
