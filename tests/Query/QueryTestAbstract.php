@@ -39,7 +39,7 @@ abstract class QueryTestAbstract extends DBTestAbstract{
 		$this->dialect    = $this->db->getDialect();
 		$this->reflection = new ReflectionClass($this->driverFQCN);
 
-		$this->assertTrue(
+		$this::assertTrue(
 			$this->db->create
 				->table($this::TABLE)
 				->ifNotExists()
@@ -56,8 +56,8 @@ abstract class QueryTestAbstract extends DBTestAbstract{
 	}
 
 	protected function tearDown():void{
-		$this->assertTrue($this->db->drop->table($this::TABLE)->ifExists()->query());
-		$this->assertTrue($this->db->disconnect());
+		$this::assertTrue($this->db->drop->table($this::TABLE)->ifExists()->query());
+		$this::assertTrue($this->db->disconnect());
 	}
 
 	public function testInstance():void{
@@ -87,21 +87,21 @@ abstract class QueryTestAbstract extends DBTestAbstract{
 			->values(['id' => 0, 'hash' => md5(0), 'data' => 'foo', 'value' => 123.456, 'active' => 1])
 			->query();
 
-		$this->assertTrue($insert);
+		$this::assertTrue($insert);
 
-		$this->assertInsertResult($this->db->select->from([$this::TABLE])->query());
+		$this::assertInsertResult($this->db->select->from([$this::TABLE])->query());
 	}
 
 	public function testInsertMulti():void{
 
-		$this->assertTrue(
+		$this::assertTrue(
 			$this->db->insert
 				->into($this::TABLE, 'IGNORE', 'id')
 				->values($this->data())
 				->multi()
 		);
 
-		$this->assertInsertMultiResult($this->db->select->from([$this::TABLE])->query());
+		$this::assertInsertMultiResult($this->db->select->from([$this::TABLE])->query());
 	}
 
 	public function testSelect():void{
@@ -118,15 +118,15 @@ abstract class QueryTestAbstract extends DBTestAbstract{
 			->limit(2)
 		;
 
-		$this->assertSame(3, $q->count()); // ignores limit/offset
+		$this::assertSame(3, $q->count()); // ignores limit/offset
 
 		$r = $q->query();
 
-		$this->assertSame(2, $r->length);
-		$this->assertSame(2, (int)$r[0]['id']);
-		$this->assertSame(md5(2), $r[0]['hash']);
-		$this->assertSame(md5(3), $r[1]->id('md5'));
-		$this->assertSame(md5(3), $r[1]->hash);
+		$this::assertSame(2, $r->length);
+		$this::assertSame(2, (int)$r[0]['id']);
+		$this::assertSame(md5(2), $r[0]['hash']);
+		$this::assertSame(md5(3), $r[1]->id('md5'));
+		$this::assertSame(md5(3), $r[1]->hash);
 
 		$r = $this->db->select
 			->cols(['hash', 'value'])
@@ -135,7 +135,7 @@ abstract class QueryTestAbstract extends DBTestAbstract{
 			->query('hash')
 		;
 
-		$this->assertSame(
+		$this::assertSame(
 			'{"c81e728d9d4c2f636f067f89cc14862c":{"hash":"c81e728d9d4c2f636f067f89cc14862c","value":"123.456789"}}',
 			json_encode($r)
 		);
@@ -147,10 +147,10 @@ abstract class QueryTestAbstract extends DBTestAbstract{
 			->query()
 		;
 
-		$this->assertSame('bar', $r[0]->data);
-		$this->assertSame('foo', $r[1]->data);
-		$this->assertTrue((bool)$r[0]->active);
-		$this->assertFalse((bool)$r[1]->active);
+		$this::assertSame('bar', $r[0]->data);
+		$this::assertSame('foo', $r[1]->data);
+		$this::assertTrue((bool)$r[0]->active);
+		$this::assertFalse((bool)$r[1]->active);
 	}
 
 	public function testUpdate():void{
@@ -160,7 +160,7 @@ abstract class QueryTestAbstract extends DBTestAbstract{
 			->values($this->data())
 			->multi();
 
-		$this->assertTrue(
+		$this::assertTrue(
 			$this->db->update
 				->table($this::TABLE)
 				->set([
@@ -179,9 +179,9 @@ abstract class QueryTestAbstract extends DBTestAbstract{
 			     ->query('hash')
 		['c4ca4238a0b923820dcc509a6f75849b'];
 
-		$this->assertSame('whatever', $r->data);
-		$this->assertSame(42.42, (float)$r->value);
-		$this->assertTrue((bool)$r->active);
+		$this::assertSame('whatever', $r->data);
+		$this::assertSame(42.42, (float)$r->value);
+		$this::assertTrue((bool)$r->active);
 	}
 
 	public function testDelete():void{
@@ -193,18 +193,18 @@ abstract class QueryTestAbstract extends DBTestAbstract{
 
 		$q = $this->db->select->cols(['hash'])->from([$this::TABLE]);
 
-		$this->assertSame([
+		$this::assertSame([
 			'c4ca4238a0b923820dcc509a6f75849b',
 			'c81e728d9d4c2f636f067f89cc14862c',
 			'eccbc87e4b5ce2fe28308fd9f2a7baf3',
 		], array_column($q->query()->__toArray(), 'hash'));
 
-		$this->assertTrue($this->db->delete->from($this::TABLE)->where('id', 2)->query());
+		$this::assertTrue($this->db->delete->from($this::TABLE)->where('id', 2)->query());
 
 		$r = $q->query();
 
-		$this->assertSame(2, $r->length);
-		$this->assertSame([
+		$this::assertSame(2, $r->length);
+		$this::assertSame([
 			'c4ca4238a0b923820dcc509a6f75849b',
 			'eccbc87e4b5ce2fe28308fd9f2a7baf3',
 		], array_column($r->__toArray(), 'hash'));
@@ -223,33 +223,33 @@ abstract class QueryTestAbstract extends DBTestAbstract{
 		$cacheKey    = $getCacheKey->invokeArgs($this->driver, [$r->sql(), [], 'hash']);
 
 		// uncached
-		$this->assertFalse($this->cache->has($cacheKey));
+		$this::assertFalse($this->cache->has($cacheKey));
 		$r->query('hash');
 
 		// cached
-		$this->assertTrue($this->cache->has($cacheKey));
+		$this::assertTrue($this->cache->has($cacheKey));
 		$r->query('hash');
 
 		sleep(2);
 #		$this->cache->clear();
 
 		// raw uncached
-		$this->assertFalse($this->cache->has($cacheKey));
+		$this::assertFalse($this->cache->has($cacheKey));
 		$this->db->rawCached($r->sql(), 'hash', true, 1);
 
 		// cached
-		$this->assertTrue($this->cache->has($cacheKey));
+		$this::assertTrue($this->cache->has($cacheKey));
 		$this->db->rawCached($r->sql(), 'hash', true, 1);
 
 		sleep(2);
 #		$this->cache->clear();
 
 		// prepared uncached
-		$this->assertFalse($this->cache->has($cacheKey));
+		$this::assertFalse($this->cache->has($cacheKey));
 		$this->db->preparedCached($r->sql(), [], 'hash', true, 1);
 
 		// cached
-		$this->assertTrue($this->cache->has($cacheKey));
+		$this::assertTrue($this->cache->has($cacheKey));
 		$this->db->preparedCached($r->sql(), [], 'hash', true, 1);
 	}
 
@@ -262,7 +262,7 @@ abstract class QueryTestAbstract extends DBTestAbstract{
 
 		$this->logger->debug('SHOW DATABASES:', $r);
 
-		$this->assertTrue(in_array($this->env->get($this->envPrefix.'_DATABASE'), array_column($r, 'Database')));
+		$this::assertTrue(in_array($this->env->get($this->envPrefix.'_DATABASE'), array_column($r, 'Database')));
 	}
 
 	public function testShowTables():void{
@@ -278,7 +278,7 @@ abstract class QueryTestAbstract extends DBTestAbstract{
 			[$table] = array_values($tables);
 
 			if($table === $this::TABLE){
-				$this->assertSame($this::TABLE, $table);
+				$this::assertSame($this::TABLE, $table);
 				break;
 			}
 

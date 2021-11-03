@@ -21,22 +21,22 @@ class PostgresTest extends QueryTestAbstract{
 	protected function assertInsertResult(ResultInterface $result):void{
 		$row = $result[0];
 
-		$this->assertSame(0, $row->id);
-		$this->assertSame('foo', $row->data);
-		$this->assertSame('123.456000', $row->value);
-		$this->assertSame(true, $row->active);
+		$this::assertSame(0, $row->id);
+		$this::assertSame('foo', $row->data);
+		$this::assertSame('123.456000', $row->value);
+		$this::assertSame(true, $row->active);
 	}
 
 	protected function assertInsertMultiResult(ResultInterface $result):void{
-		$this->assertSame(3, $result->length);
+		$this::assertSame(3, $result->length);
 
-		$this->assertSame(3, $result[2]->id);
+		$this::assertSame(3, $result[2]->id);
 
-		$this->assertSame('123.456000', $result[0]->value);
-		$this->assertSame('123.456789', $result[1]->value);
+		$this::assertSame('123.456000', $result[0]->value);
+		$this::assertSame('123.456789', $result[1]->value);
 
-		$this->assertSame(false, $result[0]->active);
-		$this->assertSame(true, $result[1]->active);
+		$this::assertSame(false, $result[0]->active);
+		$this::assertSame(true, $result[1]->active);
 	}
 
 }
