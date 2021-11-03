@@ -25,6 +25,10 @@
 			<exclude>./tests/Drivers/PDOMySQLTest.php</exclude>
 			<exclude>./tests/Drivers/PostgreSQLTest.php</exclude>
 			<exclude>./tests/Drivers/PDOPostgreSQLTest.php</exclude>
+			<exclude>./tests/Query/FirebirdTest.php</exclude>
+			<exclude>./tests/Query/MSSQLTest.php</exclude>
+			<exclude>./tests/Query/MySQLTest.php</exclude>
+			<exclude>./tests/Query/PostgresTest.php</exclude>
 		</testsuite>
 	</testsuites>
 	<logging>
