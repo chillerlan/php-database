@@ -32,6 +32,8 @@ abstract class DBTestAbstract extends TestCase{
 	protected LoggerInterface $logger;
 	protected DotEnv $env;
 	protected ReflectionClass $reflection;
+	protected string $driverFQCN;
+
 
 	/**
 	 * determines whether the tests run on Travis CI or GitHub Actions -> phpunit.xml TEST_IS_CI=TRUE

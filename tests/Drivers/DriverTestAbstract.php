@@ -16,8 +16,6 @@ use ReflectionClass;
 
 abstract class DriverTestAbstract extends DBTestAbstract{
 
-	protected string $driverFQCN;
-
 	protected function setUp():void{
 		parent::setUp();
 
