@@ -12,21 +12,13 @@ namespace chillerlan\DatabaseTest\Query;
 
 use chillerlan\Database\Database;
 use chillerlan\Database\Dialects\Dialect;
-use chillerlan\Database\Dialects\Firebird;
-use chillerlan\Database\Dialects\Postgres;
-use chillerlan\Database\Dialects\SQLite;
 use chillerlan\Database\Drivers\DriverInterface;
 use chillerlan\Database\Query\QueryException;
 use chillerlan\Database\ResultInterface;
 use chillerlan\DatabaseTest\DBTestAbstract;
 use ReflectionClass;
-use function array_column;
-use function array_values;
-use function in_array;
-use function json_encode;
-use function md5;
-use function range;
-use function sleep;
+
+use function array_column, array_values, in_array, json_encode, md5, range, sleep;
 
 abstract class QueryTestAbstract extends DBTestAbstract{
 
