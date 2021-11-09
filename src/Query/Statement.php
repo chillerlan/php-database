@@ -369,7 +369,7 @@ abstract class Statement implements LoggerAwareInterface{
 
 		$this->logger->debug('QueryTrait::query()', ['method' => __METHOD__, 'sql' => $sql, 'val' => $values, 'index' => $index]);
 
-		if($this->cached && $this instanceof Select){
+		if($this->cached && $this instanceof CachedQuery){
 			return $this->db->preparedCached($sql, $values, $index, true, $this->ttl);
 		}
 
