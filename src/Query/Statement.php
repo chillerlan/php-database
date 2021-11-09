@@ -225,12 +225,13 @@ abstract class Statement implements LoggerAwareInterface{
 
 	/** */
 	protected function _getWhere():string{
-		$where = [];
+		$where    = [];
+		$joinArgs = array_merge($this->joinArgs, ['(', ')']);
 
 		foreach($this->where as $k => $v){
 			$last = $this->where[$k-1] ?? false;
 
-			if(in_array($v,  $this->joinArgs + ['(', ')'], true)){
+			if(in_array($v, $joinArgs, true)){
 				$where[] = $v;
 
 				continue;
@@ -240,16 +241,14 @@ abstract class Statement implements LoggerAwareInterface{
 				continue;
 			}
 
-			if(!$last || $last === '('){
-				$where[] = $v['stmt'];
-			}
-			else{
-				$where[] = $v['join'].' '.$v['stmt'];
-			}
-
+			$where[] = $last === false || $last === '('
+				? $v['stmt']
+				: $v['join'].' '.$v['stmt'];
 		}
 
-		return !empty($where) ? 'WHERE '.implode(' ', $where) : '';
+		return !empty($where)
+			? 'WHERE '.implode(' ', $where)
+			: '';
 	}
 
 	/**
