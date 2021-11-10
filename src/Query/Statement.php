@@ -24,23 +24,23 @@ abstract class Statement implements LoggerAwareInterface{
 	use LoggerAwareTrait;
 
 	protected DriverInterface $db;
-	protected Dialect $dialect;
-	protected ?string $name = null;
-	protected ?string $on_conflict = null;
-	protected ?string $conflict_target = null;
-	protected ?string $charset = null;
-	protected bool $ifExists = false;
-	protected bool $ifNotExists = false;
-	protected array $where = [];
-	protected array $sql = [];
-	protected bool $multi = false;
-	protected bool $cached = false;
-	protected int $ttl = 300;
-	protected ?int $limit = null;
-	protected ?int $offset = null;
-	protected array $bindValues = [];
+	protected Dialect         $dialect;
+	protected ?string         $name            = null;
+	protected ?string         $on_conflict     = null;
+	protected ?string         $conflict_target = null;
+	protected ?string         $charset         = null;
+	protected bool            $ifExists        = false;
+	protected bool            $ifNotExists     = false;
+	protected array           $where           = [];
+	protected array           $sql             = [];
+	protected bool            $multi           = false;
+	protected bool            $cached          = false;
+	protected int             $ttl             = 300;
+	protected ?int            $limit           = null;
+	protected ?int            $offset          = null;
+	protected array           $bindValues      = [];
 
-	private array $joinArgs = ['AND', 'OR', 'XOR'];
+	private array $joinArgs  = ['AND', 'OR', 'XOR'];
 	private array $operators = [
 		'=', '>=', '>', '<=', '<', '<>', '!=',
 		'|', '&', '<<', '>>', '+', '-', '*', '/',
@@ -51,7 +51,6 @@ abstract class Statement implements LoggerAwareInterface{
 #		'BETWEEN', 'NOT BETWEEN',
 	];
 
-
 	public function __construct(DriverInterface $db, Dialect $dialect, LoggerInterface $logger = null){
 		$this->db      = $db;
 		$this->dialect = $dialect;
@@ -59,7 +58,7 @@ abstract class Statement implements LoggerAwareInterface{
 	}
 
 	/** */
-	protected function setName(string $name):Statement{
+	protected function setName(string $name):self{
 		$this->name = trim($name);
 
 		if(empty($this->name)){
@@ -70,7 +69,7 @@ abstract class Statement implements LoggerAwareInterface{
 	}
 
 	/** */
-	protected function setOnConflict(string $name, string $on_conflict = null, string $conflict_target = null):Statement{
+	protected function setOnConflict(string $name, string $on_conflict = null, string $conflict_target = null):self{
 		$this->name      = trim($name);
 		$on_conflict     = trim(strtoupper($on_conflict));
 		$conflict_target = trim($conflict_target);
@@ -91,21 +90,21 @@ abstract class Statement implements LoggerAwareInterface{
 	}
 
 	/** */
-	protected function setCharset(string $charset):Statement{
+	protected function setCharset(string $charset):self{
 		$this->charset = trim($charset);
 
 		return $this;
 	}
 
 	/** */
-	protected function setIfExists():Statement{
+	protected function setIfExists():self{
 		$this->ifExists = true;
 
 		return $this;
 	}
 
 	/** */
-	protected function setIfNotExists():Statement{
+	protected function setIfNotExists():self{
 		$this->ifNotExists = true;
 
 		return $this;
@@ -118,9 +117,9 @@ abstract class Statement implements LoggerAwareInterface{
 	 * @param bool|null   $bind
 	 * @param string|null $join
 	 *
-	 * @return $this
+	 * @return self
 	 */
-	protected function setWhere($val1, $val2, string $operator = null, bool $bind = null, string $join = null):Statement{
+	protected function setWhere($val1, $val2, string $operator = null, bool $bind = null, string $join = null):self{
 		$operator = $operator !== null ? strtoupper(trim($operator)) : '=';
 		$bind     ??= true;
 
@@ -147,7 +146,7 @@ abstract class Statement implements LoggerAwareInterface{
 					}
 
 				}
-				else if($val2 instanceof Statement){
+				else if($val2 instanceof Query){
 					$where[] = $operator.'('.$val2->sql().')';
 
 					if($val2 instanceof BindValues){
@@ -161,7 +160,7 @@ abstract class Statement implements LoggerAwareInterface{
 			else{
 				$where[] = $operator;
 
-				if($val2 instanceof Statement){
+				if($val2 instanceof Query){
 					$where[] = '('.$val2->sql().')';
 
 					if($val2 instanceof BindValues){
@@ -204,7 +203,7 @@ abstract class Statement implements LoggerAwareInterface{
 	}
 
 	/** */
-	protected function setOpenBracket(string $join = null):Statement{
+	protected function setOpenBracket(string $join = null):self{
 		$join = strtoupper(trim($join));
 
 		if(in_array($join, $this->joinArgs, true)){
@@ -217,7 +216,7 @@ abstract class Statement implements LoggerAwareInterface{
 	}
 
 	/** */
-	protected function setCloseBracket():Statement{
+	protected function setCloseBracket():self{
 		$this->where[] = ')';
 
 		return $this;
@@ -330,21 +329,21 @@ abstract class Statement implements LoggerAwareInterface{
 	}
 
 	/** */
-	protected function setLimit(int $limit):Statement{
+	protected function setLimit(int $limit):self{
 		$this->limit = max($limit, 0);
 
 		return $this;
 	}
 
 	/** */
-	protected function setOffset(int $offset):Statement{
+	protected function setOffset(int $offset):self{
 		$this->offset = max($offset, 0);
 
 		return $this;
 	}
 
 	/** */
-	protected function setCached(int $ttl = null):Statement{
+	protected function setCached(int $ttl = null):self{
 		$this->cached = true;
 
 		if($ttl > 0){
