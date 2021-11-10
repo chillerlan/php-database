@@ -12,6 +12,7 @@
 
 namespace chillerlan\Database\Drivers;
 
+use chillerlan\Database\Result;
 use chillerlan\Database\Dialects\{Dialect, MSSQL};
 
 use function array_values, bin2hex, call_user_func_array, gettype, implode, is_bool, is_numeric, sprintf, sqlsrv_client_info,
@@ -152,14 +153,14 @@ final class MSSqlSrv extends DriverAbstract{
 	/**
 	 * @inheritdoc
 	 */
-	protected function raw_query(string $sql, string $index = null, bool $assoc = null){
+	protected function raw_query(string $sql, string $index = null, bool $assoc = null):Result{
 		return $this->get_result(sqlsrv_query($this->db, $sql), $index, $assoc);
 	}
 
 	/**
 	 * @inheritdoc
 	 */
-	protected function prepared_query(string $sql, array $values = null, string $index = null, bool $assoc = null){
+	protected function prepared_query(string $sql, array $values = null, string $index = null, bool $assoc = null):Result{
 
 		// [SQLSTATE IMSSP] (-57) String keys are not allowed in parameters arrays.
 		if($values !== null){
@@ -214,10 +215,9 @@ final class MSSqlSrv extends DriverAbstract{
 	}
 
 	/**
-	 * @return bool|\chillerlan\Database\Result
 	 * @throws \chillerlan\Database\Drivers\DriverException
 	 */
-	private function get_result($result, string $index = null, bool $assoc = null){
+	private function get_result($result, string $index = null, bool $assoc = null):Result{
 
 		if(is_bool($result)){
 			$errors = sqlsrv_errors();
@@ -226,7 +226,7 @@ final class MSSqlSrv extends DriverAbstract{
 				throw new DriverException('sql error: '.$this->parseErrors($errors));
 			}
 
-			return $result;
+			return new Result(null, null, null, true, $result);
 		}
 
 		$r = parent::getResult(

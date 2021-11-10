@@ -11,6 +11,7 @@
 namespace chillerlan\Database\Drivers;
 
 use chillerlan\Database\Dialects\Dialect;
+use chillerlan\Database\Result;
 use chillerlan\Settings\SettingsContainerInterface;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
@@ -78,23 +79,17 @@ interface DriverInterface{
 	 * @param string|null $index  [optional] an index column to assingn as the result's keys
 	 * @param bool|null   $assoc  [optional] If true, the fields are named with the respective column names, otherwise numbered
 	 *
-	 * @return \chillerlan\Database\Result|bool array with results, true on void query success, otherwise false.
+	 * @return \chillerlan\Database\Result array with results
 	 * @throws \chillerlan\Database\Drivers\DriverException
 	 */
-	public function raw(string $sql, string $index = null, bool $assoc = null);
+	public function raw(string $sql, string $index = null, bool $assoc = null):Result;
 
 	/**
 	 * same as DriverInterface::raw(), but cached.
 	 *
-	 * @param string      $sql
-	 * @param string|null $index
-	 * @param bool|null   $assoc
-	 * @param int|null    $ttl
-	 *
-	 * @return \chillerlan\Database\Result|bool
 	 * @throws \chillerlan\Database\Drivers\DriverException
 	 */
-	public function rawCached(string $sql, string $index = null, bool $assoc = null, int $ttl = null);
+	public function rawCached(string $sql, string $index = null, bool $assoc = null, int $ttl = null):Result;
 
 	/**
 	 * Prepared statements wrapper
@@ -107,24 +102,17 @@ interface DriverInterface{
 	 * @param string|null $index   [optional] an index column to assingn as the result's keys
 	 * @param bool|null   $assoc   [optional] If true, the fields are named with the respective column names, otherwise numbered
 	 *
-	 * @return \chillerlan\Database\Result|bool Array with results, true on void query success, otherwise false
+	 * @return \chillerlan\Database\Result Array with results
 	 * @throws \chillerlan\Database\Drivers\DriverException
 	 */
-	public function prepared(string $sql, array $values = null, string $index = null, bool $assoc = null);
+	public function prepared(string $sql, array $values = null, string $index = null, bool $assoc = null):Result;
 
 	/**
 	 * same as DriverInterface::prepared(), but cached.
 	 *
-	 * @param string      $sql
-	 * @param array|null  $values
-	 * @param string|null $index
-	 * @param bool|null   $assoc
-	 * @param int|null    $ttl
-	 *
-	 * @return \chillerlan\Database\Result|bool
 	 * @throws \chillerlan\Database\Drivers\DriverException
 	 */
-	public function preparedCached(string $sql, array $values = null, string $index = null, bool $assoc = null, int $ttl = null);
+	public function preparedCached(string $sql, array $values = null, string $index = null, bool $assoc = null, int $ttl = null):Result;
 
 	/**
 	 * Prepared multi line insert

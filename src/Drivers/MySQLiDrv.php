@@ -135,16 +135,16 @@ final class MySQLiDrv extends DriverAbstract{
 	/**
 	 * @inheritdoc
 	 */
-	protected function raw_query(string $sql, string $index = null, bool $assoc = null){
+	protected function raw_query(string $sql, string $index = null, bool $assoc = null):Result{
 		$result = $this->db->query($sql);
 
 		if(is_bool($result)){
 
-			if($this->db->errno !== 0 || !$result){
+			if($this->db->errno !== 0){
 				throw new DriverException($this->db->error, $this->db->errno);
 			}
 
-			return $result; // @codeCoverageIgnore
+			return new Result(null, null, null, true, $result);
 		}
 
 		$r = $this->getResult([$result, 'fetch_'.(($assoc ?? true) ? 'assoc' : 'row')], [], $index, $assoc);
@@ -157,7 +157,7 @@ final class MySQLiDrv extends DriverAbstract{
 	/**
 	 * @inheritdoc
 	 */
-	protected function prepared_query(string $sql, array $values = null, string $index = null, bool $assoc = null){
+	protected function prepared_query(string $sql, array $values = null, string $index = null, bool $assoc = null):Result{
 		$assoc = $assoc ?? true;
 		$stmt = $this->db->stmt_init();
 		$stmt->prepare($sql);
@@ -174,7 +174,7 @@ final class MySQLiDrv extends DriverAbstract{
 		if(is_bool($result)){
 			// https://www.php.net/manual/mysqli-stmt.result-metadata.php#97338
 			// the query did not produce a result, everything ok.
-			return true;
+			return new Result(null, null, null, true, true);
 		}
 
 		// get the columns and their references
@@ -212,7 +212,7 @@ final class MySQLiDrv extends DriverAbstract{
 		$stmt->free_result();
 		$stmt->close();
 
-		return $i === 0 ? true : $output; // @todo: return proper Result object in all cases
+		return $output;
 	}
 
 	/**

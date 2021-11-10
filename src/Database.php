@@ -51,22 +51,22 @@ class Database extends DatabaseAbstract implements DriverInterface{
 	}
 
 	/** @inheritdoc */
-	public function raw(string $sql, string $index = null, bool $assoc = null){
+	public function raw(string $sql, string $index = null, bool $assoc = null):Result{
 		return $this->driver->raw($sql, $index, $assoc);
 	}
 
 	/** @inheritdoc */
-	public function rawCached(string $sql, string $index = null, bool $assoc = null, int $ttl = null){
+	public function rawCached(string $sql, string $index = null, bool $assoc = null, int $ttl = null):Result{
 		return $this->driver->rawCached($sql, $index, $assoc, $ttl);
 	}
 
 	/** @inheritdoc */
-	public function prepared(string $sql, array $values = null, string $index = null, bool $assoc = null){
+	public function prepared(string $sql, array $values = null, string $index = null, bool $assoc = null):Result{
 		return $this->driver->prepared($sql, $values, $index, $assoc);
 	}
 
 	/** @inheritdoc */
-	public function preparedCached(string $sql, array $values = null, string $index = null, bool $assoc = null, int $ttl = null){
+	public function preparedCached(string $sql, array $values = null, string $index = null, bool $assoc = null, int $ttl = null):Result{
 		return $this->driver->preparedCached($sql, $values, $index, $assoc, $ttl);
 	}
 

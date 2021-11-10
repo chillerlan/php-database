@@ -139,14 +139,14 @@ final class PostgreSQL extends DriverAbstract{
 	/**
 	 * @inheritdoc
 	 */
-	protected function raw_query(string $sql, string $index = null, bool $assoc = null){
+	protected function raw_query(string $sql, string $index = null, bool $assoc = null):Result{
 		return $this->get_result(pg_query($sql), $index, $assoc);
 	}
 
 	/**
 	 * @inheritdoc
 	 */
-	protected function prepared_query(string $sql, array $values = null, string $index = null, bool $assoc = null){
+	protected function prepared_query(string $sql, array $values = null, string $index = null, bool $assoc = null):Result{
 		pg_prepare($this->db, '', $this->replaceParams($sql));
 
 		return $this->get_result(pg_execute($this->db, '', $values), $index, $assoc);
@@ -179,12 +179,12 @@ final class PostgreSQL extends DriverAbstract{
 	}
 
 	/**
-	 * @return bool|\chillerlan\Database\Result
+	 * @inheritdoc
 	 */
-	private function get_result($result, string $index = null, bool $assoc = null){
+	private function get_result($result, string $index = null, bool $assoc = null):Result{
 
 		if(is_bool($result)){
-			return $result; // @codeCoverageIgnore
+			return new Result(null, null, null, true, $result);
 		}
 
 		$out = new Result(null, $this->convert_encoding_src, $this->convert_encoding_dest);
@@ -222,7 +222,7 @@ final class PostgreSQL extends DriverAbstract{
 
 		pg_free_result($result);
 
-		return $i === 0 ? true : $out;
+		return $out;
 	}
 
 	/**

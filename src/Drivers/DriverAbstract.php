@@ -59,14 +59,14 @@ abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 	}
 
 	/**
-	 * @return bool|\chillerlan\Database\Result
+	 *
 	 */
-	abstract protected function raw_query(string $sql, ?string $index, ?bool $assoc);
+	abstract protected function raw_query(string $sql, ?string $index, ?bool $assoc):Result;
 
 	/**
-	 * @return bool|\chillerlan\Database\Result
+	 *
 	 */
-	abstract protected function prepared_query(string $sql, ?array $values, ?string $index, ?bool $assoc);
+	abstract protected function prepared_query(string $sql, ?array $values, ?string $index, ?bool $assoc):Result;
 
 	/**
 	 *
@@ -131,7 +131,7 @@ abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 	/**
 	 * @inheritdoc
 	 */
-	public function raw(string $sql, string $index = null, bool $assoc = null){
+	public function raw(string $sql, string $index = null, bool $assoc = null):Result{
 		$this->checkSQL($sql);
 
 		$this->logger->debug(
@@ -151,7 +151,7 @@ abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 	/**
 	 * @inheritdoc
 	 */
-	public function prepared(string $sql, array $values = null, string $index = null, bool $assoc = null){
+	public function prepared(string $sql, array $values = null, string $index = null, bool $assoc = null):Result{
 		$this->checkSQL($sql);
 
 		$this->logger->debug(
@@ -221,7 +221,7 @@ abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 	/**
 	 * @inheritdoc
 	 */
-	public function rawCached(string $sql, string $index = null, bool $assoc = null, int $ttl = null){
+	public function rawCached(string $sql, string $index = null, bool $assoc = null, int $ttl = null):Result{
 		$result = $this->cacheGet($sql, [], $index);
 
 		if(!$result){
@@ -236,7 +236,7 @@ abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 	/**
 	 * @inheritdoc
 	 */
-	public function preparedCached(string $sql, array $values = null, string $index = null, bool $assoc = null, int $ttl = null){
+	public function preparedCached(string $sql, array $values = null, string $index = null, bool $assoc = null, int $ttl = null):Result{
 		$result = $this->cacheGet($sql, $values, $index);
 
 		if(!$result){
@@ -249,11 +249,9 @@ abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 	}
 
 	/**
-	 * @todo return result only, Result::$isBool, Result::$success
-	 *
-	 * @return bool|\chillerlan\Database\Result
+	 * @inheritdoc
 	 */
-	protected function getResult(callable $callable, array $args, string $index = null, bool $assoc = null){
+	protected function getResult(callable $callable, array $args, string $index = null, bool $assoc = null):Result{
 		$out = new Result(null, $this->convert_encoding_src, $this->convert_encoding_dest);
 		$i   = 0;
 
@@ -265,7 +263,7 @@ abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
 			$i++;
 		}
 
-		return $i === 0 ? true : $out;
+		return $out;
 	}
 
 	/**

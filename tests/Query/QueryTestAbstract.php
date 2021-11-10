@@ -39,24 +39,26 @@ abstract class QueryTestAbstract extends DBTestAbstract{
 		$this->dialect    = $this->db->getDialect();
 		$this->reflection = new ReflectionClass($this->driverFQCN);
 
-		$this::assertTrue(
-			$this->db->create
-				->table($this::TABLE)
-				->ifNotExists()
-				->primaryKey('id')
-				->charset('utf8')
-				->int('id', 10)
-				->varchar('hash', 32)
-				->text('data', null, true)
-				->field('value', 'decimal', '9,6', null, null, true)
-				->field('active', 'boolean', null, null, null, null, null, 'false')
-				->field('created', 'timestamp', null, null, null, null, 'CURRENT_TIMESTAMP')
-				->query()
-		);
+		$r = $this->db->create
+			->table($this::TABLE)
+			->ifNotExists()
+			->primaryKey('id')
+			->charset('utf8')
+			->int('id', 10)
+			->varchar('hash', 32)
+			->text('data', null, true)
+			->field('value', 'decimal', '9,6', null, null, true)
+			->field('active', 'boolean', null, null, null, null, null, 'false')
+			->field('created', 'timestamp', null, null, null, null, 'CURRENT_TIMESTAMP')
+			->query();
+
+		$this::assertTrue($r->isSuccess());
 	}
 
 	protected function tearDown():void{
-		$this::assertTrue($this->db->drop->table($this::TABLE)->ifExists()->query());
+		$r = $this->db->drop->table($this::TABLE)->ifExists()->query();
+
+		$this::assertTrue($r->isSuccess());
 		$this::assertTrue($this->db->disconnect());
 	}
 
@@ -87,19 +89,19 @@ abstract class QueryTestAbstract extends DBTestAbstract{
 			->values(['id' => 0, 'hash' => md5(0), 'data' => 'foo', 'value' => 123.456, 'active' => 1])
 			->query();
 
-		$this::assertTrue($insert);
+		$this::assertTrue($insert->isSuccess());
 
 		$this::assertInsertResult($this->db->select->from([$this::TABLE])->query());
 	}
 
 	public function testInsertMulti():void{
 
-		$this::assertTrue(
-			$this->db->insert
-				->into($this::TABLE, 'IGNORE', 'id')
-				->values($this->data())
-				->multi()
-		);
+		$insert = $this->db->insert
+			->into($this::TABLE, 'IGNORE', 'id')
+			->values($this->data())
+			->multi();
+
+		$this::assertTrue($insert);
 
 		$this::assertInsertMultiResult($this->db->select->from([$this::TABLE])->query());
 	}
@@ -160,24 +162,27 @@ abstract class QueryTestAbstract extends DBTestAbstract{
 			->values($this->data())
 			->multi();
 
-		$this::assertTrue(
-			$this->db->update
-				->table($this::TABLE)
-				->set([
-					'data'   => 'whatever',
-					'value'  => 42.42,
-					'active' => 1,
-				])
-				->where('id', 1)
-				->query()
-		);
+		$update = $this->db->update
+			->table($this::TABLE)
+			->set([
+				'data'   => 'whatever',
+				'value'  => 42.42,
+				'active' => 1,
+			])
+			->where('id', 1)
+			->query();
 
-		$r = $this->db->select
-			     ->cols(['hash', 'data', 'value', 'active'])
-			     ->from([$this::TABLE])
-			     ->where('id', 1)
-			     ->query('hash')
-		['c4ca4238a0b923820dcc509a6f75849b'];
+		$this::assertTrue($update->isSuccess());
+
+		$result = $this->db->select
+			->cols(['hash', 'data', 'value', 'active'])
+			->from([$this::TABLE])
+			->where('id', 1)
+			->query('hash');
+
+		$this::assertTrue($result->isSuccess());
+
+		$r = $result['c4ca4238a0b923820dcc509a6f75849b'];
 
 		$this::assertSame('whatever', $r->data);
 		$this::assertSame(42.42, (float)$r->value);
@@ -199,7 +204,12 @@ abstract class QueryTestAbstract extends DBTestAbstract{
 			'eccbc87e4b5ce2fe28308fd9f2a7baf3',
 		], array_column($q->query()->toArray(), 'hash'));
 
-		$this::assertTrue($this->db->delete->from($this::TABLE)->where('id', 2)->query());
+		$delete = $this->db->delete
+			->from($this::TABLE)
+			->where('id', 2)
+			->query();
+
+		$this::assertTrue($delete->isSuccess());
 
 		$r = $q->query();
 

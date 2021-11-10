@@ -12,6 +12,7 @@
 
 namespace chillerlan\Database\Drivers;
 
+use chillerlan\Database\Result;
 use chillerlan\Database\Dialects\{Dialect, MSSQL};
 use chillerlan\Settings\SettingsContainerInterface;
 use Psr\Log\LoggerInterface;
@@ -173,13 +174,13 @@ final class PDOMSSqlSrv extends PDODriverAbstract{
 	/**
 	 * @inheritdoc
 	 */
-	protected function raw_query(string $sql, string $index = null, bool $assoc = null){
+	protected function raw_query(string $sql, string $index = null, bool $assoc = null):Result{
 
 		try{
 			return parent::raw_query($sql, $index, $assoc);
 		}
 		catch(Throwable $e){
-			return $this->silenceNonErrorException($e);
+			return new Result(null, null, null, true, $this->silenceNonErrorException($e));
 		}
 
 	}
@@ -207,13 +208,13 @@ final class PDOMSSqlSrv extends PDODriverAbstract{
 	/**
 	 * @inheritdoc
 	 */
-	protected function prepared_query(string $sql, array $values = null, string $index = null, bool $assoc = null){
+	protected function prepared_query(string $sql, array $values = null, string $index = null, bool $assoc = null):Result{
 
 		try{
 			return parent::prepared_query($sql, $values, $index, $assoc);
 		}
 		catch(Throwable $e){
-			return $this->silenceNonErrorException($e);
+			return new Result(null, null, null, true, $this->silenceNonErrorException($e));
 		}
 
 	}

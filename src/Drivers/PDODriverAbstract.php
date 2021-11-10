@@ -12,6 +12,7 @@
 
 namespace chillerlan\Database\Drivers;
 
+use chillerlan\Database\Result;
 use PDO, PDOStatement, Throwable;
 
 use function call_user_func_array, explode, get_called_class, gettype, is_bool, trim;
@@ -107,13 +108,13 @@ abstract class PDODriverAbstract extends DriverAbstract{
 	}
 
 	/**
-	 * @return bool|\chillerlan\Database\Result
+	 * @inheritdoc
 	 */
-	protected function get_result($stmt, string $index = null, bool $assoc = null){
+	protected function get_result($stmt, string $index = null, bool $assoc = null):Result{
 		$assoc = $assoc ?? true;
 
 		if(is_bool($stmt)){
-			return $stmt;
+			return new Result(null, null, null, true, $stmt);
 		}
 
 		return parent::getResult([$stmt, 'fetch'], [$assoc ? PDO::FETCH_ASSOC : PDO::FETCH_NUM], $index, $assoc);
@@ -122,14 +123,14 @@ abstract class PDODriverAbstract extends DriverAbstract{
 	/**
 	 * @inheritdoc
 	 */
-	protected function raw_query(string $sql, string $index = null, bool $assoc = null){
+	protected function raw_query(string $sql, string $index = null, bool $assoc = null):Result{
 		return $this->get_result($this->db->query($sql), $index, $assoc);
 	}
 
 	/**
 	 * @inheritdoc
 	 */
-	protected function prepared_query(string $sql, array $values = null, string $index = null, bool $assoc = null){
+	protected function prepared_query(string $sql, array $values = null, string $index = null, bool $assoc = null):Result{
 		$stmt = $this->db->prepare($sql, $this->pdo_stmt_options);
 
 		if(!empty($values)){
