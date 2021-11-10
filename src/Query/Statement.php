@@ -113,14 +113,14 @@ abstract class Statement implements LoggerAwareInterface{
 
 	/**
 	 * @param mixed       $val1
-	 * @param mixed|null  $val2
+	 * @param mixed       $val2
 	 * @param string|null $operator
 	 * @param bool|null   $bind
 	 * @param string|null $join
 	 *
 	 * @return $this
 	 */
-	protected function setWhere($val1, $val2 = null, string $operator = null, bool $bind = null, string $join = null):Statement{
+	protected function setWhere($val1, $val2, string $operator = null, bool $bind = null, string $join = null):Statement{
 		$operator = $operator !== null ? strtoupper(trim($operator)) : '=';
 		$bind     ??= true;
 
