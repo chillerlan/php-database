@@ -18,24 +18,16 @@ namespace chillerlan\Database\Query;
 interface Where{
 
 	/**
-	 * @param             $val1
-	 * @param             $val2
+	 * @param mixed       $val1
+	 * @param mixed       $val2
 	 * @param string|null $operator
 	 * @param bool|null   $bind
 	 * @param string|null $join
-	 *
-	 * @return $this
 	 */
-	public function where($val1, $val2, string $operator = null, bool $bind = null, string $join = null);
+	public function where($val1, $val2, string $operator = null, bool $bind = null, string $join = null):self;
 
-	/**
-	 * @return $this
-	 */
-	public function openBracket(string $join = null);
+	public function openBracket(string $join = null):self;
 
-	/**
-	 * @return $this
-	 */
-	public function closeBracket();
+	public function closeBracket():self;
 
 }

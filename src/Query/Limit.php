@@ -12,14 +12,8 @@ namespace chillerlan\Database\Query;
 
 interface Limit{
 
-	/**
-	 * @return $this
-	 */
-	public function limit(int $limit);
+	public function limit(int $limit):self;
 
-	/**
-	 * @return $this
-	 */
-	public function offset(int $offset);
+	public function offset(int $offset):self;
 
 }

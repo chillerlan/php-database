@@ -12,9 +12,6 @@ namespace chillerlan\Database\Query;
 
 interface IfExists{
 
-	/**
-	 * @return $this
-	 */
-	public function ifExists();
+	public function ifExists():self;
 
 }

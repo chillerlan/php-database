@@ -12,11 +12,6 @@ namespace chillerlan\Database\Query;
 
 interface CachedQuery{
 
-	/**
-	 * @param int|null $ttl
-	 *
-	 * @return $this
-	 */
-	public function cached(int $ttl = null);
+	public function cached(int $ttl = null):self;
 
 }
