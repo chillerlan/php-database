@@ -15,73 +15,54 @@ use ArrayAccess, Countable, JsonSerializable, SeekableIterator;
 interface ResultInterface extends SeekableIterator, ArrayAccess, Countable, JsonSerializable{
 
 	/** */
-	public function __toArray():array;
-
-	/**
-	 * @param callable $callback
-	 *
-	 * @return mixed
-	 */
-	public function __each($callback);
-
-	/**
-	 * @param callable $callback
-	 *
-	 * @return array
-	 */
-	public function __map($callback):array;
+	public function isBool():bool;
 
 	/** */
-	public function __reverse():ResultInterface;
-
-	/**
-	 * @return mixed
-	 */
-	public function __first();
-
-	/**
-	 * @return mixed
-	 */
-	public function __last();
+	public function isSuccess():bool;
 
 	/** */
-	public function __clear():ResultInterface;
+	public function toArray():array;
+
+	/** @return mixed */
+	public function each(callable $callback);
 
 	/** */
-	public function __inspect():string;
-
-	/**
-	 * @param callable $callback
-	 *
-	 * @return array
-	 */
-	public function __findAll($callback):array;
-
-	/**
-	 * @param callable $callback
-	 *
-	 * @return array
-	 */
-	public function __reject($callback):array;
-
-	/**
-	 * Result constructor.
-	 */
-	public function __construct(iterable $data = null, string $sourceEncoding = null, string $destEncoding = null);
+	public function map(callable $callback):array;
 
 	/** */
-	public function __merge(Result $DBResult):Result;
+	public function reverse():ResultInterface;
+
+	/** @return mixed */
+	public function first();
+
+	/** @return mixed */
+	public function last();
 
 	/** */
-	public function __chunk(int $size):array;
+	public function clear():ResultInterface;
 
 	/** */
-	public function __fields():array;
+	public function inspect():string;
 
 	/** */
-	public function __values(bool $to_array = null):array;
+	public function findAll(callable $callback):array;
 
 	/** */
-	public function __column(string $column, string $index_key = null):array;
+	public function reject(callable $callback):array;
+
+	/** */
+	public function merge(ResultInterface $Result):ResultInterface;
+
+	/** */
+	public function chunk(int $size):array;
+
+	/** */
+	public function fields():array;
+
+	/** */
+	public function values(bool $to_array = null):array;
+
+	/** */
+	public function column(string $column, string $index_key = null):array;
 
 }

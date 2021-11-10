@@ -30,7 +30,7 @@ class Insert extends Statement implements BindValues, MultiQuery{
 
 		/** @noinspection PhpConditionAlreadyCheckedInspection - ResultInterface implements Iterator */
 		if($values instanceof ResultInterface){
-			$this->bindValues = $values->__toArray();
+			$this->bindValues = $values->toArray();
 
 			return $this;
 		}

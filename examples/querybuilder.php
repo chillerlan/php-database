@@ -91,7 +91,7 @@ $result = $db->select
 	->where('t1.type', 'a')
 	->orderBy(['t1.price' => 'asc'])
 	->query('uid')
-	->__toArray();
+	->toArray();
 
 var_dump($result);
 

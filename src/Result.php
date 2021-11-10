@@ -15,26 +15,31 @@ use OutOfBoundsException;
 use function array_chunk, array_column, array_key_exists, array_keys, array_merge, array_reverse,
 	array_values, call_user_func_array, count, is_callable, method_exists, next, print_r;
 
-/**
- * @property int                              $length
- * @property \chillerlan\Database\ResultRow[] $array
- */
 class Result implements ResultInterface{
 
 	protected ?string $sourceEncoding = null;
-	protected string $destEncoding;
-	protected array $array = [];
-	protected int $offset = 0;
+	protected string  $destEncoding;
+	protected bool    $isBool;
+	protected bool    $isSuccess;
+	/** @var  \chillerlan\Database\ResultRow[]  */
+	protected array   $array          = [];
+	protected int     $offset         = 0;
 
 	/** @todo */
-#	protected bool $isBool;
-#	protected bool $success = false;
 #	protected array $metadata = [];
 
 	/** @inheritdoc */
-	public function __construct(iterable $data = null, string $sourceEncoding = null, string $destEncoding = null){
+	public function __construct(
+		iterable $data = null,
+		string $sourceEncoding = null,
+		string $destEncoding = null,
+		bool $isBool = null,
+		bool $isSuccess = null
+	){
 		$this->sourceEncoding = $sourceEncoding;
 		$this->destEncoding   = $destEncoding ?? 'UTF-8';
+		$this->isBool         = $isBool ?? false;
+		$this->isSuccess      = $isSuccess ?? true;
 
 		if($data !== null){
 
@@ -47,20 +52,19 @@ class Result implements ResultInterface{
 		$this->offset = 0;
 	}
 
-	/**
-	 * @link http://api.prototypejs.org/language/Enumerable/prototype/toArray/
-	 */
-	public function __EnumerableToArray():array {
-		return $this->array;
+	public function isBool():bool{
+		return $this->isBool;
+	}
+
+	public function isSuccess():bool{
+		return $this->isSuccess;
 	}
 
 	/**
 	 * @link http://api.prototypejs.org/language/Enumerable/prototype/each/
-	 *
-	 * @param callable $callback
 	 */
-	public function __each($callback):ResultInterface{
-		$this->__map($callback);
+	public function each(callable $callback):ResultInterface{
+		$this->map($callback);
 
 		return $this;
 	}
@@ -69,16 +73,9 @@ class Result implements ResultInterface{
 	 * @link http://api.prototypejs.org/language/Enumerable/prototype/collect/
 	 * @link http://api.prototypejs.org/language/Enumerable/prototype/map/
 	 *
-	 * @param callable $callback
-	 *
 	 * @throws \chillerlan\Database\DatabaseException
 	 */
-	public function __map($callback):array{
-
-		if(!is_callable($callback)){
-			throw new DatabaseException('invalid callback');
-		}
-
+	public function map(callable $callback):array{
 		$return = [];
 
 		foreach($this->array as $index => $element){
@@ -91,7 +88,7 @@ class Result implements ResultInterface{
 	/**
 	 * @link http://api.prototypejs.org/language/Array/prototype/reverse/
 	 */
-	public function __reverse():ResultInterface{
+	public function reverse():ResultInterface{
 		$this->array  = array_reverse($this->array);
 		$this->offset = 0;
 
@@ -99,17 +96,17 @@ class Result implements ResultInterface{
 	}
 
 	/** @inheritDoc */
-	public function __first(){
+	public function first(){
 		return $this->array[0] ?? null;
 	}
 
 	/** @inheritDoc */
-	public function __last(){
+	public function last(){
 		return $this->array[count($this->array) - 1] ?? null;
 	}
 
 	/** @inheritDoc */
-	public function __clear():ResultInterface{
+	public function clear():ResultInterface{
 		$this->array = [];
 
 		return $this;
@@ -118,23 +115,16 @@ class Result implements ResultInterface{
 	/**
 	 * @link http://api.prototypejs.org/language/Array/prototype/inspect/
 	 */
-	public function __inspect():string {
+	public function inspect():string {
 		return print_r($this->array, true);
 	}
 
 	/**
 	 * @link http://api.prototypejs.org/language/Enumerable/prototype/findAll/
 	 *
-	 * @param callable $callback
-	 *
 	 * @throws \chillerlan\Database\DatabaseException
 	 */
-	public function __findAll($callback):array{
-
-		if(!is_callable($callback)){
-			throw new DatabaseException('invalid callback');
-		}
-
+	public function findAll(callable $callback):array{
 		$return = [];
 
 		foreach($this->array as $index => $element){
@@ -151,17 +141,9 @@ class Result implements ResultInterface{
 	/**
 	 * @link http://api.prototypejs.org/language/Enumerable/prototype/reject/
 	 *
-	 * @param callable $callback
-	 *
-	 * @return array
 	 * @throws \chillerlan\Database\DatabaseException
 	 */
-	public function __reject($callback):array{
-
-		if(!is_callable($callback)){
-			throw new DatabaseException('invalid callback');
-		}
-
+	public function reject(callable $callback):array{
 		$return = [];
 
 		foreach($this->array as $index => $element){
@@ -173,40 +155,6 @@ class Result implements ResultInterface{
 		}
 
 		return $return;
-	}
-
-	/**
-	 * @return mixed|null
-	 */
-	public function __get(string $name){
-		return $this->get($name);
-	}
-
-	/**
-	 * @param string $name
-	 * @param mixed  $value
-	 */
-	public function __set(string $name, $value):void{
-		$this->set($name, $value);
-	}
-
-	/**
-	 * @return mixed|null
-	 */
-	private function get(string $name){
-		$method = 'magic_get_'.$name;
-
-		return method_exists($this, $method) ? $this->$method() : null;
-	}
-
-	/**  */
-	private function set(string $name, $value):void{
-		$method = 'magic_set_'.$name;
-
-		if(method_exists($this, $method)){
-			$this->$method($value);
-		}
-
 	}
 
 	/**
@@ -301,50 +249,41 @@ class Result implements ResultInterface{
 	}
 
 	/** @inheritdoc */
-	public function __merge(Result $DBResult):Result{
-		$this->array = array_merge($this->array, $DBResult->__EnumerableToArray());
+	public function merge(ResultInterface $Result):ResultInterface{
+		$this->array = array_merge($this->array, $Result->array);
 
 		return $this;
 	}
 
 	/** @inheritdoc */
-	public function __chunk(int $size):array{
-		return array_chunk($this->__toArray(), $size, true);
+	public function chunk(int $size):array{
+		return array_chunk($this->toArray(), $size, true);
 	}
 
 	/** @inheritdoc */
-	public function __toArray():array{
+	public function toArray():array{
 		$arr = [];
 
 		foreach($this->array as $key => $item){
-			$arr[$key] = $item->__toArray();
+			$arr[$key] = $item->toArray();
 		}
 
 		return $arr;
 	}
 
 	/** @inheritdoc */
-	public function __fields():array{
+	public function fields():array{
 		return array_keys($this->array);
 	}
 
 	/** @inheritdoc */
-	public function __values(bool $to_array = null):array{
-		return array_values($to_array === true ? $this->__toArray() : $this->array);
+	public function values(bool $to_array = null):array{
+		return array_values($to_array === true ? $this->toArray() : $this->array);
 	}
 
 	/** @inheritdoc */
-	public function __column(string $column, string $index_key = null):array{
-		return array_column($this->__toArray(), $column, $index_key);
-	}
-
-	/*********
-	 * magic *
-	 *********/
-
-	/**  */
-	protected function magic_get_length():int{
-		return $this->count();
+	public function column(string $column, string $index_key = null):array{
+		return array_column($this->toArray(), $column, $index_key);
 	}
 
 	/***************
@@ -367,7 +306,7 @@ class Result implements ResultInterface{
 
 	/** @inheritdoc */
 	public function jsonSerialize(){
-		return $this->__toArray();
+		return $this->toArray();
 	}
 
 }

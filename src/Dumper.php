@@ -54,13 +54,13 @@ class Dumper extends DatabaseAbstract{
 				if($data instanceof Result && $data->length > 0){
 					$sql = ['INSERT INTO'];
 					$sql[] = $this->dialect->quote($table);
-					$sql[] = '('.implode(', ', array_map([$this->dialect, 'quote'], $data[0]->__fields())).')';
+					$sql[] = '('.implode(', ', array_map([$this->dialect, 'quote'], $data[0]->fields())).')';
 					$sql[] = 'VALUES'.PHP_EOL;
 
 					/** @var \chillerlan\Database\ResultRow $row */
 					$values = [];
 					foreach($data as $row){
-						$values[] = '('.implode(', ', array_map([$this->driver, 'escape'], $row->__values())).')';
+						$values[] = '('.implode(', ', array_map([$this->driver, 'escape'], $row->values())).')';
 					}
 
 					$sql[] = implode(','.PHP_EOL, $values).';'.PHP_EOL.PHP_EOL;

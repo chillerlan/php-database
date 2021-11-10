@@ -28,7 +28,7 @@ class MySQLTest extends QueryTestAbstract{
 	}
 
 	protected function assertInsertMultiResult(ResultInterface $result):void{
-		$this::assertSame(3, $result->length);
+		$this::assertSame(3, $result->count());
 
 		$this::assertSame(3, $result[2]->id);
 

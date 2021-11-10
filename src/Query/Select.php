@@ -104,7 +104,7 @@ class Select extends Statement implements Where, Limit, BindValues, Query, Cache
 		$sql    = $this->dialect->selectCount($this->from, $this->_getWhere(), $this->distinct, $this->groupby);
 		$result = $this->db->prepared(implode(' ', $sql), $this->bindValues);
 
-		if($result instanceof ResultInterface && $result->length > 0){
+		if($result instanceof ResultInterface && $result->count() > 0){
 			return (int)$result[0]->count;
 		}
 

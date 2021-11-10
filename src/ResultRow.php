@@ -18,9 +18,6 @@ use function call_user_func_array, is_callable, is_string, mb_convert_encoding;
 class ResultRow extends Result{
 
 	/**
-	 * @param string $name
-	 * @param array  $arguments
-	 *
 	 * @return mixed|null
 	 */
 	public function __call(string $name, array $arguments){
@@ -48,8 +45,8 @@ class ResultRow extends Result{
 	/**
 	 * @inheritdoc
 	 */
-	public function __toArray():array{
-		return $this->__EnumerableToArray();
+	public function toArray():array{
+		return $this->array;
 	}
 
 	/**

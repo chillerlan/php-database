@@ -345,7 +345,7 @@ $result = $conn->select
 	->where('t1.type', 'a')
 	->orderBy(['t1.price' => 'asc'])
 	->query('uid')
-	->__toArray();
+	->toArray();
 ```
 
 ```mysql
@@ -451,16 +451,16 @@ method | description
 ------ | -----------
 `__construct($data = null, $sourceEncoding = null, $destEncoding = 'UTF-8')` | If `$data` is of type `\Traversable`, `\stdClass` or `array`, the `Result` will be filled with its values. If `$sourceEncoding` is present, the values will be converted to `$destEncoding` via `mb_convert_encoding()`.
 `__merge(Result $result)` | merges one `Result` object into another (using `array_merge()`)
-`__chunk(int $size)` | splits the `Result` into chunks of `$size` and returns it as `array` (using `array_chunk()`)
+`chunk(int $size)` | splits the `Result` into chunks of `$size` and returns it as `array` (using `array_chunk()`)
 
 #### methods from `Enumerable`
 
 method | description
 ------ | -----------
-`__toArray()` | returns an `array` representation of the `Result`
-`__map($callback)` | collects the result of `$callback` for each value of `Result` and returns it as `array`
-`__each($callback)` | similar to `__map()`, except it doesn't collect results and returns the `Result` instance
-`__reverse()` | reverses the order of the `Result` (using `array_reverse()`)
+`toArray()` | returns an `array` representation of the `Result`
+`map($callback)` | collects the result of `$callback` for each value of `Result` and returns it as `array`
+`each($callback)` | similar to `map()`, except it doesn't collect results and returns the `Result` instance
+`reverse()` | reverses the order of the `Result` (using `array_reverse()`)
 
 ### `ResultRow`
 `ResultRow` allows to call the result fields as magic methods or properties.
@@ -468,10 +468,10 @@ If called as method, you may supply a `callable` as argument which then takes th
 
 ### `Result` and `ResultRow` examples
 
-#### `__map()` and `__each()`
+#### `map()` and `each()`
 
 ```php
-$values = $result->__map(function($row){
+$values = $result->map(function($row){
 
 	// ...
 
@@ -483,7 +483,7 @@ $values = $result->__map(function($row){
 });
 ```
 
-#### `__merge()`, `__toArray()`, `__chunk()` and `__reverse()`
+#### `__merge()`, `toArray()`, `chunk()` and `reverse()`
 
 ```php
 $result1 = new Result([['id' => 1]]);
@@ -491,10 +491,10 @@ $result2 = new Result([['id' => 2]]);
 
 $result1->__merge($result2);
 
-var_dump($result1->__toArray());
+var_dump($result1->toArray());
 // -> [['id' => 1], ['id' => 2]]
 
-var_dump($result1->__reverse()->__chunk(1)[0]);
+var_dump($result1->reverse()->chunk(1)[0]);
 // -> [['id' => 2]]
 ```
 

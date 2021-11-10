@@ -122,7 +122,7 @@ abstract class QueryTestAbstract extends DBTestAbstract{
 
 		$r = $q->query();
 
-		$this::assertSame(2, $r->length);
+		$this::assertSame(2, $r->count());
 		$this::assertSame(2, (int)$r[0]['id']);
 		$this::assertSame(md5(2), $r[0]['hash']);
 		$this::assertSame(md5(3), $r[1]->id('md5'));
@@ -197,17 +197,17 @@ abstract class QueryTestAbstract extends DBTestAbstract{
 			'c4ca4238a0b923820dcc509a6f75849b',
 			'c81e728d9d4c2f636f067f89cc14862c',
 			'eccbc87e4b5ce2fe28308fd9f2a7baf3',
-		], array_column($q->query()->__toArray(), 'hash'));
+		], array_column($q->query()->toArray(), 'hash'));
 
 		$this::assertTrue($this->db->delete->from($this::TABLE)->where('id', 2)->query());
 
 		$r = $q->query();
 
-		$this::assertSame(2, $r->length);
+		$this::assertSame(2, $r->count());
 		$this::assertSame([
 			'c4ca4238a0b923820dcc509a6f75849b',
 			'eccbc87e4b5ce2fe28308fd9f2a7baf3',
-		], array_column($r->__toArray(), 'hash'));
+		], array_column($r->toArray(), 'hash'));
 	}
 
 	public function testSelectCached():void{
@@ -258,7 +258,7 @@ abstract class QueryTestAbstract extends DBTestAbstract{
 		$r = $this->db->show
 			->databases()
 			->query()
-			->__toArray();
+			->toArray();
 
 		$this->logger->debug('SHOW DATABASES:', $r);
 
@@ -270,7 +270,7 @@ abstract class QueryTestAbstract extends DBTestAbstract{
 		$r = $this->db->show
 			->tables()
 			->query()
-			->__toArray();
+			->toArray();
 
 		$this->logger->debug('SHOW TABLES:', $r);
 
