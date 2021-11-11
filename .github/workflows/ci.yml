@@ -14,32 +14,32 @@ on:
 
 jobs:
 
-#  static-code-analysis:
-#    name: "Static Code Analysis"
-#
-#    runs-on: ubuntu-latest
-#
-#    env:
-#      PHAN_ALLOW_XDEBUG: 0
-#      PHAN_DISABLE_XDEBUG_WARN: 1
-#
-#    steps:
-#      - name: "Checkout"
-#        uses: actions/checkout@v2
-#
-#      - name: "Install PHP"
-#        uses: shivammathur/setup-php@v2
-#        with:
-#          php-version: "7.4"
-#          tools: pecl
-#          coverage: none
-#          extensions: ast, curl, json, simplexml, zlib
-#
-#      - name: "Update dependencies with composer"
-#        run: composer update --no-interaction --no-ansi --no-progress --no-suggest --prefer-source
-#
-#      - name: "Run phan"
-#        run: php vendor/bin/phan
+  static-code-analysis:
+    name: "Static Code Analysis"
+
+    runs-on: ubuntu-latest
+
+    env:
+      PHAN_ALLOW_XDEBUG: 0
+      PHAN_DISABLE_XDEBUG_WARN: 1
+
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v2
+
+      - name: "Install PHP"
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "7.4"
+          tools: pecl
+          coverage: none
+          extensions: ast, curl, json, simplexml, zlib
+
+      - name: "Update dependencies with composer"
+        run: composer update --no-interaction --no-ansi --no-progress --no-suggest --prefer-source
+
+      - name: "Run phan"
+        run: php vendor/bin/phan
 
   tests:
     name: "Unit Tests"
