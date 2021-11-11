@@ -33,14 +33,14 @@ class ResultTest extends TestCase{
 		$this->result->rewind();
 	}
 
-	public function testInstance(){
+	public function testInstance():void{
 		$this::assertInstanceOf(ResultInterface::class, $this->result);
 		$this::assertInstanceOf(ArrayAccess::class, $this->result);
 		$this::assertInstanceOf(Countable::class, $this->result);
 		$this::assertInstanceOf(SeekableIterator::class, $this->result);
 	}
 
-	public function testRow(){
+	public function testRow():void{
 		$this::assertSame(10, $this->result->count());
 		$this::assertSame(md5(0), $this->result[0]->hash);
 		$this::assertSame(range(0, 9), $this->result->column('id'));
@@ -71,7 +71,7 @@ class ResultTest extends TestCase{
 
 	}
 
-	public function testEach(){
+	public function testEach():void{
 		$this->result->each(function($row, $i){
 			/** @var \chillerlan\Database\ResultRow|mixed $row */
 			$this::assertSame($row->id, $i);
@@ -84,7 +84,7 @@ class ResultTest extends TestCase{
 		});
 	}
 
-	public function testMerge(){
+	public function testMerge():void{
 		$r1 = new Result([['id' => 1]]);
 		$this::assertSame(1, $r1[0]->id);
 
@@ -97,17 +97,17 @@ class ResultTest extends TestCase{
 		$this::assertSame(1, $r1[1]->id);
 	}
 
-	public function testToArray(){
+	public function testToArray():void{
 		$r = new Result([['id' => 1], ['id' => 2]]);
 		$this::assertSame([['id' => 1], ['id' => 2]], $r->toArray());
 		$this::assertSame([['id' => 1]], $r->chunk(1)[0]);
 	}
 
-	public function testToJSON(){
+	public function testToJSON():void{
 		$this::assertSame('[{"id":1},{"id":2}]', json_encode((new Result([['id' => 1], ['id' => 2]]))));
 	}
 
-	public function testRowOffsetSet(){
+	public function testRowOffsetSet():void{
 		$r = new ResultRow;
 
 		$r['id'] = 'foo';
@@ -117,7 +117,7 @@ class ResultTest extends TestCase{
 		$this::assertSame('bar', $r[0]);
 	}
 
-	public function testConvertEncoding(){
+	public function testConvertEncoding():void{
 		$r = new ResultRow(['name_zh' => hex2bin('72ee5b5062f195e8')], 'UTF-16', 'UTF-8');
 
 		$this::assertSame('狮子拱门', $r->name_zh);
