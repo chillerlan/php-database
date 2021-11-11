@@ -21,7 +21,7 @@ final class SQLite extends DialectAbstract{
 	 */
 	public function fieldspec(string $name, string $type, $length = null, string $attribute = null, string $collation = null, bool $isNull = null, string $defaultType = null, $defaultValue = null, string $extra = null):string{
 		$type      = strtoupper(trim($type));
-		$collation = strtoupper($collation);
+		$collation = strtoupper($collation ?? '');
 
 		$field = [$this->quote(trim($name))];
 
@@ -52,7 +52,7 @@ final class SQLite extends DialectAbstract{
 			$field[] = 'COLLATE '.$collation;
 		}
 
-		$defaultType = strtoupper($defaultType);
+		$defaultType = strtoupper($defaultType ?? '');
 
 		if($defaultType === 'USER_DEFINED'){
 			$field[] = 'DEFAULT \''.$defaultValue.'\'';

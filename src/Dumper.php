@@ -10,7 +10,6 @@
 
 namespace chillerlan\Database;
 
-use chillerlan\Database\Dialects\Dialect;
 use chillerlan\Settings\SettingsContainerInterface;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
@@ -22,12 +21,9 @@ class Dumper extends DatabaseAbstract{
 
 	const PAGESIZE = 100;
 
-	protected Dialect $dialect;
-
 	public function __construct(SettingsContainerInterface $options, CacheInterface $cache = null, LoggerInterface $logger = null){
 		parent::__construct($options, $cache, $logger);
 
-		$this->dialect = $this->driver->getDialect();
 		$this->driver->connect();
 	}
 
@@ -38,9 +34,9 @@ class Dumper extends DatabaseAbstract{
 
 		foreach($tables as $table){
 			$this->logger->info('dumping table: '.$table);
-			fwrite($fh, PHP_EOL.'--'.PHP_EOL.'-- '.$table.PHP_EOL.'--'.PHP_EOL.PHP_EOL.$this->query->show->createTable($table)->query()[0]->{'Create Table'}.';'.PHP_EOL.PHP_EOL);
+			fwrite($fh, PHP_EOL.'--'.PHP_EOL.'-- '.$table.PHP_EOL.'--'.PHP_EOL.PHP_EOL.$this->show->createTable($table)->query()[0]->{'Create Table'}.';'.PHP_EOL.PHP_EOL);
 
-			$q = $this->query->select->from([$table]);
+			$q = $this->select->from([$table]);
 			$pages = (int)floor($q->count() / $this::PAGESIZE);
 
 			foreach(range(0, $pages) as $i){
@@ -51,7 +47,7 @@ class Dumper extends DatabaseAbstract{
 					->query();
 
 
-				if($data instanceof Result && $data->length > 0){
+				if($data instanceof Result && $data->count() > 0){
 					$sql = ['INSERT INTO'];
 					$sql[] = $this->dialect->quote($table);
 					$sql[] = '('.implode(', ', array_map([$this->dialect, 'quote'], $data[0]->fields())).')';
@@ -77,14 +73,14 @@ class Dumper extends DatabaseAbstract{
 
 		}
 
-
 	}
 
 
 	protected function parseTables(array $tables = null, array $not = null):array{
-		$q  = $this->query->show->tables()->query()->__toArray();
-		$r  = [];
-		$st = [];
+		$q     = $this->show->tables()->query()->toArray();
+		$r     = [];
+		$st    = [];
+		$not ??= [];
 
 		foreach($q as $t){
 			[$table] = array_values($t);
@@ -117,4 +113,5 @@ class Dumper extends DatabaseAbstract{
 
 		return $r;
 	}
+
 }

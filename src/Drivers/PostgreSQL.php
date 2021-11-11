@@ -149,7 +149,7 @@ final class PostgreSQL extends DriverAbstract{
 	protected function prepared_query(string $sql, array $values = null, string $index = null, bool $assoc = null):Result{
 		pg_prepare($this->db, '', $this->replaceParams($sql));
 
-		return $this->get_result(pg_execute($this->db, '', $values), $index, $assoc);
+		return $this->get_result(pg_execute($this->db, '', $values ?? []), $index, $assoc);
 	}
 
 	/**
@@ -231,6 +231,7 @@ final class PostgreSQL extends DriverAbstract{
 	private function replaceParams(string $sql):string{
 		$i = 1;
 
+		/** @phan-suppress-next-line PhanTypeMismatchArgumentInternal - a Closure is callable... */
 		return preg_replace_callback('/(\?)/', function() use (&$i){
 			return '$'.$i++;
 		}, $sql);

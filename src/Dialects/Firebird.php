@@ -67,7 +67,7 @@ final class Firebird extends DialectAbstract{
 
 			foreach($cols as $name => $col){
 
-				if(strtolower($name) === strtolower($primaryKey)){
+				if(strtolower($name) === strtolower($primaryKey ?? '')){
 					$x = explode(' NOT NULL', $col, 2);
 
 					if(count($x) > 0){
@@ -147,7 +147,7 @@ END ^
 			$field[] = 'NOT NULL';
 		}
 
-		$defaultType = strtoupper($defaultType);
+		$defaultType = strtoupper($defaultType ?? '');
 
 		if($defaultType === 'USER_DEFINED'){
 

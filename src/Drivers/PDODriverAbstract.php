@@ -15,7 +15,7 @@ namespace chillerlan\Database\Drivers;
 use chillerlan\Database\Result;
 use PDO, PDOStatement, Throwable;
 
-use function call_user_func_array, explode, get_called_class, gettype, is_bool, trim;
+use function call_user_func_array, get_called_class, gettype, is_bool;
 
 /**
  *

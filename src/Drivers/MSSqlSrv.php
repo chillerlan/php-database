@@ -75,7 +75,7 @@ final class MSSqlSrv extends DriverAbstract{
 		$this->db = sqlsrv_connect($host, $options);
 
 		if(!$this->db){
-			throw new DriverException('db error: [MSSqlSrv]: could not connect: '.$this->parseErrors(sqlsrv_errors()));
+			throw new DriverException('db error: [MSSqlSrv]: could not connect: '.$this->parseErrors(sqlsrv_errors() ?? []));
 		}
 
 		return $this;
@@ -167,7 +167,7 @@ final class MSSqlSrv extends DriverAbstract{
 			$values = array_values($values);
 		}
 
-		return $this->get_result(sqlsrv_query($this->db, $sql, $values), $index, $assoc);
+		return $this->get_result(sqlsrv_query($this->db, $sql, $values ?? []), $index, $assoc);
 	}
 
 	/**

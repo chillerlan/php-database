@@ -13,7 +13,7 @@ namespace chillerlan\Database\Drivers;
 use chillerlan\Database\Result;
 use chillerlan\Settings\SettingsContainerInterface;
 use Throwable;
-use Psr\Log\{LoggerAwareInterface, LoggerInterface, NullLogger};
+use Psr\Log\{LoggerInterface, NullLogger};
 use Psr\SimpleCache\CacheInterface;
 
 use function bin2hex, call_user_func_array, count, floatval, get_called_class, hash, intval, is_array, is_bool,
@@ -22,7 +22,7 @@ use function bin2hex, call_user_func_array, count, floatval, get_called_class, h
 /**
  *
  */
-abstract class DriverAbstract implements DriverInterface, LoggerAwareInterface{
+abstract class DriverAbstract implements DriverInterface{
 
 	/** @var \chillerlan\Database\DatabaseOptions */
 	protected SettingsContainerInterface $options;

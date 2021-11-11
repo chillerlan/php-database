@@ -79,7 +79,7 @@ final class MSSQL extends DialectAbstract{
 
 	/** @inheritdoc */
 	public function createTable(string $table, array $cols, string $primaryKey = null, bool $ifNotExists = null, bool $temp = null, string $dir = null):array{
-
+		$sql = [];
 		// @todo
 #		if($ifNotExists){
 #			$sql[] = 'IF OBJECT_ID(N\''.str_replace(['[', ']'], '', $table).'\', N\'U\') IS NULL' ;
@@ -137,7 +137,7 @@ final class MSSQL extends DialectAbstract{
 			$field[] = $isNull ? 'NULL' : 'NOT NULL';
 		}
 
-		$defaultType = strtoupper($defaultType);
+		$defaultType = strtoupper($defaultType ?? '');
 
 		if($defaultType === 'USER_DEFINED'){
 

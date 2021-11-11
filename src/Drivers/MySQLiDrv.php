@@ -158,8 +158,10 @@ final class MySQLiDrv extends DriverAbstract{
 	 * @inheritdoc
 	 */
 	protected function prepared_query(string $sql, array $values = null, string $index = null, bool $assoc = null):Result{
-		$assoc = $assoc ?? true;
-		$stmt = $this->db->stmt_init();
+		$values ??= [];
+		$assoc  ??= true;
+		$stmt     = $this->db->stmt_init();
+
 		$stmt->prepare($sql);
 		$this->stmtError($this->db->errno, $this->db->error);
 
@@ -183,6 +185,7 @@ final class MySQLiDrv extends DriverAbstract{
 		$refs = [];
 
 		foreach($result->fetch_fields() as $k => $field){
+			/** @phan-suppress-next-line PhanTypeInvalidDimOffset */
 			$refs[] = &$cols[$assoc ? $field->name : $k];
 		}
 
@@ -196,6 +199,7 @@ final class MySQLiDrv extends DriverAbstract{
 			$row = [];
 			$key = $i;
 
+			/** @phan-suppress-next-line PhanEmptyForeach */
 			foreach($cols as $field => $data){
 				$row[$field] = $data;
 			}

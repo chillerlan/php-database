@@ -71,8 +71,8 @@ abstract class Statement implements LoggerAwareInterface{
 	/** */
 	protected function setOnConflict(string $name, string $on_conflict = null, string $conflict_target = null):self{
 		$this->name      = trim($name);
-		$on_conflict     = trim(strtoupper($on_conflict));
-		$conflict_target = trim($conflict_target);
+		$on_conflict     = trim(strtoupper($on_conflict ?? ''));
+		$conflict_target = trim($conflict_target ?? '');
 
 		if(empty($this->name)){
 			throw new QueryException('no name specified');
@@ -204,7 +204,7 @@ abstract class Statement implements LoggerAwareInterface{
 
 	/** */
 	protected function setOpenBracket(string $join = null):self{
-		$join = strtoupper(trim($join));
+		$join = strtoupper(trim($join ?? ''));
 
 		if(in_array($join, $this->joinArgs, true)){
 			$this->where[] = $join;

@@ -54,7 +54,7 @@ class CreateTable extends Statement implements Query, IfNotExists{
 
 	public function primaryKey(string $field, string $dir = null):CreateTable{
 		$this->primaryKey = trim($field);
-		$this->dir        = strtoupper($dir);
+		$this->dir        = strtoupper($dir ?? '');
 
 		return $this;
 	}

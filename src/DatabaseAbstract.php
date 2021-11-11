@@ -44,7 +44,7 @@ abstract class DatabaseAbstract implements LoggerAwareInterface{
 		'truncate' => Truncate::class,
 		'update'   => Update::class,
 	];
-
+	/** @var \chillerlan\Database\DatabaseOptions */
 	protected SettingsContainerInterface $options;
 	protected ?CacheInterface $cache = null;
 	protected DriverInterface $driver;
@@ -61,6 +61,7 @@ abstract class DatabaseAbstract implements LoggerAwareInterface{
 
 		// set a default logger
 		$this->logger  = $logger ?? new NullLogger;
+		/** @phan-suppress-next-line PhanTypeExpectedObjectOrClassName */
 		$this->driver  = new $this->options->driver($this->options, $this->cache, $this->logger);
 
 		if(!$this->driver instanceof DriverInterface){

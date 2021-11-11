@@ -19,7 +19,7 @@ final class MySQL extends DialectAbstract{
 
 	/** @inheritdoc */
 	public function insert(string $table, array $fields, string $onConflict = null, string $conflictTarget = null):array{
-		$onConflict = strtoupper($onConflict);
+		$onConflict = strtoupper($onConflict ?? '');
 
 		switch($onConflict){
 			case 'IGNORE':
@@ -45,7 +45,7 @@ final class MySQL extends DialectAbstract{
 	public function createDatabase(string $dbname, bool $ifNotExists = null, string $collate = null):array {
 		$collate = $collate ?? $this->charset;
 
-		$sql[] = 'CREATE DATABASE';
+		$sql = ['CREATE DATABASE'];
 
 		if($ifNotExists){
 			$sql[] = 'IF NOT EXISTS';
@@ -119,7 +119,7 @@ final class MySQL extends DialectAbstract{
 	 */
 	public function fieldspec(string $name, string $type, $length = null, string $attribute = null, string $collation = null, bool $isNull = null, string $defaultType = null, $defaultValue = null, string $extra = null):string {
 		$type          = strtoupper(trim($type));
-		$defaultType   = strtoupper($defaultType);
+		$defaultType   = strtoupper($defaultType ?? '');
 		$field         = [$this->quote(trim($name))];
 		$nolengthtypes = [
 			'DATE', 'TINYBLOB', 'TINYTEXT', 'BLOB', 'TEXT', 'MEDIUMBLOB',

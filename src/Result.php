@@ -13,7 +13,7 @@ namespace chillerlan\Database;
 use OutOfBoundsException;
 
 use function array_chunk, array_column, array_key_exists, array_keys, array_merge, array_reverse,
-	array_values, call_user_func_array, count, is_callable, method_exists, next, print_r;
+	array_values, call_user_func_array, count, next, print_r;
 
 class Result implements ResultInterface{
 
@@ -28,7 +28,6 @@ class Result implements ResultInterface{
 	/** @todo */
 #	protected array $metadata = [];
 
-	/** @inheritdoc */
 	public function __construct(
 		iterable $data = null,
 		string $sourceEncoding = null,
@@ -250,6 +249,7 @@ class Result implements ResultInterface{
 
 	/** @inheritdoc */
 	public function merge(ResultInterface $Result):ResultInterface{
+		/** @phan-suppress-next-line PhanUndeclaredProperty */
 		$this->array = array_merge($this->array, $Result->array);
 
 		return $this;

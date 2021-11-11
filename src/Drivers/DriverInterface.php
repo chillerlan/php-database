@@ -13,10 +13,11 @@ namespace chillerlan\Database\Drivers;
 use chillerlan\Database\Dialects\Dialect;
 use chillerlan\Database\Result;
 use chillerlan\Settings\SettingsContainerInterface;
+use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
 
-interface DriverInterface{
+interface DriverInterface extends LoggerAwareInterface{
 
 	/**
 	 * Constructor.

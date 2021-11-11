@@ -168,7 +168,7 @@ final class Postgres extends DialectAbstract{
 			$field[] = strtoupper($attribute);
 		}
 
-		$defaultType = strtoupper($defaultType);
+		$defaultType = strtoupper($defaultType ?? '');
 
 		if($defaultType === 'USER_DEFINED'){
 
@@ -206,7 +206,7 @@ final class Postgres extends DialectAbstract{
 
 	/** @inheritdoc */
 	public function createTable(string $table, array $cols, string $primaryKey = null, bool $ifNotExists = null, bool $temp = null, string $dir = null):array{
-		$sql[] = 'CREATE';
+		$sql = ['CREATE'];
 
 		if($temp){
 			$sql[] = 'TEMPORARY';
