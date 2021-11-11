@@ -231,6 +231,7 @@ final class MSSqlSrv extends DriverAbstract{
 
 		$r = parent::getResult(
 			'sqlsrv_fetch_array',
+			/** @phan-suppress-next-line PhanUndeclaredConstant */
 			[$result, ($assoc ?? true) ? SQLSRV_FETCH_ASSOC : SQLSRV_FETCH_NUMERIC],
 			$index,
 			$assoc

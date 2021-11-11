@@ -30,6 +30,8 @@ final class PDOMSSqlSrv extends PDODriverAbstract{
 
 	/**
 	 * PDOMSSqlSrv constructor.
+	 *
+	 * @phan-suppress PhanUndeclaredConstantOfClass
 	 */
 	public function __construct(SettingsContainerInterface $options, CacheInterface $cache = null, LoggerInterface $log = null){
 		// setting this with any value breaks
