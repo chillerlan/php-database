@@ -31,7 +31,7 @@
 	"require-dev": {
 		"chillerlan/php-dotenv": "^2.1",
 		"chillerlan/php-cache": "^4.1",
-		"phan/phan": "^5.2",
+		"phan/phan": "^5.3",
 		"phpunit/phpunit": "^9.5"
 	},
 	"autoload": {
@@ -44,5 +44,14 @@
 			"chillerlan\\DatabaseTest\\": "tests/",
 			"chillerlan\\DatabaseExample\\": "examples/"
 		}
+	},
+	"scripts": {
+		"phpunit": "@php vendor/phpunit/phpunit/phpunit",
+		"phan": "@php vendor/phan/phan/phan"
+	},
+	"config": {
+		"lock": false,
+		"sort-packages": true,
+		"platform-check": true
 	}
 }
