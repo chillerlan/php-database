@@ -37,7 +37,6 @@ abstract class DBTestAbstract extends TestCase{
 	protected ReflectionClass $reflection;
 	protected string $driverFQCN;
 
-
 	/**
 	 * determines whether the tests run on Travis CI or GitHub Actions -> phpunit.xml TEST_IS_CI=TRUE
 	 */
@@ -87,7 +86,6 @@ abstract class DBTestAbstract extends TestCase{
 			$this->env->get($this->envPrefix.'_DATABASE')
 		));
 
-
 		$this->options = new DatabaseOptions([
 			'host'     => $this->env->get($this->envPrefix.'_HOST'),
 			'port'     => $this->env->get($this->envPrefix.'_PORT'),
@@ -115,10 +113,6 @@ abstract class DBTestAbstract extends TestCase{
 			$this->driver->disconnect();
 		}
 
-#		if(isset($this->db) && $this->db instanceof Database){
-#			$this->db->disconnect();
-#		}
-
 	}
 
 	/**
@@ -130,6 +124,5 @@ abstract class DBTestAbstract extends TestCase{
 
 		return $method;
 	}
-
 
 }
