@@ -15,6 +15,9 @@ use chillerlan\Database\Drivers\DriverInterface;
 use chillerlan\DotEnv\DotEnv;
 use chillerlan\Settings\SettingsContainerInterface;
 use chillerlan\SimpleCache\MemoryCache;
+use Monolog\Formatter\LineFormatter;
+use Monolog\Handler\{NullHandler, StreamHandler};
+use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
@@ -22,7 +25,7 @@ use Exception, ReflectionClass, ReflectionMethod;
 
 use function constant, defined, realpath, str_replace;
 
-use const DIRECTORY_SEPARATOR, PHP_OS_FAMILY;
+use const DIRECTORY_SEPARATOR, JSON_UNESCAPED_SLASHES, PHP_OS_FAMILY;
 
 abstract class DBTestAbstract extends TestCase{
 
@@ -61,8 +64,19 @@ abstract class DBTestAbstract extends TestCase{
 
 		// set the config dir and .env config
 		$this->env    = new DotEnv(realpath(__DIR__.'/../'.constant('TEST_CFGDIR')), constant('TEST_ENVFILE'));
-		$this->logger = new DBTestLogger($this->is_ci ? 'none' : 'debug');
+		$this->logger = new Logger('databaseTest', [new NullHandler]); // PSR-3
 		$this->cache  = new MemoryCache;
+
+		// logger output only when not on CI
+		if(!$this->is_ci){
+			$formatter = new LineFormatter(null, 'Y-m-d H:i:s', true, true);
+			$formatter->setJsonPrettyPrint(true);
+			$formatter->addJsonEncodeOption(JSON_UNESCAPED_SLASHES);
+
+			$handler = (new StreamHandler('php://stdout'))->setFormatter($formatter);
+
+			$this->logger->pushHandler($handler);
+		}
 
 		$this->env->load();
 

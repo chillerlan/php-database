@@ -31,6 +31,7 @@
 	"require-dev": {
 		"chillerlan/php-dotenv": "^2.1",
 		"chillerlan/php-cache": "^4.1",
+		"monolog/monolog": "^2.3",
 		"phan/phan": "^5.3",
 		"phpunit/phpunit": "^9.5"
 	},
