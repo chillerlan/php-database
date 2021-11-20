@@ -41,6 +41,33 @@ jobs:
       - name: "Run phan"
         run: php vendor/bin/phan
 
+  build-docs:
+    name: "Build and publish Docs"
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "Checkout sources"
+        uses: actions/checkout@v2
+
+      - name: "Install PHP"
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "7.4"
+          coverage: none
+          tools: phpDocumentor
+          extensions: gd, imagick, json, mbstring
+
+      - name: "Build Docs"
+        run: phpdoc --config=phpdoc.xml
+
+      - name: "Publish Docs to gh-pages"
+        uses: JamesIves/github-pages-deploy-action@4.1.6
+        with:
+          BRANCH: gh-pages
+          FOLDER: docs
+          CLEAN: true
+
   tests:
     name: "Unit Tests"
 
