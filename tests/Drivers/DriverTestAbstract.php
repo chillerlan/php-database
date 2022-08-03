@@ -13,14 +13,20 @@ namespace chillerlan\DatabaseTest\Drivers;
 use chillerlan\Database\Drivers\{DriverException, DriverInterface};
 use chillerlan\DatabaseTest\DBTestAbstract;
 use ReflectionClass;
+use Throwable;
 
 abstract class DriverTestAbstract extends DBTestAbstract{
 
 	protected function setUp():void{
 		parent::setUp();
 
-		$this->driver = new $this->driverFQCN($this->options, $this->cache, $this->logger);
-		$this->driver->connect();
+		try{
+			$this->driver = new $this->driverFQCN($this->options, $this->cache, $this->logger);
+			$this->driver->connect();
+		}
+		catch(Throwable $e){
+			$this::markTestSkipped($e->getMessage());
+		}
 
 		$this->reflection = new ReflectionClass($this->driverFQCN);
 	}

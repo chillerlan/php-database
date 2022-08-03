@@ -12,11 +12,21 @@ namespace chillerlan\DatabaseTest\Query;
 
 use chillerlan\Database\Drivers\PDOSQLite;
 use chillerlan\Database\ResultInterface;
+use function extension_loaded;
 
 class SQLiteTest extends QueryTestAbstract{
 
 	protected string $envPrefix  = 'DB_SQLITE3';
 	protected string $driverFQCN = PDOSQLite::class;
+
+	protected function setUp():void{
+
+		if(!extension_loaded('pdo_sqlite')){
+			$this::markTestSkipped('sqlite not installed');
+		}
+
+		parent::setUp();
+	}
 
 	protected function assertInsertResult(ResultInterface $result):void{
 		$row = $result[0];

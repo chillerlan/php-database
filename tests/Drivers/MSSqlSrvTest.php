@@ -11,12 +11,21 @@
 namespace chillerlan\DatabaseTest\Drivers;
 
 use chillerlan\Database\Drivers\MSSqlSrv;
-use function get_resource_type;
+use function function_exists, get_resource_type;
 
 final class MSSqlSrvTest extends DriverTestAbstract{
 
 	protected string $envPrefix  = 'DB_MSSQL';
 	protected string $driverFQCN = MSSqlSrv::class;
+
+	protected function setUp():void{
+
+		if(!function_exists('sqlsrv_connect')){
+			$this::markTestSkipped('mssql not installed');
+		}
+
+		parent::setUp();
+	}
 
 	public function testGetDBResource():void{
 		$r = $this->driver->getDBResource();

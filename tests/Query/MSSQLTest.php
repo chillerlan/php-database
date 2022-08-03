@@ -12,11 +12,21 @@ namespace chillerlan\DatabaseTest\Query;
 
 use chillerlan\Database\Drivers\MSSqlSrv;
 use chillerlan\Database\ResultInterface;
+use function function_exists;
 
 class MSSQLTest extends QueryTestAbstract{
 
 	protected string $envPrefix  = 'DB_MSSQL';
 	protected string $driverFQCN = MSSqlSrv::class;
+
+	protected function setUp():void{
+
+		if(!function_exists('sqlsrv_connect')){
+			$this::markTestSkipped('mssql not installed');
+		}
+
+		parent::setUp();
+	}
 
 	protected function assertInsertResult(ResultInterface $result):void{
 		$row = $result[0];

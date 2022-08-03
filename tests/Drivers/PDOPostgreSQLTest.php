@@ -11,11 +11,21 @@
 namespace chillerlan\DatabaseTest\Drivers;
 
 use chillerlan\Database\Drivers\PDOPostgreSQL;
+use function extension_loaded;
 
 final class PDOPostgreSQLTest extends PDODriverTestAbstract{
 
 	protected string $envPrefix  = 'DB_POSTGRES';
 	protected string $driverFQCN = PDOPostgreSQL::class;
+
+	protected function setUp():void{
+
+		if(!extension_loaded('pdo_pgsql')){
+			$this::markTestSkipped('postgres (PDO) not installed');
+		}
+
+		parent::setUp();
+	}
 
 	public function testEscapeString():void{
 		// https://xkcd.com/327/

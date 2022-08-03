@@ -12,11 +12,21 @@ namespace chillerlan\DatabaseTest\Query;
 
 use chillerlan\Database\Drivers\PostgreSQL;
 use chillerlan\Database\ResultInterface;
+use function extension_loaded;
 
 class PostgresTest extends QueryTestAbstract{
 
 	protected string $envPrefix  = 'DB_POSTGRES';
 	protected string $driverFQCN = PostgreSQL::class;
+
+	protected function setUp():void{
+
+		if(!extension_loaded('pgsql')){
+			$this::markTestSkipped('pgsql not installed');
+		}
+
+		parent::setUp();
+	}
 
 	protected function assertInsertResult(ResultInterface $result):void{
 		$row = $result[0];

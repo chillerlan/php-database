@@ -12,11 +12,21 @@ namespace chillerlan\DatabaseTest\Query;
 
 use chillerlan\Database\Drivers\MySQLiDrv;
 use chillerlan\Database\ResultInterface;
+use function extension_loaded;
 
 class MySQLTest extends QueryTestAbstract{
 
 	protected string $envPrefix  = 'DB_MYSQLI';
 	protected string $driverFQCN = MySQLiDrv::class;
+
+	protected function setUp():void{
+
+		if(!extension_loaded('mysqli')){
+			$this::markTestSkipped('mysqli not installed');
+		}
+
+		parent::setUp();
+	}
 
 	protected function assertInsertResult(ResultInterface $result):void{
 		$row = $result[0];

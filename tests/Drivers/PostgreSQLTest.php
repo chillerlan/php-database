@@ -11,18 +11,34 @@
 namespace chillerlan\DatabaseTest\Drivers;
 
 use chillerlan\Database\Drivers\PostgreSQL;
+use function extension_loaded;
 use function get_resource_type;
+use const PHP_VERSION_ID;
 
 final class PostgreSQLTest extends DriverTestAbstract{
 
 	protected string $envPrefix  = 'DB_POSTGRES';
 	protected string $driverFQCN = PostgreSQL::class;
 
+	protected function setUp():void{
+
+		if(!extension_loaded('pgsql')){
+			$this::markTestSkipped('pgsql not installed');
+		}
+
+		parent::setUp();
+	}
+
 	public function testGetDBResource():void{
 		$r = $this->driver->getDBResource();
 
-		$this::assertIsResource($r);
-		$this::assertSame('pgsql link', get_resource_type($r));
+		if(PHP_VERSION_ID >= 80100){
+			$this::assertInstanceOf('PgSql\\Connection', $r);
+		}
+		else{
+			$this::assertIsResource($r);
+			$this::assertSame('pgsql link', get_resource_type($r));
+		}
 	}
 
 	public function testEscapeString():void{

@@ -11,10 +11,20 @@
 namespace chillerlan\DatabaseTest\Drivers;
 
 use chillerlan\Database\Drivers\PDOSQLite;
+use function extension_loaded;
 
 final class PDOSQLiteTest extends PDODriverTestAbstract{
 
 	protected string $envPrefix  = 'DB_SQLITE3';
 	protected string $driverFQCN = PDOSQLite::class;
+
+	protected function setUp():void{
+
+		if(!extension_loaded('pdo_sqlite')){
+			$this::markTestSkipped('sqlite (PDO) not installed');
+		}
+
+		parent::setUp();
+	}
 
 }

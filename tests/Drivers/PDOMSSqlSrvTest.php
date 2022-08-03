@@ -11,11 +11,21 @@
 namespace chillerlan\DatabaseTest\Drivers;
 
 use chillerlan\Database\Drivers\PDOMSSqlSrv;
+use function function_exists;
 
 final class PDOMSSqlSrvTest extends PDODriverTestAbstract{
 
 	protected string $envPrefix  = 'DB_MSSQL';
 	protected string $driverFQCN = PDOMSSqlSrv::class;
+
+	protected function setUp():void{
+
+		if(!function_exists('sqlsrv_connect')){
+			$this::markTestSkipped('mssql not installed');
+		}
+
+		parent::setUp();
+	}
 
 	public function testEscapeString():void{
 		// https://xkcd.com/327/

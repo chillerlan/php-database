@@ -12,11 +12,21 @@ namespace chillerlan\DatabaseTest\Query;
 
 use chillerlan\Database\Drivers\PDOFirebird;
 use chillerlan\Database\ResultInterface;
+use function extension_loaded;
 
 class FirebirdTest extends QueryTestAbstract{
 
 	protected string $envPrefix  = 'DB_FIREBIRD';
 	protected string $driverFQCN = PDOFirebird::class;
+
+	protected function setUp():void{
+
+		if(!extension_loaded('pdo_firebird')){
+			$this::markTestSkipped('firebird not installed');
+		}
+
+		parent::setUp();
+	}
 
 	protected function assertInsertResult(ResultInterface $result):void{
 		$row = $result[0];

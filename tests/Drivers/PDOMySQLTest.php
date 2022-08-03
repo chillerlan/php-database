@@ -11,10 +11,20 @@
 namespace chillerlan\DatabaseTest\Drivers;
 
 use chillerlan\Database\Drivers\PDOMySQL;
+use function extension_loaded;
 
 final class PDOMySQLTest extends PDODriverTestAbstract{
 
 	protected string $envPrefix  = 'DB_MYSQLI';
 	protected string $driverFQCN = PDOMySQL::class;
+
+	protected function setUp():void{
+
+		if(!extension_loaded('pdo_mysql')){
+			$this::markTestSkipped('mysql (PDO) not installed');
+		}
+
+		parent::setUp();
+	}
 
 }
