@@ -2686,6 +2686,11 @@ Search.appendIndex(
             "summary": "",
             "url": "classes/chillerlan-DatabaseTest-Drivers-MSSqlSrvTest.html"
         },                {
+            "fqsen": "\\chillerlan\\DatabaseTest\\Drivers\\MSSqlSrvTest\u003A\u003AsetUp\u0028\u0029",
+            "name": "setUp",
+            "summary": "",
+            "url": "classes/chillerlan-DatabaseTest-Drivers-MSSqlSrvTest.html#method_setUp"
+        },                {
             "fqsen": "\\chillerlan\\DatabaseTest\\Drivers\\MSSqlSrvTest\u003A\u003AtestGetDBResource\u0028\u0029",
             "name": "testGetDBResource",
             "summary": "",
@@ -2710,6 +2715,11 @@ Search.appendIndex(
             "name": "MySQLiTest",
             "summary": "",
             "url": "classes/chillerlan-DatabaseTest-Drivers-MySQLiTest.html"
+        },                {
+            "fqsen": "\\chillerlan\\DatabaseTest\\Drivers\\MySQLiTest\u003A\u003AsetUp\u0028\u0029",
+            "name": "setUp",
+            "summary": "",
+            "url": "classes/chillerlan-DatabaseTest-Drivers-MySQLiTest.html#method_setUp"
         },                {
             "fqsen": "\\chillerlan\\DatabaseTest\\Drivers\\MySQLiTest\u003A\u003AtestGetDBResource\u0028\u0029",
             "name": "testGetDBResource",
@@ -2746,6 +2756,11 @@ Search.appendIndex(
             "summary": "",
             "url": "classes/chillerlan-DatabaseTest-Drivers-PDOFirebirdTest.html"
         },                {
+            "fqsen": "\\chillerlan\\DatabaseTest\\Drivers\\PDOFirebirdTest\u003A\u003AsetUp\u0028\u0029",
+            "name": "setUp",
+            "summary": "",
+            "url": "classes/chillerlan-DatabaseTest-Drivers-PDOFirebirdTest.html#method_setUp"
+        },                {
             "fqsen": "\\chillerlan\\DatabaseTest\\Drivers\\PDOFirebirdTest\u003A\u003A\u0024envPrefix",
             "name": "envPrefix",
             "summary": "",
@@ -2760,6 +2775,11 @@ Search.appendIndex(
             "name": "PDOMSSqlSrvTest",
             "summary": "",
             "url": "classes/chillerlan-DatabaseTest-Drivers-PDOMSSqlSrvTest.html"
+        },                {
+            "fqsen": "\\chillerlan\\DatabaseTest\\Drivers\\PDOMSSqlSrvTest\u003A\u003AsetUp\u0028\u0029",
+            "name": "setUp",
+            "summary": "",
+            "url": "classes/chillerlan-DatabaseTest-Drivers-PDOMSSqlSrvTest.html#method_setUp"
         },                {
             "fqsen": "\\chillerlan\\DatabaseTest\\Drivers\\PDOMSSqlSrvTest\u003A\u003AtestEscapeString\u0028\u0029",
             "name": "testEscapeString",
@@ -2781,6 +2801,11 @@ Search.appendIndex(
             "summary": "",
             "url": "classes/chillerlan-DatabaseTest-Drivers-PDOMySQLTest.html"
         },                {
+            "fqsen": "\\chillerlan\\DatabaseTest\\Drivers\\PDOMySQLTest\u003A\u003AsetUp\u0028\u0029",
+            "name": "setUp",
+            "summary": "",
+            "url": "classes/chillerlan-DatabaseTest-Drivers-PDOMySQLTest.html#method_setUp"
+        },                {
             "fqsen": "\\chillerlan\\DatabaseTest\\Drivers\\PDOMySQLTest\u003A\u003A\u0024envPrefix",
             "name": "envPrefix",
             "summary": "",
@@ -2795,6 +2820,11 @@ Search.appendIndex(
             "name": "PDOPostgreSQLTest",
             "summary": "",
             "url": "classes/chillerlan-DatabaseTest-Drivers-PDOPostgreSQLTest.html"
+        },                {
+            "fqsen": "\\chillerlan\\DatabaseTest\\Drivers\\PDOPostgreSQLTest\u003A\u003AsetUp\u0028\u0029",
+            "name": "setUp",
+            "summary": "",
+            "url": "classes/chillerlan-DatabaseTest-Drivers-PDOPostgreSQLTest.html#method_setUp"
         },                {
             "fqsen": "\\chillerlan\\DatabaseTest\\Drivers\\PDOPostgreSQLTest\u003A\u003AtestEscapeString\u0028\u0029",
             "name": "testEscapeString",
@@ -2816,6 +2846,11 @@ Search.appendIndex(
             "summary": "",
             "url": "classes/chillerlan-DatabaseTest-Drivers-PDOSQLiteMemoryTest.html"
         },                {
+            "fqsen": "\\chillerlan\\DatabaseTest\\Drivers\\PDOSQLiteMemoryTest\u003A\u003AsetUp\u0028\u0029",
+            "name": "setUp",
+            "summary": "",
+            "url": "classes/chillerlan-DatabaseTest-Drivers-PDOSQLiteMemoryTest.html#method_setUp"
+        },                {
             "fqsen": "\\chillerlan\\DatabaseTest\\Drivers\\PDOSQLiteMemoryTest\u003A\u003A\u0024envPrefix",
             "name": "envPrefix",
             "summary": "",
@@ -2831,6 +2866,11 @@ Search.appendIndex(
             "summary": "",
             "url": "classes/chillerlan-DatabaseTest-Drivers-PDOSQLiteTest.html"
         },                {
+            "fqsen": "\\chillerlan\\DatabaseTest\\Drivers\\PDOSQLiteTest\u003A\u003AsetUp\u0028\u0029",
+            "name": "setUp",
+            "summary": "",
+            "url": "classes/chillerlan-DatabaseTest-Drivers-PDOSQLiteTest.html#method_setUp"
+        },                {
             "fqsen": "\\chillerlan\\DatabaseTest\\Drivers\\PDOSQLiteTest\u003A\u003A\u0024envPrefix",
             "name": "envPrefix",
             "summary": "",
@@ -2845,6 +2885,11 @@ Search.appendIndex(
             "name": "PostgreSQLTest",
             "summary": "",
             "url": "classes/chillerlan-DatabaseTest-Drivers-PostgreSQLTest.html"
+        },                {
+            "fqsen": "\\chillerlan\\DatabaseTest\\Drivers\\PostgreSQLTest\u003A\u003AsetUp\u0028\u0029",
+            "name": "setUp",
+            "summary": "",
+            "url": "classes/chillerlan-DatabaseTest-Drivers-PostgreSQLTest.html#method_setUp"
         },                {
             "fqsen": "\\chillerlan\\DatabaseTest\\Drivers\\PostgreSQLTest\u003A\u003AtestGetDBResource\u0028\u0029",
             "name": "testGetDBResource",
@@ -2870,6 +2915,11 @@ Search.appendIndex(
             "name": "FirebirdTest",
             "summary": "",
             "url": "classes/chillerlan-DatabaseTest-Query-FirebirdTest.html"
+        },                {
+            "fqsen": "\\chillerlan\\DatabaseTest\\Query\\FirebirdTest\u003A\u003AsetUp\u0028\u0029",
+            "name": "setUp",
+            "summary": "",
+            "url": "classes/chillerlan-DatabaseTest-Query-FirebirdTest.html#method_setUp"
         },                {
             "fqsen": "\\chillerlan\\DatabaseTest\\Query\\FirebirdTest\u003A\u003AassertInsertResult\u0028\u0029",
             "name": "assertInsertResult",
@@ -2901,6 +2951,11 @@ Search.appendIndex(
             "summary": "",
             "url": "classes/chillerlan-DatabaseTest-Query-MSSQLTest.html"
         },                {
+            "fqsen": "\\chillerlan\\DatabaseTest\\Query\\MSSQLTest\u003A\u003AsetUp\u0028\u0029",
+            "name": "setUp",
+            "summary": "",
+            "url": "classes/chillerlan-DatabaseTest-Query-MSSQLTest.html#method_setUp"
+        },                {
             "fqsen": "\\chillerlan\\DatabaseTest\\Query\\MSSQLTest\u003A\u003AassertInsertResult\u0028\u0029",
             "name": "assertInsertResult",
             "summary": "",
@@ -2926,6 +2981,11 @@ Search.appendIndex(
             "summary": "",
             "url": "classes/chillerlan-DatabaseTest-Query-MySQLTest.html"
         },                {
+            "fqsen": "\\chillerlan\\DatabaseTest\\Query\\MySQLTest\u003A\u003AsetUp\u0028\u0029",
+            "name": "setUp",
+            "summary": "",
+            "url": "classes/chillerlan-DatabaseTest-Query-MySQLTest.html#method_setUp"
+        },                {
             "fqsen": "\\chillerlan\\DatabaseTest\\Query\\MySQLTest\u003A\u003AassertInsertResult\u0028\u0029",
             "name": "assertInsertResult",
             "summary": "",
@@ -2950,6 +3010,11 @@ Search.appendIndex(
             "name": "PostgresTest",
             "summary": "",
             "url": "classes/chillerlan-DatabaseTest-Query-PostgresTest.html"
+        },                {
+            "fqsen": "\\chillerlan\\DatabaseTest\\Query\\PostgresTest\u003A\u003AsetUp\u0028\u0029",
+            "name": "setUp",
+            "summary": "",
+            "url": "classes/chillerlan-DatabaseTest-Query-PostgresTest.html#method_setUp"
         },                {
             "fqsen": "\\chillerlan\\DatabaseTest\\Query\\PostgresTest\u003A\u003AassertInsertResult\u0028\u0029",
             "name": "assertInsertResult",
@@ -3121,6 +3186,11 @@ Search.appendIndex(
             "summary": "",
             "url": "classes/chillerlan-DatabaseTest-Query-SQLiteTest.html"
         },                {
+            "fqsen": "\\chillerlan\\DatabaseTest\\Query\\SQLiteTest\u003A\u003AsetUp\u0028\u0029",
+            "name": "setUp",
+            "summary": "",
+            "url": "classes/chillerlan-DatabaseTest-Query-SQLiteTest.html#method_setUp"
+        },                {
             "fqsen": "\\chillerlan\\DatabaseTest\\Query\\SQLiteTest\u003A\u003AassertInsertResult\u0028\u0029",
             "name": "assertInsertResult",
             "summary": "",
@@ -3135,6 +3205,11 @@ Search.appendIndex(
             "name": "testShowDatabases",
             "summary": "",
             "url": "classes/chillerlan-DatabaseTest-Query-SQLiteTest.html#method_testShowDatabases"
+        },                {
+            "fqsen": "\\chillerlan\\DatabaseTest\\Query\\SQLiteTest\u003A\u003AtestSelect\u0028\u0029",
+            "name": "testSelect",
+            "summary": "",
+            "url": "classes/chillerlan-DatabaseTest-Query-SQLiteTest.html#method_testSelect"
         },                {
             "fqsen": "\\chillerlan\\DatabaseTest\\Query\\SQLiteTest\u003A\u003A\u0024envPrefix",
             "name": "envPrefix",
