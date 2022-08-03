@@ -25,7 +25,7 @@ jobs:
 
     steps:
       - name: "Checkout"
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: "Install PHP"
         uses: shivammathur/setup-php@v2
@@ -48,7 +48,7 @@ jobs:
 
     steps:
       - name: "Checkout sources"
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: "Install PHP"
         uses: shivammathur/setup-php@v2
@@ -62,7 +62,7 @@ jobs:
         run: phpdoc --config=phpdoc.xml
 
       - name: "Publish Docs to gh-pages"
-        uses: JamesIves/github-pages-deploy-action@4.1.6
+        uses: JamesIves/github-pages-deploy-action@4.3.4
         with:
           BRANCH: gh-pages
           FOLDER: docs
@@ -82,14 +82,15 @@ jobs:
         php-version:
           - "7.4"
           - "8.0"
+          - "8.1"
 
     steps:
-      - name: "Configure git to avoid issues with line endings"
-        if: ${{ runner.os == 'Windows' }}
-        run: git config --global core.autocrlf false
+#      - name: "Configure git to avoid issues with line endings"
+#        if: ${{ runner.os == 'Windows' }}
+#        run: git config --global core.autocrlf false
 
       - name: "Checkout"
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       # pgsql is already installed on the runner, we just need to start the service
       # https://www.cybertec-postgresql.com/en/postgresql-github-actions-continuous-integration/
@@ -167,6 +168,4 @@ jobs:
         run: php vendor/phpunit/phpunit/phpunit --configuration=phpunit.xml.dist
 
       - name: "Send code coverage report to Codecov.io"
-        uses: codecov/codecov-action@v1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+        uses: codecov/codecov-action@v3
