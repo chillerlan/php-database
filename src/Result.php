@@ -168,6 +168,7 @@ class Result implements ResultInterface{
 	 * @link  http://php.net/manual/arrayaccess.offsetget.php
 	 * @inheritdoc
 	 */
+	#[\ReturnTypeWillChange]
 	public function offsetGet($offset){
 		return $this->array[$offset] ?? null;
 	}
@@ -193,6 +194,7 @@ class Result implements ResultInterface{
 	 * @link  http://php.net/manual/iterator.current.php
 	 * @inheritdoc
 	 */
+	#[\ReturnTypeWillChange]
 	public function current(){
 		return $this->array[$this->offset] ?? null;
 	}
@@ -209,6 +211,7 @@ class Result implements ResultInterface{
 	 * @link  http://php.net/manual/iterator.key.php
 	 * @inheritdoc
 	 */
+	#[\ReturnTypeWillChange]
 	public function key(){
 		return $this->offset;
 	}
@@ -305,6 +308,7 @@ class Result implements ResultInterface{
 	 ********************/
 
 	/** @inheritdoc */
+	#[\ReturnTypeWillChange]
 	public function jsonSerialize(){
 		return $this->toArray();
 	}

@@ -123,7 +123,7 @@ abstract class Statement implements LoggerAwareInterface{
 		$operator = $operator !== null ? strtoupper(trim($operator)) : '=';
 		$bind     ??= true;
 
-		$join = strtoupper(trim($join));
+		$join = strtoupper(trim($join ?? ''));
 		$join = in_array($join, $this->joinArgs, true) ? $join : 'AND';
 
 		if(in_array($operator, $this->operators, true)){

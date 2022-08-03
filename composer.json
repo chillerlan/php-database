@@ -24,12 +24,12 @@
 		"php": "^7.4 || ^8.0",
 		"ext-json": "*",
 		"ext-mbstring": "*",
-		"chillerlan/php-settings-container": "^2.1",
+		"chillerlan/php-settings-container": "^2.1.4",
 		"psr/simple-cache": "^1.0",
 		"psr/log": "^1.1 || ^2.0 || ^3.0"
 	},
 	"require-dev": {
-		"chillerlan/php-dotenv": "^2.1",
+		"chillerlan/php-dotenv": "^2.1.2",
 		"chillerlan/php-cache": "^4.1",
 		"monolog/monolog": "^2.3",
 		"phan/phan": "^5.3",

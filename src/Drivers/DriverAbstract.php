@@ -160,12 +160,7 @@ abstract class DriverAbstract implements DriverInterface{
 		);
 
 		try{
-			return $this->prepared_query(
-				$sql,
-				$values !== null ? $values : [],
-				$index,
-				$assoc  !== null ? $assoc  : true
-			);
+			return $this->prepared_query($sql, ($values ?? []), $index, ($assoc ?? true));
 		}
 		catch(Throwable $e){
 			throw new DriverException('sql error: ['.get_called_class().'::prepared()] '.$e->getMessage());

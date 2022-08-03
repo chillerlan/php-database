@@ -140,7 +140,7 @@ final class PostgreSQL extends DriverAbstract{
 	 * @inheritdoc
 	 */
 	protected function raw_query(string $sql, string $index = null, bool $assoc = null):Result{
-		return $this->get_result(pg_query($sql), $index, $assoc);
+		return $this->get_result(pg_query($this->db, $sql), $index, $assoc);
 	}
 
 	/**
