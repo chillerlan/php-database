@@ -44,7 +44,7 @@ A PHP 7.4+ SQL client and querybuilder for the most common databases.
 ```json
 {
 	"require": {
-		"php": "^7.4",
+		"php": "^7.4 || ^8.0",
 		"chillerlan/php-database": "dev-main"
 	}
 }
