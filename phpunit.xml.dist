@@ -1,23 +1,19 @@
 <?xml version="1.0"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.5/phpunit.xsd"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.0/phpunit.xsd"
          bootstrap="vendor/autoload.php"
          cacheResultFile=".build/phpunit.result.cache"
          colors="true"
-         verbose="true"
 >
-	<coverage>
-		<include>
-			<directory suffix=".php">./src</directory>
-		</include>
-		<report>
-			<clover outputFile=".build/coverage/clover.xml"/>
-			<xml outputDirectory=".build/coverage/coverage-xml"/>
-		</report>
-	</coverage>
 	<testsuites>
 		<testsuite name="php-database test suite">
 			<directory suffix=".php">./tests</directory>
+			<!-- abstract classes because phpunit 10 -.- -->
+			<exclude>./tests/DBTestAbstract.php</exclude>
+			<exclude>./tests/Drivers/DriverTestAbstract.php</exclude>
+			<exclude>./tests/Drivers/PDODriverTestAbstract.php</exclude>
+			<exclude>./tests/Query/QueryTestAbstract.php</exclude>
+			<!-- excluded tests on CI -->
 			<exclude>./tests/Drivers/PDOFirebirdTest.php</exclude>
 			<exclude>./tests/Drivers/MSSqlSrvTest.php</exclude>
 			<exclude>./tests/Drivers/PDOMSSqlSrvTest.php</exclude>
@@ -31,6 +27,15 @@
 			<exclude>./tests/Query/PostgresTest.php</exclude>
 		</testsuite>
 	</testsuites>
+	<coverage>
+		<include>
+			<directory suffix=".php">./src</directory>
+		</include>
+		<report>
+			<clover outputFile=".build/coverage/clover.xml"/>
+			<xml outputDirectory=".build/coverage/coverage-xml"/>
+		</report>
+	</coverage>
 	<logging>
 		<junit outputFile=".build/logs/junit.xml"/>
 	</logging>
