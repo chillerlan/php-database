@@ -14,7 +14,8 @@ use chillerlan\Database\Drivers\DriverException;
 use InvalidArgumentException;
 use Monolog\Formatter\{FormatterInterface, ScalarFormatter};
 use Monolog\Handler\AbstractProcessingHandler;
-use Monolog\Logger;
+use Monolog\Level;
+use Monolog\LogRecord;
 use Throwable;
 use function strpos, trim;
 
@@ -32,7 +33,7 @@ class MonologHandler extends AbstractProcessingHandler{
 	/**
 	 * MonologHandler constructor
 	 */
-	public function __construct(Database $db, string $logTable, $level = Logger::DEBUG, bool $bubble = true){
+	public function __construct(Database $db, string $logTable, $level = Level::Debug, bool $bubble = true){
 		parent::__construct($level, $bubble);
 
 		$this->db = $db;
@@ -45,10 +46,10 @@ class MonologHandler extends AbstractProcessingHandler{
 	/**
 	 * @inheritDoc
 	 */
-	protected function write(array $record):void{
+	protected function write(LogRecord $record):void{
 		$this->db->insert
 			->into($this->logTable)
-			->values($record['formatted'])
+			->values($record->formatted)
 			->query()
 		;
 	}
@@ -59,10 +60,10 @@ class MonologHandler extends AbstractProcessingHandler{
 	protected function getRecordFormatter():FormatterInterface{
 		return new class() extends ScalarFormatter{
 
-			public function format(array $record):array{
+			public function format(LogRecord $record):array{
 				$result = [];
 
-				foreach($record as $key => $value){
+				foreach($record->toArray() as $key => $value){
 					if($key === 'level'){
 						continue;
 					}

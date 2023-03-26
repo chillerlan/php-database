@@ -15,8 +15,9 @@ namespace chillerlan\Database\Drivers;
 use chillerlan\Database\Dialects\{Dialect, Postgres};
 use chillerlan\Database\Result;
 use Throwable;
+use PgSql\Connection;
 
-use function bin2hex, call_user_func_array, implode, in_array, is_bool, is_resource, pg_close, pg_connect,
+use function bin2hex, call_user_func_array, implode, in_array, is_bool, pg_close, pg_connect,
 	pg_execute, pg_field_type, pg_free_result, pg_prepare, pg_query, pg_version, preg_replace_callback;
 
 /**
@@ -27,16 +28,16 @@ final class PostgreSQL extends DriverAbstract{
 	/**
 	 * Holds the database resource object
 	 *
-	 * @var resource|null
+	 * @var \PgSql\Connection|resource|null
 	 */
-	private $db = null;
+	private ?Connection $db = null;
 
 	/**
 	 * @inheritdoc
 	 */
 	public function connect():DriverInterface{
 
-		if(is_resource($this->db)){
+		if($this->db !== null){
 			return $this;
 		}
 
@@ -69,8 +70,14 @@ final class PostgreSQL extends DriverAbstract{
 	 */
 	public function disconnect():bool{
 
-		if(is_resource($this->db)){
-			return pg_close($this->db);
+		if($this->db !== null){
+			$ret = pg_close($this->db);
+
+			if($ret === true){
+				$this->db = null;
+			}
+
+			return $ret;
 		}
 
 		return true;
@@ -78,10 +85,8 @@ final class PostgreSQL extends DriverAbstract{
 
 	/**
 	 * @inheritdoc
-	 *
-	 * @return resource|null
 	 */
-	public function getDBResource(){
+	public function getDBResource():?Connection{
 		return $this->db;
 	}
 
@@ -97,7 +102,7 @@ final class PostgreSQL extends DriverAbstract{
 	 */
 	public function getClientInfo():string{
 
-		if(!is_resource($this->db)){
+		if($this->db === null){
 			return 'disconnected, no info available';
 		}
 
@@ -111,7 +116,7 @@ final class PostgreSQL extends DriverAbstract{
 	 */
 	public function getServerInfo():string{
 
-		if(!is_resource($this->db)){
+		if($this->db === null){
 			return 'disconnected, no info available';
 		}
 
