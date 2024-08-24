@@ -16,7 +16,6 @@ use PHPUnit\Framework\Attributes\Group;
 use function extension_loaded;
 use function json_encode;
 use function md5;
-use const PHP_VERSION_ID;
 
 #[Group('sqlite')]
 final class SQLiteTest extends QueryTestAbstract{
@@ -36,16 +35,9 @@ final class SQLiteTest extends QueryTestAbstract{
 	protected function assertInsertResult(ResultInterface $result):void{
 		$row = $result[0];
 
-		if(PHP_VERSION_ID >= 80100){
-			$this::assertSame(0, $row->id);
-			$this::assertSame(123.456, $row->value);
-			$this::assertSame(1, $row->active);
-		}
-		else{
-			$this::assertSame('0', $row->id);
-			$this::assertSame('123.456', $row->value);
-			$this::assertSame('1', $row->active);
-		}
+		$this::assertSame(0, $row->id);
+		$this::assertSame(123.456, $row->value);
+		$this::assertSame(1, $row->active);
 
 		$this::assertSame('foo', $row->data);
 	}
@@ -53,23 +45,11 @@ final class SQLiteTest extends QueryTestAbstract{
 	protected function assertInsertMultiResult(ResultInterface $result):void{
 		$this::assertSame(3, $result->count());
 
-		if(PHP_VERSION_ID >= 80100){
-			$this::assertSame(3, $result[2]->id);
-			$this::assertSame(123.456, $result[0]->value);
-			$this::assertSame(123.456789, $result[1]->value);
-			$this::assertSame(0, $result[0]->active);
-			$this::assertSame(1, $result[1]->active);
-
-		}
-		else{
-			$this::assertSame('3', $result[2]->id);
-			$this::assertSame('123.456', $result[0]->value);
-			$this::assertSame('123.456789', $result[1]->value);
-			$this::assertSame('0', $result[0]->active);
-			$this::assertSame('1', $result[1]->active);
-		}
-
-
+		$this::assertSame(3, $result[2]->id);
+		$this::assertSame(123.456, $result[0]->value);
+		$this::assertSame(123.456789, $result[1]->value);
+		$this::assertSame(0, $result[0]->active);
+		$this::assertSame(1, $result[1]->active);
 	}
 
 	public function testShowDatabases():void{
@@ -107,18 +87,10 @@ final class SQLiteTest extends QueryTestAbstract{
 			->query('hash')
 		;
 
-		if(PHP_VERSION_ID >= 80100){
-			$this::assertSame(
-				'{"c81e728d9d4c2f636f067f89cc14862c":{"hash":"c81e728d9d4c2f636f067f89cc14862c","value":123.456789}}',
-				json_encode($r)
-			);
-		}
-		else{
-			$this::assertSame(
-				'{"c81e728d9d4c2f636f067f89cc14862c":{"hash":"c81e728d9d4c2f636f067f89cc14862c","value":"123.456789"}}',
-				json_encode($r)
-			);
-		}
+		$this::assertSame(
+			'{"c81e728d9d4c2f636f067f89cc14862c":{"hash":"c81e728d9d4c2f636f067f89cc14862c","value":123.456789}}',
+			json_encode($r)
+		);
 
 		$r = $this->db->select
 			->from([$this::TABLE])
