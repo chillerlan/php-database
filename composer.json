@@ -1,6 +1,6 @@
 {
 	"name": "chillerlan/php-database",
-	"description": "An extensible database wrapper and query builder for PHP 7.4+",
+	"description": "An extensible database wrapper and query builder.",
 	"homepage": "https://github.com/chillerlan/php-database",
 	"license": "MIT",
 	"type": "library",
@@ -22,29 +22,28 @@
 		"source": "https://github.com/chillerlan/php-database"
 	},
 	"require": {
-		"php": "^8.1",
+		"php": "^8.2",
 		"ext-json": "*",
 		"ext-mbstring": "*",
-		"chillerlan/php-settings-container": "^3.0",
-		"psr/simple-cache": "^1.0",
+		"chillerlan/php-settings-container": "^3.2.1",
+		"psr/simple-cache": "^1.0 || ^2.0 || ^3.0",
 		"psr/log": "^1.1 || ^2.0 || ^3.0"
 	},
 	"require-dev": {
-		"chillerlan/php-dotenv": "^2.1.2",
-		"chillerlan/php-cache": "dev-main#fca6963aefb689b333c511e3807809b9f88e0c0d",
-		"monolog/monolog": "^3.3",
-		"phan/phan": "^5.4",
-		"phpunit/phpunit": "^10.0"
+		"chillerlan/php-dotenv": "^3.0",
+		"chillerlan/php-cache": "^5.1",
+		"monolog/monolog": "^3.7",
+		"phan/phan": "^5.4.5",
+		"phpunit/phpunit": "^11.3"
 	},
 	"autoload": {
 		"psr-4": {
-			"chillerlan\\Database\\": "src/"
+			"chillerlan\\Database\\": "src"
 		}
 	},
 	"autoload-dev": {
 		"psr-4": {
-			"chillerlan\\DatabaseTest\\": "tests/",
-			"chillerlan\\DatabaseExample\\": "examples/"
+			"chillerlan\\DatabaseTest\\": "tests"
 		}
 	},
 	"scripts": {
