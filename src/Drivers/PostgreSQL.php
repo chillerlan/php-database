@@ -15,10 +15,11 @@ namespace chillerlan\Database\Drivers;
 use chillerlan\Database\Dialects\{Dialect, Postgres};
 use chillerlan\Database\Result;
 use Throwable;
-use PgSql\Connection;
+use PgSql\Connection as PgSqlConnection;
+use PgSql\Result as PgSqlResult;
 
-use function bin2hex, call_user_func_array, implode, in_array, is_bool, pg_close, pg_connect,
-	pg_execute, pg_field_type, pg_free_result, pg_prepare, pg_query, pg_version, preg_replace_callback;
+use function bin2hex, call_user_func_array, implode, in_array, pg_close, pg_connect, pg_execute, pg_field_type,
+	pg_free_result, pg_last_error, pg_prepare, pg_query, pg_version, preg_replace_callback;
 
 /**
  *
@@ -27,10 +28,8 @@ final class PostgreSQL extends DriverAbstract{
 
 	/**
 	 * Holds the database resource object
-	 *
-	 * @var \PgSql\Connection|resource|null
 	 */
-	private ?Connection $db = null;
+	private ?PgSqlConnection $db = null;
 
 	/**
 	 * @inheritdoc
@@ -86,7 +85,7 @@ final class PostgreSQL extends DriverAbstract{
 	/**
 	 * @inheritdoc
 	 */
-	public function getDBResource():?Connection{
+	public function getDBResource():?PgSqlConnection{
 		return $this->db;
 	}
 
@@ -161,7 +160,11 @@ final class PostgreSQL extends DriverAbstract{
 	 * @inheritdoc
 	 */
 	protected function multi_query(string $sql, array $values):bool{
-		pg_prepare($this->db, '', $this->replaceParams($sql));
+		$p = pg_prepare($this->db, '', $this->replaceParams($sql));
+
+		if($p === false){
+			throw new DriverException(pg_last_error());
+		}
 
 		foreach($values as $row){
 			pg_execute($this->db, '', $row);
@@ -174,7 +177,11 @@ final class PostgreSQL extends DriverAbstract{
 	 * @inheritdoc
 	 */
 	protected function multi_callback_query(string $sql, array $data, $callback):bool{
-		pg_prepare($this->db, '', $this->replaceParams($sql));
+		$p = pg_prepare($this->db, '', $this->replaceParams($sql));
+
+		if($p === false){
+			throw new DriverException(pg_last_error());
+		}
 
 		foreach($data as $k => $row){
 			pg_execute($this->db, '', call_user_func_array($callback, [$row, $k]));
@@ -186,10 +193,10 @@ final class PostgreSQL extends DriverAbstract{
 	/**
 	 * @inheritdoc
 	 */
-	private function get_result($result, string $index = null, bool $assoc = null):Result{
+	private function get_result(PgSqlResult|false $result, string $index = null, bool $assoc = null):Result{
 
-		if(is_bool($result)){
-			return new Result(null, null, null, true, $result);
+		if($result === false){
+			throw new DriverException(pg_last_error());
 		}
 
 		$out = new Result(null, $this->convert_encoding_src, $this->convert_encoding_dest);
