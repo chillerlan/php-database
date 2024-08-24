@@ -33,7 +33,7 @@ abstract class DialectAbstract implements Dialect{
 	protected string $charset = 'utf8';
 
 	/** @inheritdoc */
-	public function select(array $cols, array $from, string $where = null, $limit = null, $offset = null, bool $distinct = null, array $groupby = null, array $orderby = null):array{
+	public function select(array $cols, array $from, string|null $where = null, mixed $limit = null, mixed $offset = null, bool|null $distinct = null, array|null $groupby = null, array|null $orderby = null):array{
 		$sql = ['SELECT'];
 
 		if($distinct){
@@ -67,7 +67,7 @@ abstract class DialectAbstract implements Dialect{
 	}
 
 	/** @inheritdoc */
-	public function insert(string $table, array $fields, string $onConflict = null, string $conflictTarget = null):array{
+	public function insert(string $table, array $fields, string|null $onConflict = null, string|null $conflictTarget = null):array{
 		$sql = ['INSERT INTO'];
 		$sql[] = $this->quote($table);
 		$sql[] = '('.$this->quotes[0].implode($this->quotes[1].', '.$this->quotes[0], $fields).$this->quotes[1].')';
@@ -98,7 +98,7 @@ abstract class DialectAbstract implements Dialect{
 	}
 
 	/** @inheritdoc */
-	public function createDatabase(string $dbname, bool $ifNotExists = null, string $collate = null):array{
+	public function createDatabase(string $dbname, bool|null $ifNotExists = null, string|null $collate = null):array{
 		throw new QueryException('not supported');
 	}
 
@@ -108,7 +108,7 @@ abstract class DialectAbstract implements Dialect{
 	}
 
 	/** @inheritdoc */
-	public function dropDatabase(string $dbname, bool $ifExists){
+	public function dropDatabase(string $dbname, bool $ifExists):array{
 		$sql = ['DROP DATABASE'];
 
 		if($ifExists){
@@ -133,7 +133,7 @@ abstract class DialectAbstract implements Dialect{
 		return $sql;
 	}
 
-	public function selectCount(array $from, string $where = null, bool $distinct = null, array $groupby = null){
+	public function selectCount(array $from, string|null $where = null, bool|null $distinct = null, array|null $groupby = null):array{
 		$sql = ['SELECT'];
 
 		if($distinct){
@@ -234,7 +234,7 @@ abstract class DialectAbstract implements Dialect{
 	/** @inheritdoc */
 	public function from(array $expressions):array {
 
-		$_from = function (string $table, string $ref = null):string {
+		$_from = function (string $table, string|null $ref = null):string {
 			// @todo: quotes
 			$from = $this->quote($table);
 
@@ -269,7 +269,7 @@ abstract class DialectAbstract implements Dialect{
 	}
 
 	/** @inheritdoc */
-	public function enum(string $name, array $values, $defaultValue = null, bool $isNull = null):string {
+	public function enum(string $name, array $values, mixed $defaultValue = null, bool|null $isNull = null):string{
 
 		$field = $this->quote($name);
 		$field .= 'ENUM (\''.implode('\', \'', $values).'\')';
@@ -302,7 +302,7 @@ abstract class DialectAbstract implements Dialect{
 	}
 
 	/** @inheritdoc */
-	public function showTables(string $database = null, string $pattern = null, string $where = null):array{
+	public function showTables(string|null $database = null, string|null $pattern = null, string|null $where = null):array{
 		throw new QueryException('not supported');
 	}
 

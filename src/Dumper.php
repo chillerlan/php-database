@@ -21,13 +21,13 @@ class Dumper extends DatabaseAbstract{
 
 	const PAGESIZE = 100;
 
-	public function __construct(SettingsContainerInterface $options, CacheInterface $cache = null, LoggerInterface $logger = null){
+	public function __construct(SettingsContainerInterface $options, CacheInterface|null $cache = null, LoggerInterface|null $logger = null){
 		parent::__construct($options, $cache, $logger);
 
 		$this->driver->connect();
 	}
 
-	public function dump(array $selection = null, array $not = null){
+	public function dump(array|null $selection = null, array|null $not = null){
 		$tables = $this->parseTables($selection, $not);
 
 		$fh = fopen($this->options->storage_path.'/dump.sql', 'w');
@@ -76,7 +76,7 @@ class Dumper extends DatabaseAbstract{
 	}
 
 
-	protected function parseTables(array $tables = null, array $not = null):array{
+	protected function parseTables(array|null $tables = null, array|null $not = null):array{
 		$q     = $this->show->tables()->query()->toArray();
 		$r     = [];
 		$st    = [];

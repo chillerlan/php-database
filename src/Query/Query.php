@@ -17,7 +17,7 @@ interface Query{
 	 *
 	 * @return string
 	 */
-	public function sql(bool $multi = null):string;
+	public function sql(bool|null $multi = null):string;
 
 	/**
 	 * @param string|null $index
@@ -25,6 +25,6 @@ interface Query{
 	 * @return \chillerlan\Database\Result|bool
 	 * @throws \chillerlan\Database\Query\QueryException
 	 */
-	public function query(string $index = null);
+	public function query(string|null $index = null);
 
 }

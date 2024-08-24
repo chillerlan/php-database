@@ -23,11 +23,11 @@ class Delete extends Statement implements Where, Limit, BindValues, Query{
 		return $this->setName($name);
 	}
 
-	public function where($val1, $val2 = null, string $operator = null, bool $bind = null, string $join = null):Delete{
+	public function where($val1, $val2 = null, string|null $operator = null, bool|null $bind = null, string|null $join = null):Delete{
 		return $this->setWhere($val1, $val2, $operator, $bind, $join);
 	}
 
-	public function openBracket(string $join = null):Delete{
+	public function openBracket(string|null $join = null):Delete{
 		return $this->setOpenBracket($join);
 	}
 

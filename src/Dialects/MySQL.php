@@ -19,7 +19,7 @@ final class MySQL extends DialectAbstract{
 	protected string $charset = 'utf8mb4_bin'; // utf8mb4_0900_bin
 
 	/** @inheritdoc */
-	public function insert(string $table, array $fields, string $onConflict = null, string $conflictTarget = null):array{
+	public function insert(string $table, array $fields, string|null $onConflict = null, string|null $conflictTarget = null):array{
 		$onConflict = strtoupper($onConflict ?? '');
 
 		switch($onConflict){
@@ -43,7 +43,7 @@ final class MySQL extends DialectAbstract{
 	}
 
 	/** @inheritdoc */
-	public function createDatabase(string $dbname, bool $ifNotExists = null, string $collate = null):array {
+	public function createDatabase(string $dbname, bool|null $ifNotExists = null, string|null $collate = null):array{
 		$collate = $collate ?? $this->charset;
 
 		$sql = ['CREATE DATABASE'];
@@ -71,7 +71,7 @@ final class MySQL extends DialectAbstract{
 	}
 
 	/** @inheritdoc */
-	public function createTable(string $table, array $cols, string $primaryKey = null, bool $ifNotExists = null, bool $temp = null, string $dir = null):array {
+	public function createTable(string $table, array $cols, string|null $primaryKey = null, bool|null $ifNotExists = null, bool|null $temp = null, string|null $dir = null):array{
 		$sql = ['CREATE'];
 
 		if($temp){
@@ -118,7 +118,7 @@ final class MySQL extends DialectAbstract{
 	 *
 	 * @see https://dev.mysql.com/doc/refman/8.0/en/data-types.html
 	 */
-	public function fieldspec(string $name, string $type, $length = null, string $attribute = null, string $collation = null, bool $isNull = null, string $defaultType = null, $defaultValue = null, string $extra = null):string {
+	public function fieldspec(string $name, string $type, mixed $length = null, string|null $attribute = null, string|null $collation = null, bool|null $isNull = null, string|null $defaultType = null, mixed $defaultValue = null, string|null $extra = null):string{
 		$type          = strtoupper(trim($type));
 		$defaultType   = strtoupper($defaultType ?? '');
 		$field         = [$this->quote(trim($name))];
@@ -195,7 +195,7 @@ final class MySQL extends DialectAbstract{
 	}
 
 	/** @inheritdoc */
-	public function showTables(string $database = null, string $pattern = null, string $where = null):array{
+	public function showTables(string|null $database = null, string|null $pattern = null, string|null $where = null):array{
 		return ['SHOW TABLES'];
 	}
 

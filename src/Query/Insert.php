@@ -22,7 +22,7 @@ use function array_keys;
  */
 class Insert extends Statement implements BindValues, MultiQuery{
 
-	public function into(string $table, string $on_conflict = null, string $conflict_target = null):Insert{
+	public function into(string $table, string|null $on_conflict = null, string|null $conflict_target = null):Insert{
 		return $this->setOnConflict($table, $on_conflict, $conflict_target);
 	}
 

@@ -22,7 +22,7 @@ interface DriverInterface extends LoggerAwareInterface{
 	/**
 	 * Constructor.
 	 */
-	public function __construct(SettingsContainerInterface $options, CacheInterface $cache = null, LoggerInterface $logger = null);
+	public function __construct(SettingsContainerInterface $options, CacheInterface|null $cache = null, LoggerInterface|null $logger = null);
 
 	/**
 	 * Establishes a database connection
@@ -41,7 +41,7 @@ interface DriverInterface extends LoggerAwareInterface{
 	 *
 	 * @return mixed (resource, PDO, mysqli, ...)
 	 */
-	public function getDBResource();
+	public function getDBResource():mixed;
 
 	/**
 	 * Returns an SQL dialect object for the current driver
@@ -65,7 +65,7 @@ interface DriverInterface extends LoggerAwareInterface{
 	 *
 	 * @return mixed escaped. obviously. (hopefully)
 	 */
-	public function escape($data = null);
+	public function escape(mixed $data = null):mixed;
 
 	/**
 	 * Basic SQL query for non prepared statements
@@ -83,14 +83,14 @@ interface DriverInterface extends LoggerAwareInterface{
 	 * @return \chillerlan\Database\Result array with results
 	 * @throws \chillerlan\Database\Drivers\DriverException
 	 */
-	public function raw(string $sql, string $index = null, bool $assoc = null):Result;
+	public function raw(string $sql, string|null $index = null, bool|null $assoc = null):Result;
 
 	/**
 	 * same as DriverInterface::raw(), but cached.
 	 *
 	 * @throws \chillerlan\Database\Drivers\DriverException
 	 */
-	public function rawCached(string $sql, string $index = null, bool $assoc = null, int $ttl = null):Result;
+	public function rawCached(string $sql, string|null $index = null, bool|null $assoc = null, int|null $ttl = null):Result;
 
 	/**
 	 * Prepared statements wrapper
@@ -106,14 +106,14 @@ interface DriverInterface extends LoggerAwareInterface{
 	 * @return \chillerlan\Database\Result Array with results
 	 * @throws \chillerlan\Database\Drivers\DriverException
 	 */
-	public function prepared(string $sql, array $values = null, string $index = null, bool $assoc = null):Result;
+	public function prepared(string $sql, array|null $values = null, string|null $index = null, bool|null $assoc = null):Result;
 
 	/**
 	 * same as DriverInterface::prepared(), but cached.
 	 *
 	 * @throws \chillerlan\Database\Drivers\DriverException
 	 */
-	public function preparedCached(string $sql, array $values = null, string $index = null, bool $assoc = null, int $ttl = null):Result;
+	public function preparedCached(string $sql, array|null $values = null, string|null $index = null, bool|null $assoc = null, int|null $ttl = null):Result;
 
 	/**
 	 * Prepared multi line insert

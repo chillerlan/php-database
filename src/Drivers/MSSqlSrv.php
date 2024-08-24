@@ -96,7 +96,7 @@ final class MSSqlSrv extends DriverAbstract{
 	/**
 	 * @inheritdoc
 	 */
-	public function getDBResource(){
+	public function getDBResource():mixed{
 		return $this->db;
 	}
 
@@ -153,14 +153,14 @@ final class MSSqlSrv extends DriverAbstract{
 	/**
 	 * @inheritdoc
 	 */
-	protected function raw_query(string $sql, string $index = null, bool $assoc = null):Result{
+	protected function raw_query(string $sql, string|null $index = null, bool|null $assoc = null):Result{
 		return $this->get_result(sqlsrv_query($this->db, $sql), $index, $assoc);
 	}
 
 	/**
 	 * @inheritdoc
 	 */
-	protected function prepared_query(string $sql, array $values = null, string $index = null, bool $assoc = null):Result{
+	protected function prepared_query(string $sql, array|null $values = null, string|null $index = null, bool|null $assoc = null):Result{
 
 		// [SQLSTATE IMSSP] (-57) String keys are not allowed in parameters arrays.
 		if($values !== null){
@@ -217,7 +217,7 @@ final class MSSqlSrv extends DriverAbstract{
 	/**
 	 * @throws \chillerlan\Database\Drivers\DriverException
 	 */
-	private function get_result($result, string $index = null, bool $assoc = null):Result{
+	private function get_result($result, string|null $index = null, bool|null $assoc = null):Result{
 
 		if(is_bool($result)){
 			$errors = sqlsrv_errors();

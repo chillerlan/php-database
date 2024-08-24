@@ -85,7 +85,7 @@ final class PostgreSQL extends DriverAbstract{
 	/**
 	 * @inheritdoc
 	 */
-	public function getDBResource():?PgSqlConnection{
+	public function getDBResource():PgSqlConnection|null{
 		return $this->db;
 	}
 
@@ -143,14 +143,14 @@ final class PostgreSQL extends DriverAbstract{
 	/**
 	 * @inheritdoc
 	 */
-	protected function raw_query(string $sql, string $index = null, bool $assoc = null):Result{
+	protected function raw_query(string $sql, string|null $index = null, bool|null $assoc = null):Result{
 		return $this->get_result(pg_query($this->db, $sql), $index, $assoc);
 	}
 
 	/**
 	 * @inheritdoc
 	 */
-	protected function prepared_query(string $sql, array $values = null, string $index = null, bool $assoc = null):Result{
+	protected function prepared_query(string $sql, array|null $values = null, string|null $index = null, bool|null $assoc = null):Result{
 		pg_prepare($this->db, '', $this->replaceParams($sql));
 
 		return $this->get_result(pg_execute($this->db, '', $values ?? []), $index, $assoc);
@@ -193,7 +193,7 @@ final class PostgreSQL extends DriverAbstract{
 	/**
 	 * @inheritdoc
 	 */
-	private function get_result(PgSqlResult|false $result, string $index = null, bool $assoc = null):Result{
+	private function get_result(PgSqlResult|false $result, string|null $index = null, bool|null $assoc = null):Result{
 
 		if($result === false){
 			throw new DriverException(pg_last_error());

@@ -17,7 +17,7 @@ use function array_chunk, array_column, array_key_exists, array_keys, array_merg
 
 class Result implements ResultInterface{
 
-	protected ?string $sourceEncoding = null;
+	protected string|null $sourceEncoding = null;
 	protected string  $destEncoding;
 	protected bool    $isBool;
 	protected bool    $isSuccess;
@@ -29,11 +29,11 @@ class Result implements ResultInterface{
 #	protected array $metadata = [];
 
 	public function __construct(
-		iterable $data = null,
-		string $sourceEncoding = null,
-		string $destEncoding = null,
-		bool $isBool = null,
-		bool $isSuccess = null
+		iterable|null $data = null,
+		string|null $sourceEncoding = null,
+		string|null $destEncoding = null,
+		bool|null $isBool = null,
+		bool|null $isSuccess = null
 	){
 		$this->sourceEncoding = $sourceEncoding;
 		$this->destEncoding   = $destEncoding ?? 'UTF-8';
@@ -95,12 +95,12 @@ class Result implements ResultInterface{
 	}
 
 	/** @inheritDoc */
-	public function first(){
+	public function first():mixed{
 		return $this->array[0] ?? null;
 	}
 
 	/** @inheritDoc */
-	public function last(){
+	public function last():mixed{
 		return $this->array[count($this->array) - 1] ?? null;
 	}
 
@@ -114,7 +114,7 @@ class Result implements ResultInterface{
 	/**
 	 * @link http://api.prototypejs.org/language/Array/prototype/inspect/
 	 */
-	public function inspect():string {
+	public function inspect():string{
 		return print_r($this->array, true);
 	}
 
@@ -277,12 +277,12 @@ class Result implements ResultInterface{
 	}
 
 	/** @inheritdoc */
-	public function values(bool $to_array = null):array{
+	public function values(bool|null $to_array = null):array{
 		return array_values($to_array === true ? $this->toArray() : $this->array);
 	}
 
 	/** @inheritdoc */
-	public function column(string $column, string $index_key = null):array{
+	public function column(string $column, string|null $index_key = null):array{
 		return array_column($this->toArray(), $column, $index_key);
 	}
 

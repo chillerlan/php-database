@@ -19,7 +19,7 @@ final class SQLite extends DialectAbstract{
 	 *
 	 * @see https://www.sqlite.org/datatype3.html
 	 */
-	public function fieldspec(string $name, string $type, $length = null, string $attribute = null, string $collation = null, bool $isNull = null, string $defaultType = null, $defaultValue = null, string $extra = null):string{
+	public function fieldspec(string $name, string $type, mixed $length = null, string|null $attribute = null, string|null $collation = null, bool|null $isNull = null, string|null $defaultType = null, mixed $defaultValue = null, string|null $extra = null):string{
 		$type      = strtoupper(trim($type));
 		$collation = strtoupper($collation ?? '');
 
@@ -76,7 +76,7 @@ final class SQLite extends DialectAbstract{
 	}
 
 	/** @inheritdoc */
-	public function createTable(string $table, array $cols, string $primaryKey = null, bool $ifNotExists = null, bool $temp = null, string $dir = null):array{
+	public function createTable(string $table, array $cols, string|null $primaryKey = null, bool|null $ifNotExists = null, bool|null $temp = null, string|null $dir = null):array{
 		$sql = ['CREATE'];
 
 		if($temp){
@@ -124,7 +124,7 @@ final class SQLite extends DialectAbstract{
 	}
 
 	/** @inheritdoc */
-	public function showTables(string $database = null, string $pattern = null, string $where = null):array{
+	public function showTables(string|null $database = null, string|null $pattern = null, string|null $where = null):array{
 		/** @noinspection SqlResolve */
 		return ['SELECT "name" AS "tablename" FROM sqlite_master'];
 	}

@@ -16,7 +16,7 @@ interface MultiQuery extends Query{
 	 * @return mixed
 	 * @throws \chillerlan\Database\Query\QueryException
 	 */
-	public function multi(array $values = null);
+	public function multi(array|null $values = null);
 
 	/**
 	 * @return mixed

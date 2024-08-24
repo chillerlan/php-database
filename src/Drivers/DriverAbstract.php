@@ -16,7 +16,7 @@ use Throwable;
 use Psr\Log\{LoggerInterface, NullLogger};
 use Psr\SimpleCache\CacheInterface;
 
-use function bin2hex, call_user_func_array, count, floatval, get_called_class, hash, intval, is_array, is_bool,
+use function bin2hex, call_user_func_array, count, floatval, hash, intval, is_array, is_bool,
 	is_callable, is_float, is_int, is_numeric, serialize, trim;
 
 /**
@@ -27,10 +27,10 @@ abstract class DriverAbstract implements DriverInterface{
 	/** @var \chillerlan\Database\DatabaseOptions */
 	protected SettingsContainerInterface $options;
 	protected LoggerInterface $logger;
-	protected ?CacheInterface $cache = null;
+	protected CacheInterface|null $cache = null;
 	protected string $cachekey_hash_algo;
-	protected ?string $convert_encoding_src;
-	protected ?string $convert_encoding_dest;
+	protected string|null $convert_encoding_src;
+	protected string|null $convert_encoding_dest;
 
 	/**
 	 * Constructor.
@@ -39,7 +39,7 @@ abstract class DriverAbstract implements DriverInterface{
 	 * @param \Psr\SimpleCache\CacheInterface|null $cache
 	 * @param \Psr\Log\LoggerInterface|null        $logger
 	 */
-	public function __construct(SettingsContainerInterface $options, CacheInterface $cache = null, LoggerInterface $logger = null){
+	public function __construct(SettingsContainerInterface $options, CacheInterface|null $cache = null, LoggerInterface|null $logger = null){
 		$this->options = $options;
 		$this->cache   = $cache;
 
@@ -61,12 +61,12 @@ abstract class DriverAbstract implements DriverInterface{
 	/**
 	 *
 	 */
-	abstract protected function raw_query(string $sql, ?string $index, ?bool $assoc):Result;
+	abstract protected function raw_query(string $sql, string|null $index = null, bool|null $assoc = null):Result;
 
 	/**
 	 *
 	 */
-	abstract protected function prepared_query(string $sql, ?array $values, ?string $index, ?bool $assoc):Result;
+	abstract protected function prepared_query(string $sql, array|null $values = null, string|null $index = null, bool|null $assoc = null):Result;
 
 	/**
 	 *
@@ -88,7 +88,7 @@ abstract class DriverAbstract implements DriverInterface{
 	/**
 	 * @inheritdoc
 	 */
-	public function escape($data = null){
+	public function escape(mixed $data = null):mixed{
 
 		if($data === null){
 			return 'null';
@@ -131,7 +131,7 @@ abstract class DriverAbstract implements DriverInterface{
 	/**
 	 * @inheritdoc
 	 */
-	public function raw(string $sql, string $index = null, bool $assoc = null):Result{
+	public function raw(string $sql, string|null $index = null, bool|null $assoc = null):Result{
 		$this->checkSQL($sql);
 
 		$this->logger->debug(
@@ -143,7 +143,7 @@ abstract class DriverAbstract implements DriverInterface{
 			return $this->raw_query($sql, $index, $assoc !== null ? $assoc : true);
 		}
 		catch(Throwable $e){
-			throw new DriverException('sql error: ['.get_called_class().'::raw()] '.$e->getMessage());
+			throw new DriverException('sql error: ['.static::class.'::raw()] '.$e->getMessage());
 		}
 
 	}
@@ -151,7 +151,7 @@ abstract class DriverAbstract implements DriverInterface{
 	/**
 	 * @inheritdoc
 	 */
-	public function prepared(string $sql, array $values = null, string $index = null, bool $assoc = null):Result{
+	public function prepared(string $sql, array|null $values = null, string|null $index = null, bool|null $assoc = null):Result{
 		$this->checkSQL($sql);
 
 		$this->logger->debug(
@@ -163,7 +163,7 @@ abstract class DriverAbstract implements DriverInterface{
 			return $this->prepared_query($sql, ($values ?? []), $index, ($assoc ?? true));
 		}
 		catch(Throwable $e){
-			throw new DriverException('sql error: ['.get_called_class().'::prepared()] '.$e->getMessage());
+			throw new DriverException('sql error: ['.static::class.'::prepared()] '.$e->getMessage());
 		}
 
 	}
@@ -183,7 +183,7 @@ abstract class DriverAbstract implements DriverInterface{
 			return $this->multi_query($sql, $values);
 		}
 		catch(Throwable $e){
-			throw new DriverException('sql error: ['.get_called_class().'::multi()] '.$e->getMessage());
+			throw new DriverException('sql error: ['.static::class.'::multi()] '.$e->getMessage());
 		}
 
 	}
@@ -208,7 +208,7 @@ abstract class DriverAbstract implements DriverInterface{
 			return $this->multi_callback_query($sql, $data, $callback);
 		}
 		catch(Throwable $e){
-			throw new DriverException('sql error: ['.get_called_class().'::multiCallback()] '.$e->getMessage());
+			throw new DriverException('sql error: ['.static::class.'::multiCallback()] '.$e->getMessage());
 		}
 
 	}
@@ -216,7 +216,7 @@ abstract class DriverAbstract implements DriverInterface{
 	/**
 	 * @inheritdoc
 	 */
-	public function rawCached(string $sql, string $index = null, bool $assoc = null, int $ttl = null):Result{
+	public function rawCached(string $sql, string|null $index = null, bool|null $assoc = null, int|null $ttl = null):Result{
 		$result = $this->cacheGet($sql, [], $index);
 
 		if(!$result){
@@ -231,7 +231,7 @@ abstract class DriverAbstract implements DriverInterface{
 	/**
 	 * @inheritdoc
 	 */
-	public function preparedCached(string $sql, array $values = null, string $index = null, bool $assoc = null, int $ttl = null):Result{
+	public function preparedCached(string $sql, array|null $values = null, string|null $index = null, bool|null $assoc = null, int|null $ttl = null):Result{
 		$result = $this->cacheGet($sql, $values, $index);
 
 		if(!$result){
@@ -246,7 +246,7 @@ abstract class DriverAbstract implements DriverInterface{
 	/**
 	 * @inheritdoc
 	 */
-	protected function getResult(callable $callable, array $args, string $index = null, bool $assoc = null):Result{
+	protected function getResult(callable $callable, array $args, string|null $index = null, bool|null $assoc = null):Result{
 		$out = new Result(null, $this->convert_encoding_src, $this->convert_encoding_dest);
 		$i   = 0;
 
@@ -264,14 +264,14 @@ abstract class DriverAbstract implements DriverInterface{
 	/**
 	 *
 	 */
-	protected function cacheKey(string $sql, array $values = null, string $index = null):string{
+	protected function cacheKey(string $sql, array|null $values = null, string|null $index = null):string{
 		return hash($this->cachekey_hash_algo, serialize([$sql, $values, $index]));
 	}
 
 	/**
 	 *
 	 */
-	protected function cacheGet(string $sql, array $values = null, string $index = null){
+	protected function cacheGet(string $sql, array|null $values = null, string|null $index = null):mixed{
 
 		if($this->cache instanceof CacheInterface){
 			return $this->cache->get($this->cacheKey($sql, $values, $index));
@@ -283,7 +283,7 @@ abstract class DriverAbstract implements DriverInterface{
 	/**
 	 *
 	 */
-	protected function cacheSet(string $sql, $result, array $values = null, string $index = null, int $ttl = null):bool{
+	protected function cacheSet(string $sql, $result, array|null $values = null, string|null $index = null, int|null $ttl = null):bool{
 
 		if($this->cache instanceof CacheInterface){
 			return $this->cache->set($this->cacheKey($sql, $values, $index), $result, $ttl);

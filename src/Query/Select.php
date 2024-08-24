@@ -28,11 +28,11 @@ class Select extends Statement implements Where, Limit, BindValues, Query, Cache
 	protected array $orderby = [];
 	protected array $groupby = [];
 
-	public function where($val1, $val2 = null, string $operator = null, bool $bind = null, string $join = null):Select{
+	public function where(mixed $val1, mixed $val2 = null, string|null $operator = null, bool|null $bind = null, string|null $join = null):Select{
 		return $this->setWhere($val1, $val2, $operator, $bind, $join);
 	}
 
-	public function openBracket(string $join = null):Select{
+	public function openBracket(string|null $join = null):Select{
 		return $this->setOpenBracket($join);
 	}
 
@@ -48,7 +48,7 @@ class Select extends Statement implements Where, Limit, BindValues, Query, Cache
 		return $this->setOffset($offset);
 	}
 
-	public function cached(int $ttl = null):Select{
+	public function cached(int|null $ttl = null):Select{
 		return $this->setCached($ttl);
 	}
 

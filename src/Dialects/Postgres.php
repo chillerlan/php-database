@@ -17,7 +17,7 @@ use chillerlan\Database\Query\QueryException;
 final class Postgres extends DialectAbstract{
 
 	/** @inheritdoc */
-	public function select(array $cols, array $from, string $where = null, $limit = null, $offset = null, bool $distinct = null, array $groupby = null, array $orderby = null):array{
+	public function select(array $cols, array $from, string|null $where = null, mixed $limit = null, mixed $offset = null, bool|null $distinct = null, array|null $groupby = null, array|null $orderby = null):array{
 		$sql = ['SELECT'];
 
 		if($distinct){
@@ -58,7 +58,7 @@ final class Postgres extends DialectAbstract{
 	 *
 	 * @inheritdoc
 	 */
-	public function insert(string $table, array $fields, string $onConflict = null, string $conflictTarget = null):array{
+	public function insert(string $table, array $fields, string|null $onConflict = null, string|null $conflictTarget = null):array{
 		$sql = parent::insert($table, $fields);
 
 		if(in_array($onConflict, ['IGNORE', 'REPLACE'], true)){
@@ -99,7 +99,7 @@ final class Postgres extends DialectAbstract{
 	}
 
 	/** @inheritdoc */
-	public function createDatabase(string $dbname, bool $ifNotExists = null, string $collate = null):array{
+	public function createDatabase(string $dbname, bool|null $ifNotExists = null, string|null $collate = null):array{
 		$sql = ['CREATE DATABASE'];
 		$sql[] = $this->quote($dbname);
 
@@ -130,7 +130,7 @@ final class Postgres extends DialectAbstract{
 	 *
 	 * @see https://www.postgresql.org/docs/9.5/datatype.html
 	 */
-	public function fieldspec(string $name, string $type, $length = null, string $attribute = null, string $collation = null, bool $isNull = null, string $defaultType = null, $defaultValue = null, string $extra = null):string{
+	public function fieldspec(string $name, string $type, mixed $length = null, string|null $attribute = null, string|null $collation = null, bool|null $isNull = null, string|null $defaultType = null, mixed $defaultValue = null, string|null $extra = null):string{
 		$name = trim($name);
 		$type = strtoupper(trim($type));
 
@@ -205,7 +205,7 @@ final class Postgres extends DialectAbstract{
 	}
 
 	/** @inheritdoc */
-	public function createTable(string $table, array $cols, string $primaryKey = null, bool $ifNotExists = null, bool $temp = null, string $dir = null):array{
+	public function createTable(string $table, array $cols, string|null $primaryKey = null, bool|null $ifNotExists = null, bool|null $temp = null, string|null $dir = null):array{
 		$sql = ['CREATE'];
 
 		if($temp){
@@ -243,7 +243,7 @@ final class Postgres extends DialectAbstract{
 	}
 
 	/** @inheritdoc */
-	public function showTables(string $database = null, string $pattern = null, string $where = null):array{
+	public function showTables(string|null $database = null, string|null $pattern = null, string|null $where = null):array{
 		/** @noinspection SqlResolve */
 		return ['SELECT tablename FROM pg_catalog.pg_tables WHERE schemaname != \'pg_catalog\'AND schemaname != \'information_schema\' '];
 	}

@@ -33,10 +33,10 @@ interface ResultInterface extends SeekableIterator, ArrayAccess, Countable, Json
 	public function reverse():ResultInterface;
 
 	/** @return mixed */
-	public function first();
+	public function first():mixed;
 
 	/** @return mixed */
-	public function last();
+	public function last():mixed;
 
 	/** */
 	public function clear():ResultInterface;
@@ -60,9 +60,9 @@ interface ResultInterface extends SeekableIterator, ArrayAccess, Countable, Json
 	public function fields():array;
 
 	/** */
-	public function values(bool $to_array = null):array;
+	public function values(bool|null $to_array = null):array;
 
 	/** */
-	public function column(string $column, string $index_key = null):array;
+	public function column(string $column, string|null $index_key = null):array;
 
 }

@@ -27,11 +27,11 @@ class Update extends Statement implements Where, Limit, BindValues, MultiQuery{
 		return $this->setName($name);
 	}
 
-	public function where($val1, $val2 = null, string $operator = null, bool $bind = null, string $join = null):Update{
+	public function where(mixed $val1, mixed $val2 = null, string|null $operator = null, bool|null $bind = null, string|null $join = null):Update{
 		return $this->setWhere($val1, $val2, $operator, $bind, $join);
 	}
 
-	public function openBracket(string $join = null):Update{
+	public function openBracket(string|null $join = null):Update{
 		return $this->setOpenBracket($join);
 	}
 
@@ -57,7 +57,7 @@ class Update extends Statement implements Where, Limit, BindValues, MultiQuery{
 		return $this->dialect->update($this->name, $this->set, $this->_getWhere());
 	}
 
-	public function set(array $set, bool $bind = null):Update{
+	public function set(array $set, bool|null $bind = null):Update{
 
 		foreach($set as $k => $v){
 

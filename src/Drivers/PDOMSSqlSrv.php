@@ -19,7 +19,7 @@ use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
 use PDO, Throwable;
 
-use function bin2hex, explode, get_called_class, is_array, is_numeric, strpos, strtolower, trim;
+use function bin2hex, explode, is_array, is_numeric, strpos, strtolower, trim;
 
 use const PHP_OS;
 
@@ -33,7 +33,7 @@ final class PDOMSSqlSrv extends PDODriverAbstract{
 	 *
 	 * @phan-suppress PhanUndeclaredConstantOfClass
 	 */
-	public function __construct(SettingsContainerInterface $options, CacheInterface $cache = null, LoggerInterface $log = null){
+	public function __construct(SettingsContainerInterface $options, CacheInterface|null $cache = null, LoggerInterface|null $logger = null){
 		// setting this with any value breaks
 		unset($this->pdo_options[PDO::ATTR_EMULATE_PREPARES]);
 
@@ -41,7 +41,7 @@ final class PDOMSSqlSrv extends PDODriverAbstract{
 		$this->pdo_options[PDO::SQLSRV_ATTR_FETCHES_NUMERIC_TYPE] = true;
 		$this->pdo_options[PDO::SQLSRV_ATTR_ENCODING]             = PDO::SQLSRV_ENCODING_UTF8;
 
-		parent::__construct($options, $cache, $log);
+		parent::__construct($options, $cache, $logger);
 	}
 
 	/**
@@ -176,7 +176,7 @@ final class PDOMSSqlSrv extends PDODriverAbstract{
 	/**
 	 * @inheritdoc
 	 */
-	protected function raw_query(string $sql, string $index = null, bool $assoc = null):Result{
+	protected function raw_query(string $sql, string|null $index = null, bool|null $assoc = null):Result{
 
 		try{
 			return parent::raw_query($sql, $index, $assoc);
@@ -204,13 +204,13 @@ final class PDOMSSqlSrv extends PDODriverAbstract{
 
 		}
 
-		throw new DriverException('sql error: ['.get_called_class().'::raw()]'.$message);
+		throw new DriverException('sql error: ['.static::class.'::raw()]'.$message);
 	}
 
 	/**
 	 * @inheritdoc
 	 */
-	protected function prepared_query(string $sql, array $values = null, string $index = null, bool $assoc = null):Result{
+	protected function prepared_query(string $sql, array|null $values = null, string|null $index = null, bool|null $assoc = null):Result{
 
 		try{
 			return parent::prepared_query($sql, $values, $index, $assoc);

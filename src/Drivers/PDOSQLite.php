@@ -15,7 +15,7 @@ namespace chillerlan\Database\Drivers;
 use chillerlan\Database\Dialects\{Dialect, SQLite};
 use Throwable, PDO;
 
-use function get_called_class, is_file, is_readable, is_writable, trigger_error;
+use function is_file, is_readable, is_writable, trigger_error;
 
 /**
  *
@@ -68,7 +68,7 @@ final class PDOSQLite extends PDODriverAbstract{
 			return 'disconnected, no info available';
 		}
 
-		return get_called_class().', connected to: '.$this->options->database;
+		return static::class.', connected to: '.$this->options->database;
 	}
 
 	/**

@@ -38,7 +38,7 @@ class ResultRow extends Result{
 	/**
 	 * @inheritdoc
 	 */
-	public function __get(string $name){
+	public function __get(string $name):mixed{
 		return $this->array[$name] ?? null;
 	}
 

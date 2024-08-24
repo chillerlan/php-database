@@ -97,7 +97,7 @@ final class MySQLiDrv extends DriverAbstract{
 	/**
 	 * @inheritdoc
 	 */
-	public function getDBResource():?mysqli{
+	public function getDBResource():mysqli|null{
 		return $this->db;
 	}
 
@@ -135,7 +135,7 @@ final class MySQLiDrv extends DriverAbstract{
 	/**
 	 * @inheritdoc
 	 */
-	protected function raw_query(string $sql, string $index = null, bool $assoc = null):Result{
+	protected function raw_query(string $sql, string|null $index = null, bool|null $assoc = null):Result{
 		$result = $this->db->query($sql);
 
 		if(is_bool($result)){
@@ -157,7 +157,7 @@ final class MySQLiDrv extends DriverAbstract{
 	/**
 	 * @inheritdoc
 	 */
-	protected function prepared_query(string $sql, array $values = null, string $index = null, bool $assoc = null):Result{
+	protected function prepared_query(string $sql, array|null $values = null, string|null $index = null, bool|null $assoc = null):Result{
 		$values ??= [];
 		$assoc  ??= true;
 		$stmt     = $this->db->stmt_init();

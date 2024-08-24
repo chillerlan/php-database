@@ -15,7 +15,7 @@ namespace chillerlan\Database\Drivers;
 use chillerlan\Database\Result;
 use PDO, PDOStatement, Throwable;
 
-use function call_user_func_array, get_called_class, gettype, is_bool;
+use function call_user_func_array, gettype, is_bool;
 
 /**
  *
@@ -25,7 +25,7 @@ abstract class PDODriverAbstract extends DriverAbstract{
 	/**
 	 * Holds the database resource object
 	 */
-	protected ?PDO $db = null;
+	protected PDO|null $db = null;
 
 	/**
 	 * Some basic PDO options
@@ -62,7 +62,7 @@ abstract class PDODriverAbstract extends DriverAbstract{
 			return $this;
 		}
 		catch(Throwable $e){
-			throw new DriverException('db error: [PDODriver '.get_called_class().']: '.$e->getMessage());
+			throw new DriverException('db error: [PDODriver '.static::class.']: '.$e->getMessage());
 		}
 
 	}
@@ -79,7 +79,7 @@ abstract class PDODriverAbstract extends DriverAbstract{
 	/**
 	 * @inheritdoc
 	 */
-	public function getDBResource():?PDO{
+	public function getDBResource():PDO|null{
 		return $this->db;
 	}
 
@@ -110,7 +110,7 @@ abstract class PDODriverAbstract extends DriverAbstract{
 	/**
 	 * @inheritdoc
 	 */
-	protected function get_result($stmt, string $index = null, bool $assoc = null):Result{
+	protected function get_result($stmt, string|null $index = null, bool|null $assoc = null):Result{
 		$assoc = $assoc ?? true;
 
 		if(is_bool($stmt)){
@@ -123,14 +123,14 @@ abstract class PDODriverAbstract extends DriverAbstract{
 	/**
 	 * @inheritdoc
 	 */
-	protected function raw_query(string $sql, string $index = null, bool $assoc = null):Result{
+	protected function raw_query(string $sql, string|null $index = null, bool|null $assoc = null):Result{
 		return $this->get_result($this->db->query($sql), $index, $assoc);
 	}
 
 	/**
 	 * @inheritdoc
 	 */
-	protected function prepared_query(string $sql, array $values = null, string $index = null, bool $assoc = null):Result{
+	protected function prepared_query(string $sql, array|null $values = null, string|null $index = null, bool|null $assoc = null):Result{
 		$stmt = $this->db->prepare($sql, $this->pdo_stmt_options);
 
 		if(!empty($values)){

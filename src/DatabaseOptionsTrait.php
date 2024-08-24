@@ -15,37 +15,37 @@ trait DatabaseOptionsTrait{
 	/**
 	 * The database driver to use (FQCN)
 	 */
-	protected ?string $driver = null;
+	protected string|null $driver = null;
 
 	/**
 	 * The host to connect to
 	 */
-	protected ?string $host = 'localhost';
+	protected string|null $host = 'localhost';
 
 	/**
 	 * The port number
 	 */
-	protected ?int $port = null;
+	protected int|null $port = null;
 
 	/**
 	 * A socket
 	 */
-	protected ?string $socket = null;
+	protected string|null $socket = null;
 
 	/**
 	 * The database name
 	 */
-	protected ?string $database = null;
+	protected string|null $database = null;
 
 	/**
 	 * The username
 	 */
-	protected ?string $username = null;
+	protected string|null $username = null;
 
 	/**
 	 * The password
 	 */
-	protected ?string $password = null;
+	protected string|null $password = null;
 
 	/**
 	 * Indicates whether the connection should use SSL or not
@@ -55,27 +55,27 @@ trait DatabaseOptionsTrait{
 	/**
 	 * The SSL key
 	 */
-	protected ?string $ssl_key = null;
+	protected string|null $ssl_key = null;
 
 	/**
 	 * The SSL certificate
 	 */
-	protected ?string $ssl_cert = null;
+	protected string|null $ssl_cert = null;
 
 	/**
 	 * The path to a SSL certificate authority file
 	 */
-	protected ?string $ssl_ca = null;
+	protected string|null $ssl_ca = null;
 
 	/**
 	 * The directory containing SSL certificate authority files
 	 */
-	protected ?string $ssl_capath = null;
+	protected string|null $ssl_capath = null;
 
 	/**
 	 * The SSL cipher
 	 */
-	protected ?string $ssl_cipher = null;
+	protected string|null $ssl_cipher = null;
 
 	/**
 	 * MySQLi connection timeout
@@ -97,19 +97,19 @@ trait DatabaseOptionsTrait{
 	/**
 	 * The driver name to use for an ODBC connection (@todo)
 	 */
-	protected ?string $odbc_driver = null;
+	protected string|null $odbc_driver = null;
 
 	/**
 	 * atabase result encoding
 	 *
 	 * @see \mb_convert_encoding()
 	 */
-	protected ?string $convert_encoding_src = null;
+	protected string|null $convert_encoding_src = null;
 
 	/**
 	 * @see \mb_convert_encoding()
 	 */
-	protected ?string $convert_encoding_dest = 'UTF-8';
+	protected string|null $convert_encoding_dest = 'UTF-8';
 
 	/**
 	 * MS SQL Server connection timeout

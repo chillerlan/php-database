@@ -12,7 +12,7 @@ namespace chillerlan\Database;
 
 use chillerlan\Database\Dialects\Dialect;
 use chillerlan\Database\Drivers\DriverInterface;
-use chillerlan\Database\Query\{Alter, Create, Delete, Drop, Insert, QueryException, Select, Show, Truncate, Update};
+use chillerlan\Database\Query\{Alter, Create, Delete, Drop, Insert, QueryException, Select, Show, Statement, Truncate, Update};
 use chillerlan\Settings\SettingsContainerInterface;
 use Psr\Log\{LoggerAwareInterface, LoggerAwareTrait, LoggerInterface, NullLogger};
 use Psr\SimpleCache\CacheInterface;
@@ -46,7 +46,7 @@ abstract class DatabaseAbstract implements LoggerAwareInterface{
 	];
 	/** @var \chillerlan\Database\DatabaseOptions */
 	protected SettingsContainerInterface $options;
-	protected ?CacheInterface $cache = null;
+	protected CacheInterface|null $cache = null;
 	protected DriverInterface $driver;
 	protected Dialect $dialect;
 
@@ -55,7 +55,7 @@ abstract class DatabaseAbstract implements LoggerAwareInterface{
 	 *
 	 * @throws \chillerlan\Database\DatabaseException
 	 */
-	public function __construct(SettingsContainerInterface $options, CacheInterface $cache = null, LoggerInterface $logger = null){
+	public function __construct(SettingsContainerInterface $options, CacheInterface|null $cache = null, LoggerInterface|null $logger = null){
 		$this->options = $options;
 		$this->cache   = $cache;
 
@@ -64,17 +64,13 @@ abstract class DatabaseAbstract implements LoggerAwareInterface{
 		/** @phan-suppress-next-line PhanTypeExpectedObjectOrClassName */
 		$this->driver  = new $this->options->driver($this->options, $this->cache, $this->logger);
 
-		if(!$this->driver instanceof DriverInterface){
-			throw new DatabaseException('invalid driver interface');
-		}
-
 		$this->dialect = $this->driver->getDialect();
 	}
 
 	/**
 	 * @throws \chillerlan\Database\Query\QueryException
 	 */
-	public function __get(string $name){
+	public function __get(string $name):Statement{
 		$name = strtolower($name);
 
 		if(isset($this::STATEMENTS[$name])){

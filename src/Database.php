@@ -19,7 +19,7 @@ class Database extends DatabaseAbstract implements DriverInterface{
 	 * @inheritdoc
 	 * @codeCoverageIgnore
 	 */
-	public function getDBResource(){
+	public function getDBResource():mixed{
 		return $this->driver->getDBResource();
 	}
 
@@ -46,27 +46,27 @@ class Database extends DatabaseAbstract implements DriverInterface{
 	}
 
 	/** @inheritdoc */
-	public function escape($data = null){
+	public function escape(mixed $data = null):mixed{
 		return $this->driver->escape($data);
 	}
 
 	/** @inheritdoc */
-	public function raw(string $sql, string $index = null, bool $assoc = null):Result{
+	public function raw(string $sql, string|null $index = null, bool|null $assoc = null):Result{
 		return $this->driver->raw($sql, $index, $assoc);
 	}
 
 	/** @inheritdoc */
-	public function rawCached(string $sql, string $index = null, bool $assoc = null, int $ttl = null):Result{
+	public function rawCached(string $sql, string|null $index = null, bool|null $assoc = null, int|null $ttl = null):Result{
 		return $this->driver->rawCached($sql, $index, $assoc, $ttl);
 	}
 
 	/** @inheritdoc */
-	public function prepared(string $sql, array $values = null, string $index = null, bool $assoc = null):Result{
+	public function prepared(string $sql, array|null $values = null, string|null $index = null, bool|null $assoc = null):Result{
 		return $this->driver->prepared($sql, $values, $index, $assoc);
 	}
 
 	/** @inheritdoc */
-	public function preparedCached(string $sql, array $values = null, string $index = null, bool $assoc = null, int $ttl = null):Result{
+	public function preparedCached(string $sql, array|null $values = null, string|null $index = null, bool|null $assoc = null, int|null $ttl = null):Result{
 		return $this->driver->preparedCached($sql, $values, $index, $assoc, $ttl);
 	}
 

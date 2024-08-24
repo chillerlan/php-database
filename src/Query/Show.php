@@ -23,7 +23,7 @@ class Show extends Statement{
 		return new ShowDatabases($this->db, $this->dialect, $this->logger);
 	}
 
-	public function tables(string $from = null):ShowTables{
+	public function tables(string|null $from = null):ShowTables{
 		$showTables = new ShowTables($this->db, $this->dialect, $this->logger);
 
 		if(!empty($from)){

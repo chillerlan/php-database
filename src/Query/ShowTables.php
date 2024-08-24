@@ -14,17 +14,17 @@ use function trim;
 
 class ShowTables extends Statement implements Where, Query{
 
-	protected ?string $pattern = null;
+	protected string|null $pattern = null;
 
 	public function from(string $name):ShowTables{
 		return $this->setName($name);
 	}
 
-	public function where($val1, $val2 = null, string $operator = null, bool $bind = null, string $join = null):ShowTables{
+	public function where(mixed $val1, mixed $val2 = null, string|null $operator = null, bool|null $bind = null, string|null $join = null):ShowTables{
 		return $this->setWhere($val1, $val2, $operator, $bind, $join);
 	}
 
-	public function openBracket(string $join = null):ShowTables{
+	public function openBracket(string|null $join = null):ShowTables{
 		return $this->setOpenBracket($join);
 	}
 

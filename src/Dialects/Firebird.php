@@ -15,7 +15,7 @@ namespace chillerlan\Database\Dialects;
 final class Firebird extends DialectAbstract{
 
 	/** @inheritdoc */
-	public function select(array $cols, array $from, string $where = null, $limit = null, $offset = null, bool $distinct = null, array $groupby = null, array $orderby = null):array{
+	public function select(array $cols, array $from, string|null $where = null, mixed $limit = null, mixed $offset = null, bool|null $distinct = null, array|null $groupby = null, array|null $orderby = null):array{
 		$sql = ['SELECT'];
 
 		if($limit !== null){
@@ -48,7 +48,7 @@ final class Firebird extends DialectAbstract{
 	}
 
 	/** @inheritdoc */
-	public function createTable(string $table, array $cols, string $primaryKey = null, bool $ifNotExists = null, bool $temp = null, string $dir = null):array{
+	public function createTable(string $table, array $cols, string|null $primaryKey = null, bool|null $ifNotExists = null, bool|null $temp = null, string|null $dir = null):array{
 		$sql = [$ifNotExists ? 'RECREATE' : 'CREATE']; // nasty
 
 		if($temp){
@@ -111,7 +111,7 @@ END ^
 	}
 
 	/** @inheritdoc */
-	public function fieldspec(string $name, string $type, $length = null, string $attribute = null, string $collation = null, bool $isNull = null, string $defaultType = null, $defaultValue = null, string $extra = null):string{
+	public function fieldspec(string $name, string $type, mixed $length = null, string|null $attribute = null, string|null $collation = null, bool|null $isNull = null, string|null $defaultType = null, mixed $defaultValue = null, string|null $extra = null):string{
 		$type = strtoupper(trim($type));
 
 		$field = [$this->quote(trim($name))];
@@ -200,7 +200,7 @@ END ^
 
 
 	/** @inheritdoc */
-	public function showTables(string $database = null, string $pattern = null, string $where = null):array{
+	public function showTables(string|null $database = null, string|null $pattern = null, string|null $where = null):array{
 		/** @noinspection SqlResolve */
 		return ['SELECT TRIM(RDB$RELATION_NAME) AS "tablename" FROM RDB$RELATIONS WHERE RDB$VIEW_BLR IS NULL AND (RDB$SYSTEM_FLAG IS NULL OR RDB$SYSTEM_FLAG = 0)'];
 	}

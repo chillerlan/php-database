@@ -10,6 +10,7 @@
 
 namespace chillerlan\Database\Query;
 
+use chillerlan\Database\Result;
 use chillerlan\Database\Dialects\{Dialect, Firebird, MSSQL};
 use chillerlan\Database\Drivers\DriverInterface;
 use Psr\Log\{LoggerAwareInterface, LoggerAwareTrait, LoggerInterface};
@@ -25,10 +26,10 @@ abstract class Statement implements LoggerAwareInterface{
 
 	protected DriverInterface $db;
 	protected Dialect         $dialect;
-	protected ?string         $name            = null;
-	protected ?string         $on_conflict     = null;
-	protected ?string         $conflict_target = null;
-	protected ?string         $charset         = null;
+	protected string|null     $name            = null;
+	protected string|null     $on_conflict     = null;
+	protected string|null     $conflict_target = null;
+	protected string|null     $charset         = null;
 	protected bool            $ifExists        = false;
 	protected bool            $ifNotExists     = false;
 	protected array           $where           = [];
@@ -36,8 +37,8 @@ abstract class Statement implements LoggerAwareInterface{
 	protected bool            $multi           = false;
 	protected bool            $cached          = false;
 	protected int             $ttl             = 300;
-	protected ?int            $limit           = null;
-	protected ?int            $offset          = null;
+	protected int|null        $limit           = null;
+	protected int|null        $offset          = null;
 	protected array           $bindValues      = [];
 
 	private array $joinArgs  = ['AND', 'OR', 'XOR'];
@@ -51,7 +52,7 @@ abstract class Statement implements LoggerAwareInterface{
 #		'BETWEEN', 'NOT BETWEEN',
 	];
 
-	public function __construct(DriverInterface $db, Dialect $dialect, LoggerInterface $logger = null){
+	public function __construct(DriverInterface $db, Dialect $dialect, LoggerInterface|null $logger = null){
 		$this->db      = $db;
 		$this->dialect = $dialect;
 		$this->logger  = $logger;
@@ -69,7 +70,7 @@ abstract class Statement implements LoggerAwareInterface{
 	}
 
 	/** */
-	protected function setOnConflict(string $name, string $on_conflict = null, string $conflict_target = null):self{
+	protected function setOnConflict(string $name, string|null $on_conflict = null, string|null $conflict_target = null):self{
 		$this->name      = trim($name);
 		$on_conflict     = trim(strtoupper($on_conflict ?? ''));
 		$conflict_target = trim($conflict_target ?? '');
@@ -111,15 +112,9 @@ abstract class Statement implements LoggerAwareInterface{
 	}
 
 	/**
-	 * @param mixed       $val1
-	 * @param mixed       $val2
-	 * @param string|null $operator
-	 * @param bool|null   $bind
-	 * @param string|null $join
 	 *
-	 * @return self
 	 */
-	protected function setWhere($val1, $val2, string $operator = null, bool $bind = null, string $join = null):self{
+	protected function setWhere(mixed $val1, mixed $val2, string|null $operator = null, bool|null $bind = null, string|null $join = null):self{
 		$operator = $operator !== null ? strtoupper(trim($operator)) : '=';
 		$bind     ??= true;
 
@@ -203,7 +198,7 @@ abstract class Statement implements LoggerAwareInterface{
 	}
 
 	/** */
-	protected function setOpenBracket(string $join = null):self{
+	protected function setOpenBracket(string|null $join = null):self{
 		$join = strtoupper(trim($join ?? ''));
 
 		if(in_array($join, $this->joinArgs, true)){
@@ -260,7 +255,7 @@ abstract class Statement implements LoggerAwareInterface{
 	/**
 	 * @throws \chillerlan\Database\Query\QueryException
 	 */
-	public function sql(bool $multi = null):string{
+	public function sql(bool|null $multi = null):string{
 
 		if(!$this instanceof Query){
 			throw new QueryException('Query not supported');
@@ -324,7 +319,7 @@ abstract class Statement implements LoggerAwareInterface{
 	}
 
 	/** */
-	protected function addBindValue(string $key, $value):void{
+	protected function addBindValue(string $key, mixed $value):void{
 		$this->bindValues[$key] = $value;
 	}
 
@@ -343,7 +338,7 @@ abstract class Statement implements LoggerAwareInterface{
 	}
 
 	/** */
-	protected function setCached(int $ttl = null):self{
+	protected function setCached(int|null $ttl = null):self{
 		$this->cached = true;
 
 		if($ttl > 0){
@@ -356,7 +351,7 @@ abstract class Statement implements LoggerAwareInterface{
 	/**
 	 * @throws \chillerlan\Database\Query\QueryException
 	 */
-	public function query(string $index = null){
+	public function query(string|null $index = null):Result{
 
 		if(!$this instanceof Query){
 			throw new QueryException('Query not supported');
@@ -377,7 +372,7 @@ abstract class Statement implements LoggerAwareInterface{
 	/**
 	 * @throws \chillerlan\Database\Query\QueryException
 	 */
-	public function multi(array $values = null):bool{
+	public function multi(array|null $values = null):bool{
 
 		if(!$this instanceof MultiQuery){
 			throw new QueryException('MultiQuery not supported');
