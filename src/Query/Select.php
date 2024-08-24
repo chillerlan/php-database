@@ -28,27 +28,27 @@ class Select extends Statement implements Where, Limit, BindValues, Query, Cache
 	protected array $orderby = [];
 	protected array $groupby = [];
 
-	public function where(mixed $val1, mixed $val2 = null, string|null $operator = null, bool|null $bind = null, string|null $join = null):Select{
+	public function where(mixed $val1, mixed $val2 = null, string|null $operator = null, bool|null $bind = null, string|null $join = null):static{
 		return $this->setWhere($val1, $val2, $operator, $bind, $join);
 	}
 
-	public function openBracket(string|null $join = null):Select{
+	public function openBracket(string|null $join = null):static{
 		return $this->setOpenBracket($join);
 	}
 
-	public function closeBracket():Select{
+	public function closeBracket():static{
 		return $this->setCloseBracket();
 	}
 
-	public function limit(int $limit):Select{
+	public function limit(int $limit):static{
 		return $this->setLimit($limit);
 	}
 
-	public function offset(int $offset):Select{
+	public function offset(int $offset):static{
 		return $this->setOffset($offset);
 	}
 
-	public function cached(int|null $ttl = null):Select{
+	public function cached(int|null $ttl = null):static{
 		return $this->setCached($ttl);
 	}
 
@@ -62,31 +62,31 @@ class Select extends Statement implements Where, Limit, BindValues, Query, Cache
 		return $this->dialect->select($this->cols, $this->from, $this->_getWhere(), $this->limit, $this->offset, $this->distinct, $this->groupby, $this->orderby);
 	}
 
-	public function distinct():Select{
+	public function distinct():static{
 		$this->distinct = true;
 
 		return $this;
 	}
 
-	public function cols(array $expressions):Select{
+	public function cols(array $expressions):static{
 		$this->cols = $this->dialect->cols($expressions);
 
 		return $this;
 	}
 
-	public function from(array $expressions):Select{
+	public function from(array $expressions):static{
 		$this->from = $this->dialect->from($expressions);
 
 		return $this;
 	}
 
-	public function orderBy(array $expressions):Select{
+	public function orderBy(array $expressions):static{
 		$this->orderby = $this->dialect->orderby($expressions);
 
 		return $this;
 	}
 
-	public function groupBy(array $expressions):Select{
+	public function groupBy(array $expressions):static{
 
 		foreach($expressions as $expression){
 			$this->groupby[] = $this->dialect->quote($expression);

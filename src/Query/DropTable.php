@@ -19,11 +19,11 @@ namespace chillerlan\Database\Query;
  */
 class DropTable extends Statement implements Query, IfExists{
 
-	public function name(string $name):DropTable{
+	public function name(string $name):static{
 		return $this->setName($name);
 	}
 
-	public function ifExists():DropTable{
+	public function ifExists():static{
 		return $this->setIfExists();
 	}
 

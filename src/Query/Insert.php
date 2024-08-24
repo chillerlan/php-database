@@ -22,13 +22,12 @@ use function array_keys;
  */
 class Insert extends Statement implements BindValues, MultiQuery{
 
-	public function into(string $table, string|null $on_conflict = null, string|null $conflict_target = null):Insert{
+	public function into(string $table, string|null $on_conflict = null, string|null $conflict_target = null):static{
 		return $this->setOnConflict($table, $on_conflict, $conflict_target);
 	}
 
-	public function values(iterable $values):Insert{
+	public function values(iterable $values):static{
 
-		/** @noinspection PhpConditionAlreadyCheckedInspection - ResultInterface implements Iterator */
 		if($values instanceof ResultInterface){
 			$this->bindValues = $values->toArray();
 

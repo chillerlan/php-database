@@ -18,15 +18,15 @@ namespace chillerlan\Database\Query;
  */
 class CreateDatabase extends Statement implements Query, IfNotExists{
 
-	public function name(string $dbname):CreateDatabase{
+	public function name(string $dbname):static{
 		return $this->setName($dbname);
 	}
 
-	public function charset(string $collation):CreateDatabase{
+	public function charset(string $collation):static{
 		return $this->setCharset($collation);
 	}
 
-	public function ifNotExists():CreateDatabase{
+	public function ifNotExists():static{
 		return $this->setIfNotExists();
 	}
 

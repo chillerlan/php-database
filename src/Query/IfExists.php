@@ -12,6 +12,6 @@ namespace chillerlan\Database\Query;
 
 interface IfExists{
 
-	public function ifExists():self;
+	public function ifExists():static;
 
 }

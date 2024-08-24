@@ -24,10 +24,10 @@ interface Where{
 	 * @param bool|null   $bind
 	 * @param string|null $join
 	 */
-	public function where(mixed $val1, mixed $val2 = null, string|null $operator = null, bool|null $bind = null, string|null $join = null):self;
+	public function where(mixed $val1, mixed $val2 = null, string|null $operator = null, bool|null $bind = null, string|null $join = null):static;
 
-	public function openBracket(string|null $join = null):self;
+	public function openBracket(string|null $join = null):static;
 
-	public function closeBracket():self;
+	public function closeBracket():static;
 
 }

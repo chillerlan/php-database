@@ -19,7 +19,7 @@ namespace chillerlan\Database\Query;
  */
 class AlterTable extends Statement implements Query{
 
-	public function name(string $tablename):AlterTable{
+	public function name(string $tablename):static{
 		return $this->setName($tablename);
 	}
 

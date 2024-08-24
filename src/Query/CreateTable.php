@@ -29,15 +29,15 @@ class CreateTable extends Statement implements Query, IfNotExists{
 	protected array $cols = [];
 	protected string|null  $dir = null;
 
-	public function name(string $name):CreateTable{
+	public function name(string $name):static{
 		return $this->setName($name);
 	}
 
-	public function charset(string $charset):CreateTable{
+	public function charset(string $charset):static{
 		return $this->setCharset($charset);
 	}
 
-	public function ifNotExists():CreateTable{
+	public function ifNotExists():static{
 		return $this->setIfNotExists();
 	}
 
@@ -46,20 +46,20 @@ class CreateTable extends Statement implements Query, IfNotExists{
 		return $this->dialect->createTable($this->name, $this->cols, $this->primaryKey, $this->ifNotExists, $this->temp, $this->dir);
 	}
 
-	public function temp():CreateTable{
+	public function temp():static{
 		$this->temp = true;
 
 		return $this;
 	}
 
-	public function primaryKey(string $field, string|null $dir = null):CreateTable{
+	public function primaryKey(string $field, string|null $dir = null):static{
 		$this->primaryKey = trim($field);
 		$this->dir        = strtoupper($dir ?? '');
 
 		return $this;
 	}
 
-	public function field(string $name, string $type, mixed $length = null, string|null $attribute = null, string|null $collation = null, bool|null $isNull = null, string|null $defaultType = null, mixed $defaultValue = null, string|null $extra = null):CreateTable{
+	public function field(string $name, string $type, mixed $length = null, string|null $attribute = null, string|null $collation = null, bool|null $isNull = null, string|null $defaultType = null, mixed $defaultValue = null, string|null $extra = null):static{
 
 		if(is_scalar($defaultValue) && $defaultType === null){
 			$defaultType = 'USER_DEFINED';
@@ -70,45 +70,45 @@ class CreateTable extends Statement implements Query, IfNotExists{
 		return $this;
 	}
 
-	public function enum(string $name, array $values, mixed $defaultValue = null, bool|null $isNull = null):CreateTable{
+	public function enum(string $name, array $values, mixed $defaultValue = null, bool|null $isNull = null):static{
 		$this->cols[$name] = $this->dialect->enum($name, $values, $defaultValue, $isNull);
 
 		return $this;
 	}
 
-	public function tinyint(string $name, int|null $length = null, mixed $defaultValue = null, bool|null $isNull = null, string|null $attribute = null):CreateTable{
+	public function tinyint(string $name, int|null $length = null, mixed $defaultValue = null, bool|null $isNull = null, string|null $attribute = null):static{
 		return $this->field($name, 'TINYINT', $length, $attribute, null, $isNull, null, $defaultValue);
 	}
 
-	public function int(string $name, int|null $length = null, mixed $defaultValue = null, bool|null $isNull = null, string|null $attribute = null):CreateTable{
+	public function int(string $name, int|null $length = null, mixed $defaultValue = null, bool|null $isNull = null, string|null $attribute = null):static{
 		return $this->field($name, 'INT', $length, $attribute, null, $isNull, null, $defaultValue);
 	}
 
-	public function bigint(string $name, int|null $length = null, mixed $defaultValue = null, bool|null $isNull = null, string|null $attribute = null):CreateTable{
+	public function bigint(string $name, int|null $length = null, mixed $defaultValue = null, bool|null $isNull = null, string|null $attribute = null):static{
 		return $this->field($name, 'BIGINT', $length, $attribute, null, $isNull, null, $defaultValue);
 	}
 
-	public function varchar(string $name, int $length, mixed $defaultValue = null, bool|null $isNull = null):CreateTable{
+	public function varchar(string $name, int $length, mixed $defaultValue = null, bool|null $isNull = null):static{
 		return $this->field($name, 'VARCHAR', $length, null, null, $isNull, null, $defaultValue);
 	}
 
-	public function decimal(string $name, string $length, mixed $defaultValue = null, bool|null $isNull = null):CreateTable{
+	public function decimal(string $name, string $length, mixed $defaultValue = null, bool|null $isNull = null):static{
 		return $this->field($name, 'DECIMAL', $length, null, null, $isNull, null, $defaultValue);
 	}
 
-	public function tinytext(string $name, mixed $defaultValue = null, bool|null $isNull = null):CreateTable{
+	public function tinytext(string $name, mixed $defaultValue = null, bool|null $isNull = null):static{
 		return $this->field($name, 'TINYTEXT', null, null, null, $isNull, null, $defaultValue);
 	}
 
-	public function text(string $name, mixed $defaultValue = null, bool|null $isNull = null):CreateTable{
+	public function text(string $name, mixed $defaultValue = null, bool|null $isNull = null):static{
 		return $this->field($name, 'TEXT', null, null, null, $isNull, null, $defaultValue);
 	}
 
-	public function mediumtext(string $name, mixed $defaultValue = null, bool|null $isNull = null):CreateTable{
+	public function mediumtext(string $name, mixed $defaultValue = null, bool|null $isNull = null):static{
 		return $this->field($name, 'MEDIUMTEXT', null, null, null, $isNull, null, $defaultValue);
 	}
 
-	public function longtext(string $name, mixed $defaultValue = null, bool|null $isNull = null):CreateTable{
+	public function longtext(string $name, mixed $defaultValue = null, bool|null $isNull = null):static{
 		return $this->field($name, 'LONGTEXT', null, null, null, $isNull, null, $defaultValue);
 	}
 

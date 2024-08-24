@@ -18,11 +18,11 @@ namespace chillerlan\Database\Query;
  */
 class DropDatabase extends Statement implements Query, IfExists{
 
-	public function name(string $dbname):DropDatabase{
+	public function name(string $dbname):static{
 		return $this->setName($dbname);
 	}
 
-	public function ifExists():DropDatabase{
+	public function ifExists():static{
 		return $this->setIfExists();
 	}
 

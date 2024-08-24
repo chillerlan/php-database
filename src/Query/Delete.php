@@ -19,27 +19,27 @@ namespace chillerlan\Database\Query;
  */
 class Delete extends Statement implements Where, Limit, BindValues, Query{
 
-	public function from(string $name):Delete{
+	public function from(string $name):static{
 		return $this->setName($name);
 	}
 
-	public function where($val1, $val2 = null, string|null $operator = null, bool|null $bind = null, string|null $join = null):Delete{
+	public function where($val1, $val2 = null, string|null $operator = null, bool|null $bind = null, string|null $join = null):static{
 		return $this->setWhere($val1, $val2, $operator, $bind, $join);
 	}
 
-	public function openBracket(string|null $join = null):Delete{
+	public function openBracket(string|null $join = null):static{
 		return $this->setOpenBracket($join);
 	}
 
-	public function closeBracket():Delete{
+	public function closeBracket():static{
 		return $this->setCloseBracket();
 	}
 
-	public function limit(int $limit):Delete{
+	public function limit(int $limit):static{
 		return $this->setLimit($limit);
 	}
 
-	public function offset(int $offset):Delete{
+	public function offset(int $offset):static{
 		return $this->setOffset($offset);
 	}
 

@@ -193,7 +193,7 @@ abstract class DriverAbstract implements DriverInterface{
 	 * @todo: return array of results
 	 * @see determine callable type? http://php.net/manual/en/language.types.callable.php#118032
 	 */
-	public function multiCallback(string $sql, array $data, $callback):bool{
+	public function multiCallback(string $sql, array $data, callable|array $callback):bool{
 		$this->checkSQL($sql);
 
 		if(count($data) < 1){

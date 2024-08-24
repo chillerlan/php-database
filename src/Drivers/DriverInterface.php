@@ -142,6 +142,6 @@ interface DriverInterface extends LoggerAwareInterface{
 	 * @return bool true query success, otherwise false
 	 * @throws \chillerlan\Database\Drivers\DriverException
 	 */
-	public function multiCallback(string $sql, array $data, $callback):bool;
+	public function multiCallback(string $sql, array $data, callable|array $callback):bool;
 
 }

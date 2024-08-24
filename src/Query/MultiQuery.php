@@ -13,15 +13,13 @@ namespace chillerlan\Database\Query;
 interface MultiQuery extends Query{
 
 	/**
-	 * @return mixed
 	 * @throws \chillerlan\Database\Query\QueryException
 	 */
-	public function multi(array|null $values = null);
+	public function multi(array|null $values = null):bool;
 
 	/**
-	 * @return mixed
 	 * @throws \chillerlan\Database\Query\QueryException
 	 */
-	public function callback(array $values, callable $callback);
+	public function callback(array $values, callable $callback):bool;
 
 }

@@ -59,7 +59,7 @@ abstract class Statement implements LoggerAwareInterface{
 	}
 
 	/** */
-	protected function setName(string $name):self{
+	protected function setName(string $name):static{
 		$this->name = trim($name);
 
 		if(empty($this->name)){
@@ -70,7 +70,7 @@ abstract class Statement implements LoggerAwareInterface{
 	}
 
 	/** */
-	protected function setOnConflict(string $name, string|null $on_conflict = null, string|null $conflict_target = null):self{
+	protected function setOnConflict(string $name, string|null $on_conflict = null, string|null $conflict_target = null):static{
 		$this->name      = trim($name);
 		$on_conflict     = trim(strtoupper($on_conflict ?? ''));
 		$conflict_target = trim($conflict_target ?? '');
@@ -91,21 +91,21 @@ abstract class Statement implements LoggerAwareInterface{
 	}
 
 	/** */
-	protected function setCharset(string $charset):self{
+	protected function setCharset(string $charset):static{
 		$this->charset = trim($charset);
 
 		return $this;
 	}
 
 	/** */
-	protected function setIfExists():self{
+	protected function setIfExists():static{
 		$this->ifExists = true;
 
 		return $this;
 	}
 
 	/** */
-	protected function setIfNotExists():self{
+	protected function setIfNotExists():static{
 		$this->ifNotExists = true;
 
 		return $this;
@@ -114,7 +114,7 @@ abstract class Statement implements LoggerAwareInterface{
 	/**
 	 *
 	 */
-	protected function setWhere(mixed $val1, mixed $val2, string|null $operator = null, bool|null $bind = null, string|null $join = null):self{
+	protected function setWhere(mixed $val1, mixed $val2, string|null $operator = null, bool|null $bind = null, string|null $join = null):static{
 		$operator = $operator !== null ? strtoupper(trim($operator)) : '=';
 		$bind     ??= true;
 
@@ -198,7 +198,7 @@ abstract class Statement implements LoggerAwareInterface{
 	}
 
 	/** */
-	protected function setOpenBracket(string|null $join = null):self{
+	protected function setOpenBracket(string|null $join = null):static{
 		$join = strtoupper(trim($join ?? ''));
 
 		if(in_array($join, $this->joinArgs, true)){
@@ -211,7 +211,7 @@ abstract class Statement implements LoggerAwareInterface{
 	}
 
 	/** */
-	protected function setCloseBracket():self{
+	protected function setCloseBracket():static{
 		$this->where[] = ')';
 
 		return $this;
@@ -324,21 +324,21 @@ abstract class Statement implements LoggerAwareInterface{
 	}
 
 	/** */
-	protected function setLimit(int $limit):self{
+	protected function setLimit(int $limit):static{
 		$this->limit = max($limit, 0);
 
 		return $this;
 	}
 
 	/** */
-	protected function setOffset(int $offset):self{
+	protected function setOffset(int $offset):static{
 		$this->offset = max($offset, 0);
 
 		return $this;
 	}
 
 	/** */
-	protected function setCached(int|null $ttl = null):self{
+	protected function setCached(int|null $ttl = null):static{
 		$this->cached = true;
 
 		if($ttl > 0){

@@ -18,7 +18,7 @@ namespace chillerlan\Database\Query;
  */
 class AlterDatabase extends Statement implements Query{
 
-	public function name(string $dbname):AlterDatabase{
+	public function name(string $dbname):static{
 		return $this->setName($dbname);
 	}
 

@@ -17,7 +17,7 @@ namespace chillerlan\Database\Query;
  */
 class Truncate extends Statement implements Query{
 
-	public function table(string $name):Truncate{
+	public function table(string $name):static{
 		return $this->setName($name);
 	}
 

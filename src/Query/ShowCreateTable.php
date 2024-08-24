@@ -12,7 +12,7 @@ namespace chillerlan\Database\Query;
 
 class ShowCreateTable extends Statement implements Query{
 
-	public function name(string $name):ShowCreateTable{
+	public function name(string $name):static{
 		return $this->setName($name);
 	}
 
