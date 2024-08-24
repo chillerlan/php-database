@@ -10,7 +10,8 @@
 
 namespace chillerlan\Database;
 
-use function call_user_func_array, is_callable, is_string, mb_convert_encoding;
+use Closure;
+use function is_string, mb_convert_encoding;
 
 /**
  * @property mixed[] $array
@@ -26,8 +27,8 @@ class ResultRow extends Result{
 		if($value !== null){
 			$func = $arguments[0] ?? null;
 
-			if(is_callable($func)){
-				return call_user_func_array($func, [$value]);
+			if($func instanceof Closure){
+				return $func($value);
 			}
 
 		}

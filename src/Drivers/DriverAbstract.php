@@ -12,11 +12,12 @@ namespace chillerlan\Database\Drivers;
 
 use chillerlan\Database\Result;
 use chillerlan\Settings\SettingsContainerInterface;
+use Closure;
 use Throwable;
 use Psr\Log\{LoggerInterface, NullLogger};
 use Psr\SimpleCache\CacheInterface;
 
-use function bin2hex, call_user_func_array, count, floatval, hash, intval, is_array, is_bool,
+use function bin2hex, count, floatval, hash, intval, is_array, is_bool,
 	is_callable, is_float, is_int, is_numeric, serialize, trim;
 
 /**
@@ -76,7 +77,7 @@ abstract class DriverAbstract implements DriverInterface{
 	/**
 	 *
 	 */
-	abstract protected function multi_callback_query(string $sql, array $data, $callback):bool;
+	abstract protected function multi_callback_query(string $sql, array $data, Closure $callback):bool;
 
 	/**
 	 * Sets a logger.
@@ -193,7 +194,7 @@ abstract class DriverAbstract implements DriverInterface{
 	 * @todo: return array of results
 	 * @see determine callable type? http://php.net/manual/en/language.types.callable.php#118032
 	 */
-	public function multiCallback(string $sql, array $data, callable|array $callback):bool{
+	public function multiCallback(string $sql, array $data, Closure $callback):bool{
 		$this->checkSQL($sql);
 
 		if(count($data) < 1){
@@ -246,12 +247,12 @@ abstract class DriverAbstract implements DriverInterface{
 	/**
 	 * @inheritdoc
 	 */
-	protected function getResult(callable $callable, array $args, string|null $index = null, bool|null $assoc = null):Result{
+	protected function getResult(Closure $callable, array $args, string|null $index = null, bool|null $assoc = null):Result{
 		$out = new Result(null, $this->convert_encoding_src, $this->convert_encoding_dest);
 		$i   = 0;
 
 		/** @noinspection PhpAssignmentInConditionInspection */
-		while($row = call_user_func_array($callable, $args)){
+		while($row = $callable(...$args)){
 			$key = $assoc && !empty($index) ? $row[$index] : $i;
 
 			$out[$key] = $row;

@@ -53,7 +53,7 @@ final class ResultTest extends TestCase{
 			$this::assertNull($row->foo);
 			$this::assertNull($row->foo());
 			$this::assertTrue(isset($row['hash'], $row['id']));
-			$this::assertSame($row->id('md5'), $row->hash());
+			$this::assertSame($row->id(md5(...)), $row->hash());
 			$this::assertSame(['id' => $row->id, 'hash' => $row->hash], $row->toArray());
 			$this::assertSame(['hash' => $row->hash], $row->chunk(1)[1]);
 			$this::assertSame($row->id, $this->result->key());

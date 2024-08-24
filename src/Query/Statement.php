@@ -11,6 +11,7 @@
 namespace chillerlan\Database\Query;
 
 use chillerlan\Database\Result;
+use Closure;
 use chillerlan\Database\Dialects\{Dialect, Firebird, MSSQL};
 use chillerlan\Database\Drivers\DriverInterface;
 use Psr\Log\{LoggerAwareInterface, LoggerAwareTrait, LoggerInterface};
@@ -390,7 +391,7 @@ abstract class Statement implements LoggerAwareInterface{
 	/**
 	 * @throws \chillerlan\Database\Query\QueryException
 	 */
-	public function callback(array $values, callable $callback):bool{
+	public function callback(array $values, Closure $callback):bool{
 
 		if(!$this instanceof MultiQuery){
 			throw new QueryException('MultiQuery not supported');

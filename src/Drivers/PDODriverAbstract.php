@@ -13,9 +13,10 @@
 namespace chillerlan\Database\Drivers;
 
 use chillerlan\Database\Result;
+use Closure;
 use PDO, PDOStatement, Throwable;
 
-use function call_user_func_array, gettype, is_bool;
+use function gettype, is_bool;
 
 /**
  *
@@ -117,7 +118,7 @@ abstract class PDODriverAbstract extends DriverAbstract{
 			return new Result(null, null, null, true, $stmt);
 		}
 
-		return parent::getResult([$stmt, 'fetch'], [$assoc ? PDO::FETCH_ASSOC : PDO::FETCH_NUM], $index, $assoc);
+		return parent::getResult($stmt->fetch(...), [$assoc ? PDO::FETCH_ASSOC : PDO::FETCH_NUM], $index, $assoc);
 	}
 
 	/**
@@ -161,11 +162,11 @@ abstract class PDODriverAbstract extends DriverAbstract{
 	/**
 	 * @inheritdoc
 	 */
-	protected function multi_callback_query(string $sql, array $data, $callback):bool{
+	protected function multi_callback_query(string $sql, array $data, Closure $callback):bool{
 		$stmt = $this->db->prepare($sql, $this->pdo_stmt_options);
 
 		foreach($data as $k => $row){
-			$this->bindParams($stmt, call_user_func_array($callback, [$row, $k]));
+			$this->bindParams($stmt, $callback($row, $k));
 			$stmt->execute();
 		}
 

@@ -13,9 +13,10 @@
 namespace chillerlan\Database\Drivers;
 
 use chillerlan\Database\Result;
+use Closure;
 use chillerlan\Database\Dialects\{Dialect, MSSQL};
 
-use function array_values, bin2hex, call_user_func_array, gettype, implode, is_bool, is_numeric, sprintf, sqlsrv_client_info,
+use function array_values, bin2hex, gettype, implode, is_bool, is_numeric, sprintf, sqlsrv_client_info,
 	sqlsrv_close, sqlsrv_connect, sqlsrv_errors, sqlsrv_free_stmt, sqlsrv_query, sqlsrv_server_info;
 
 use const PHP_OS, SQLSRV_FETCH_ASSOC, SQLSRV_FETCH_NUMERIC;
@@ -195,12 +196,12 @@ final class MSSqlSrv extends DriverAbstract{
 	/**
 	 * @inheritdoc
 	 */
-	protected function multi_callback_query(string $sql, array $data, $callback):bool{
+	protected function multi_callback_query(string $sql, array $data, Closure $callback):bool{
 		$r = [];
 
 		// @todo: sqlsrv_prepare/sqlsrv_execute
 		foreach($data as $i => $row){
-			$r[] = $this->prepared_query($sql, call_user_func_array($callback, [$row, $i]));
+			$r[] = $this->prepared_query($sql, $callback($row, $i));
 		}
 
 		foreach($r as $result){

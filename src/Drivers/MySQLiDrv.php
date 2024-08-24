@@ -12,11 +12,12 @@
 
 namespace chillerlan\Database\Drivers;
 
+use Closure;
 use chillerlan\Database\Dialects\{Dialect, MySQL};
 use chillerlan\Database\Result;
 use Throwable, mysqli;
 
-use function array_unshift, call_user_func_array, count, gettype, implode, is_array, is_bool, mysqli_init;
+use function array_unshift, count, gettype, implode, is_array, is_bool, mysqli_init;
 
 use const MYSQLI_OPT_CONNECT_TIMEOUT;
 
@@ -147,7 +148,7 @@ final class MySQLiDrv extends DriverAbstract{
 			return new Result(null, null, null, true, $result);
 		}
 
-		$r = $this->getResult([$result, 'fetch_'.(($assoc ?? true) ? 'assoc' : 'row')], [], $index, $assoc);
+		$r = $this->getResult((($assoc ?? true) ? $result->fetch_assoc(...) : $result->fetch_row(...)), [], $index, $assoc);
 
 		$result->free();
 
@@ -166,7 +167,7 @@ final class MySQLiDrv extends DriverAbstract{
 		$this->stmtError($this->db->errno, $this->db->error);
 
 		if(count($values) > 0){
-			call_user_func_array([$stmt, 'bind_param'], $this->getReferences($values));
+			$stmt->bind_param(...$this->getReferences($values));
 		}
 
 		$stmt->execute();
@@ -189,7 +190,7 @@ final class MySQLiDrv extends DriverAbstract{
 			$refs[] = &$cols[$assoc ? $field->name : $k];
 		}
 
-		call_user_func_array([$stmt, 'bind_result'], $refs);
+		$stmt->bind_result(...$refs);
 
 		// fetch the data
 		$output = new Result(null, $this->convert_encoding_src, $this->convert_encoding_dest);
@@ -228,7 +229,7 @@ final class MySQLiDrv extends DriverAbstract{
 		$this->stmtError($this->db->errno, $this->db->error);
 
 		foreach($values as $row){
-			call_user_func_array([$stmt, 'bind_param'], $this->getReferences($row));
+			$stmt->bind_param(...$this->getReferences($row));
 
 			$stmt->execute();
 		}
@@ -241,16 +242,16 @@ final class MySQLiDrv extends DriverAbstract{
 	/**
 	 * @inheritdoc
 	 */
-	protected function multi_callback_query(string $sql, array $data, $callback):bool{
+	protected function multi_callback_query(string $sql, array $data, Closure $callback):bool{
 		$stmt = $this->db->stmt_init();
 		$stmt->prepare($sql);
 		$this->stmtError($this->db->errno, $this->db->error);
 
 		foreach($data as $k => $row){
-			$row = call_user_func_array($callback, [$row, $k]);
+			$row = $callback($row, $k);
 
 			if(is_array($row) && !empty($row)){
-				call_user_func_array([$stmt, 'bind_param'], $this->getReferences($row));
+				$stmt->bind_param(...$this->getReferences($row));
 
 				$stmt->execute();
 			}

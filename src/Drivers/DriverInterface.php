@@ -13,6 +13,7 @@ namespace chillerlan\Database\Drivers;
 use chillerlan\Database\Dialects\Dialect;
 use chillerlan\Database\Result;
 use chillerlan\Settings\SettingsContainerInterface;
+use Closure;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
@@ -135,13 +136,13 @@ interface DriverInterface extends LoggerAwareInterface{
 	 * @link https://gist.github.com/krakjoe/6437782
 	 * @link https://gist.github.com/krakjoe/9384409
 	 *
-	 * @param string         $sql      The SQL statement to prepare
-	 * @param array          $data     an array with the (raw) data to insert, each row represents one line to insert.
-	 * @param callable|array $callback a callback that processes the values for each row.
+	 * @param string  $sql      The SQL statement to prepare
+	 * @param array   $data     an array with the (raw) data to insert, each row represents one line to insert.
+	 * @param Closure $callback a callback that processes the values for each row.
 	 *
 	 * @return bool true query success, otherwise false
 	 * @throws \chillerlan\Database\Drivers\DriverException
 	 */
-	public function multiCallback(string $sql, array $data, callable|array $callback):bool;
+	public function multiCallback(string $sql, array $data, Closure $callback):bool;
 
 }

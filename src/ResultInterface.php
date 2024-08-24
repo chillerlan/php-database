@@ -11,6 +11,7 @@
 namespace chillerlan\Database;
 
 use ArrayAccess, Countable, JsonSerializable, SeekableIterator;
+use Closure;
 
 interface ResultInterface extends SeekableIterator, ArrayAccess, Countable, JsonSerializable{
 
@@ -24,10 +25,10 @@ interface ResultInterface extends SeekableIterator, ArrayAccess, Countable, Json
 	public function toArray():array;
 
 	/** @return mixed */
-	public function each(callable $callback);
+	public function each(Closure $callback);
 
 	/** */
-	public function map(callable $callback):array;
+	public function map(Closure $callback):array;
 
 	/** */
 	public function reverse():ResultInterface;
@@ -45,10 +46,10 @@ interface ResultInterface extends SeekableIterator, ArrayAccess, Countable, Json
 	public function inspect():string;
 
 	/** */
-	public function findAll(callable $callback):array;
+	public function findAll(Closure $callback):array;
 
 	/** */
-	public function reject(callable $callback):array;
+	public function reject(Closure $callback):array;
 
 	/** */
 	public function merge(ResultInterface $Result):ResultInterface;

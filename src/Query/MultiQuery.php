@@ -10,6 +10,8 @@
 
 namespace chillerlan\Database\Query;
 
+use Closure;
+
 interface MultiQuery extends Query{
 
 	/**
@@ -20,6 +22,6 @@ interface MultiQuery extends Query{
 	/**
 	 * @throws \chillerlan\Database\Query\QueryException
 	 */
-	public function callback(array $values, callable $callback):bool;
+	public function callback(array $values, Closure $callback):bool;
 
 }

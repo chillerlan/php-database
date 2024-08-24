@@ -12,14 +12,17 @@
 
 namespace chillerlan\Database\Drivers;
 
+use Closure;
 use chillerlan\Database\Dialects\{Dialect, Postgres};
 use chillerlan\Database\Result;
 use Throwable;
 use PgSql\Connection as PgSqlConnection;
 use PgSql\Result as PgSqlResult;
 
-use function bin2hex, call_user_func_array, implode, in_array, pg_close, pg_connect, pg_execute, pg_field_type,
+use function bin2hex, implode, in_array, pg_close, pg_connect, pg_execute, pg_field_type,
 	pg_free_result, pg_last_error, pg_prepare, pg_query, pg_version, preg_replace_callback;
+use function pg_fetch_assoc;
+use function pg_fetch_row;
 
 /**
  *
@@ -176,7 +179,7 @@ final class PostgreSQL extends DriverAbstract{
 	/**
 	 * @inheritdoc
 	 */
-	protected function multi_callback_query(string $sql, array $data, $callback):bool{
+	protected function multi_callback_query(string $sql, array $data, Closure $callback):bool{
 		$p = pg_prepare($this->db, '', $this->replaceParams($sql));
 
 		if($p === false){
@@ -184,7 +187,7 @@ final class PostgreSQL extends DriverAbstract{
 		}
 
 		foreach($data as $k => $row){
-			pg_execute($this->db, '', call_user_func_array($callback, [$row, $k]));
+			pg_execute($this->db, '', $callback($row, $k));
 		}
 
 		return true;
@@ -203,7 +206,7 @@ final class PostgreSQL extends DriverAbstract{
 		$i   = 0;
 
 		/** @noinspection PhpAssignmentInConditionInspection */
-		while($row = call_user_func_array($assoc ? 'pg_fetch_assoc' : 'pg_fetch_row', [$result])){
+		while($row = ($assoc ? pg_fetch_assoc($result) : pg_fetch_row($result))){
 			$key = $i;
 
 			$j = 0;
@@ -243,7 +246,6 @@ final class PostgreSQL extends DriverAbstract{
 	private function replaceParams(string $sql):string{
 		$i = 1;
 
-		/** @phan-suppress-next-line PhanTypeMismatchArgumentInternal - a Closure is callable... */
 		return preg_replace_callback('/(\?)/', function() use (&$i){
 			return '$'.$i++;
 		}, $sql);

@@ -10,10 +10,11 @@
 
 namespace chillerlan\Database;
 
+use Closure;
 use OutOfBoundsException;
 
 use function array_chunk, array_column, array_key_exists, array_keys, array_merge, array_reverse,
-	array_values, call_user_func_array, count, next, print_r;
+	array_values, count, next, print_r;
 
 class Result implements ResultInterface{
 
@@ -62,7 +63,7 @@ class Result implements ResultInterface{
 	/**
 	 * @link http://api.prototypejs.org/language/Enumerable/prototype/each/
 	 */
-	public function each(callable $callback):ResultInterface{
+	public function each(Closure $callback):ResultInterface{
 		$this->map($callback);
 
 		return $this;
@@ -74,11 +75,11 @@ class Result implements ResultInterface{
 	 *
 	 * @throws \chillerlan\Database\DatabaseException
 	 */
-	public function map(callable $callback):array{
+	public function map(Closure $callback):array{
 		$return = [];
 
 		foreach($this->array as $index => $element){
-			$return[$index] = call_user_func_array($callback, [$element, $index]);
+			$return[$index] = $callback($element, $index);
 		}
 
 		return $return;
@@ -123,12 +124,12 @@ class Result implements ResultInterface{
 	 *
 	 * @throws \chillerlan\Database\DatabaseException
 	 */
-	public function findAll(callable $callback):array{
+	public function findAll(Closure $callback):array{
 		$return = [];
 
 		foreach($this->array as $index => $element){
 
-			if(call_user_func_array($callback, [$element, $index]) === true){
+			if($callback($element, $index) === true){
 				$return[] = $element;
 			}
 
@@ -142,12 +143,12 @@ class Result implements ResultInterface{
 	 *
 	 * @throws \chillerlan\Database\DatabaseException
 	 */
-	public function reject(callable $callback):array{
+	public function reject(Closure $callback):array{
 		$return = [];
 
 		foreach($this->array as $index => $element){
 
-			if(call_user_func_array($callback, [$element, $index]) !== true){
+			if($callback($element, $index) !== true){
 				$return[] = $element;
 			}
 

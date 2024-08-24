@@ -154,13 +154,6 @@ abstract class DriverTestAbstract extends DBTestAbstract{
 		$this->driver->multiCallback('', [], function(){});
 	}
 
-	public function testMultiCallbackInvalidCallbackException():void{
-		$this->expectException(DriverException::class);
-		$this->expectExceptionMessage('invalid callback');
-
-		$this->driver->multiCallback('UPDATE foo bar ???', [[0]], [$this, 'foo']);
-	}
-
 	public function testMultiCallbackSQLErrorException():void{
 		$this->expectException(DriverException::class);
 		$this->expectExceptionMessage('sql error:');

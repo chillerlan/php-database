@@ -12,6 +12,7 @@ namespace chillerlan\Database;
 
 use chillerlan\Database\Dialects\Dialect;
 use chillerlan\Database\Drivers\DriverInterface;
+use Closure;
 
 class Database extends DatabaseAbstract implements DriverInterface{
 
@@ -76,7 +77,7 @@ class Database extends DatabaseAbstract implements DriverInterface{
 	}
 
 	/** @inheritdoc */
-	public function multiCallback(string $sql, array $data, callable|array $callback):bool{
+	public function multiCallback(string $sql, array $data, Closure $callback):bool{
 		return $this->driver->multiCallback($sql, $data, $callback);
 	}
 
