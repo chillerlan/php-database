@@ -11,10 +11,9 @@
 namespace chillerlan\DatabaseTest\Drivers;
 
 use chillerlan\Database\Drivers\PostgreSQL;
+use PgSql\Connection;
 use PHPUnit\Framework\Attributes\Group;
 use function extension_loaded;
-use function get_resource_type;
-use const PHP_VERSION_ID;
 
 #[Group('pgsql')]
 final class PostgreSQLTest extends DriverTestAbstract{
@@ -32,15 +31,7 @@ final class PostgreSQLTest extends DriverTestAbstract{
 	}
 
 	public function testGetDBResource():void{
-		$r = $this->driver->getDBResource();
-
-		if(PHP_VERSION_ID >= 80100){
-			$this::assertInstanceOf('PgSql\\Connection', $r);
-		}
-		else{
-			$this::assertIsResource($r);
-			$this::assertSame('pgsql link', get_resource_type($r));
-		}
+		$this::assertInstanceOf(Connection::class, $this->driver->getDBResource());
 	}
 
 	public function testEscapeString():void{
