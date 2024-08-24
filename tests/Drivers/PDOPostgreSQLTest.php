@@ -11,8 +11,10 @@
 namespace chillerlan\DatabaseTest\Drivers;
 
 use chillerlan\Database\Drivers\PDOPostgreSQL;
+use PHPUnit\Framework\Attributes\Group;
 use function extension_loaded;
 
+#[Group('pgsql')]
 final class PDOPostgreSQLTest extends PDODriverTestAbstract{
 
 	protected string $envPrefix  = 'DB_POSTGRES';

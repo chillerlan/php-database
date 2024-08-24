@@ -16,7 +16,7 @@ use PHPUnit\Framework\TestCase;
 
 use function hex2bin, json_encode, md5, range;
 
-class ResultTest extends TestCase{
+final class ResultTest extends TestCase{
 
 	/**
 	 * @var \chillerlan\Database\Result

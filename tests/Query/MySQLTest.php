@@ -12,9 +12,11 @@ namespace chillerlan\DatabaseTest\Query;
 
 use chillerlan\Database\Drivers\MySQLiDrv;
 use chillerlan\Database\ResultInterface;
+use PHPUnit\Framework\Attributes\Group;
 use function extension_loaded;
 
-class MySQLTest extends QueryTestAbstract{
+#[Group('mysql')]
+final class MySQLTest extends QueryTestAbstract{
 
 	protected string $envPrefix  = 'DB_MYSQLI';
 	protected string $driverFQCN = MySQLiDrv::class;

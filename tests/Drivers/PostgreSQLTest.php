@@ -11,10 +11,12 @@
 namespace chillerlan\DatabaseTest\Drivers;
 
 use chillerlan\Database\Drivers\PostgreSQL;
+use PHPUnit\Framework\Attributes\Group;
 use function extension_loaded;
 use function get_resource_type;
 use const PHP_VERSION_ID;
 
+#[Group('pgsql')]
 final class PostgreSQLTest extends DriverTestAbstract{
 
 	protected string $envPrefix  = 'DB_POSTGRES';

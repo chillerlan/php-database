@@ -12,9 +12,11 @@ namespace chillerlan\DatabaseTest\Query;
 
 use chillerlan\Database\Drivers\PostgreSQL;
 use chillerlan\Database\ResultInterface;
+use PHPUnit\Framework\Attributes\Group;
 use function extension_loaded;
 
-class PostgresTest extends QueryTestAbstract{
+#[Group('pgsql')]
+final class PostgresTest extends QueryTestAbstract{
 
 	protected string $envPrefix  = 'DB_POSTGRES';
 	protected string $driverFQCN = PostgreSQL::class;

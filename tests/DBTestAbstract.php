@@ -88,7 +88,7 @@ abstract class DBTestAbstract extends TestCase{
 
 		$this->options = new DatabaseOptions([
 			'host'     => $this->env->get($this->envPrefix.'_HOST'),
-			'port'     => $this->env->get($this->envPrefix.'_PORT'),
+			'port'     => (int)$this->env->get($this->envPrefix.'_PORT'),
 			'database' => $this->env->get($this->envPrefix.'_DATABASE'),
 			'username' => $this->env->get($this->envPrefix.'_USERNAME'),
 			'password' => $this->env->get($this->envPrefix.'_PASSWORD'),

@@ -11,8 +11,10 @@
 namespace chillerlan\DatabaseTest\Drivers;
 
 use chillerlan\Database\Drivers\PDOFirebird;
+use PHPUnit\Framework\Attributes\Group;
 use function extension_loaded;
 
+#[Group('firebird')]
 final class PDOFirebirdTest extends PDODriverTestAbstract{
 
 	protected string $envPrefix  = 'DB_FIREBIRD';

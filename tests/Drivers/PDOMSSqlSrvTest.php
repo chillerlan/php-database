@@ -11,8 +11,10 @@
 namespace chillerlan\DatabaseTest\Drivers;
 
 use chillerlan\Database\Drivers\PDOMSSqlSrv;
+use PHPUnit\Framework\Attributes\Group;
 use function function_exists;
 
+#[Group('mssql')]
 final class PDOMSSqlSrvTest extends PDODriverTestAbstract{
 
 	protected string $envPrefix  = 'DB_MSSQL';

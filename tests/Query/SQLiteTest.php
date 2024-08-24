@@ -12,12 +12,14 @@ namespace chillerlan\DatabaseTest\Query;
 
 use chillerlan\Database\Drivers\PDOSQLite;
 use chillerlan\Database\ResultInterface;
+use PHPUnit\Framework\Attributes\Group;
 use function extension_loaded;
 use function json_encode;
 use function md5;
 use const PHP_VERSION_ID;
 
-class SQLiteTest extends QueryTestAbstract{
+#[Group('sqlite')]
+final class SQLiteTest extends QueryTestAbstract{
 
 	protected string $envPrefix  = 'DB_SQLITE3';
 	protected string $driverFQCN = PDOSQLite::class;

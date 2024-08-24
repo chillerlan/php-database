@@ -11,8 +11,10 @@
 namespace chillerlan\DatabaseTest\Drivers;
 
 use chillerlan\Database\Drivers\MSSqlSrv;
+use PHPUnit\Framework\Attributes\Group;
 use function function_exists, get_resource_type;
 
+#[Group('mssql')]
 final class MSSqlSrvTest extends DriverTestAbstract{
 
 	protected string $envPrefix  = 'DB_MSSQL';

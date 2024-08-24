@@ -11,8 +11,10 @@
 namespace chillerlan\DatabaseTest\Drivers;
 
 use chillerlan\Database\Drivers\PDOSQLite;
+use PHPUnit\Framework\Attributes\Group;
 use function extension_loaded;
 
+#[Group('sqlite')]
 final class PDOSQLiteMemoryTest extends PDODriverTestAbstract{
 
 	protected string $envPrefix  = 'SQLITE_MEM';

@@ -14,8 +14,10 @@ namespace chillerlan\DatabaseTest\Drivers;
 
 use chillerlan\Database\Drivers\MySQLiDrv;
 use mysqli;
+use PHPUnit\Framework\Attributes\Group;
 use function extension_loaded;
 
+#[Group('mysql')]
 final class MySQLiTest extends DriverTestAbstract{
 
 	protected string $envPrefix  = 'DB_MYSQLI';

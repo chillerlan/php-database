@@ -11,8 +11,10 @@
 namespace chillerlan\DatabaseTest\Drivers;
 
 use chillerlan\Database\Drivers\PDOMySQL;
+use PHPUnit\Framework\Attributes\Group;
 use function extension_loaded;
 
+#[Group('mysql')]
 final class PDOMySQLTest extends PDODriverTestAbstract{
 
 	protected string $envPrefix  = 'DB_MYSQLI';
