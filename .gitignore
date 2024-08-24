@@ -14,6 +14,6 @@
 .build/*
 config/.env
 vendor/*
-storage/*
+tests/storage/*
 composer.lock
 phpunit.xml

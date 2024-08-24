@@ -82,7 +82,7 @@ abstract class DBTestAbstract extends TestCase{
 		// fix database file names
 		$this->env->set($this->envPrefix.'_DATABASE', str_replace(
 			'{STORAGE}',
-			realpath(__DIR__.'/../storage').DIRECTORY_SEPARATOR,
+			realpath(__DIR__.'/storage').DIRECTORY_SEPARATOR,
 			$this->env->get($this->envPrefix.'_DATABASE')
 		));
 
