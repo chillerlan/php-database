@@ -11,6 +11,10 @@ on:
     branches:
       - main
 
+env:
+  PHP_EXTENSIONS: json, mbstring, simplexml, sodium, odbc, pdo_odbc, mysqli, pdo_mysql, pgsql, pdo_pgsql, sqlite3, pdo_sqlite, sqlsrv, pdo_sqlsrv, pdo_firebird
+  PHP_INI_VALUES: memory_limit=-1, error_reporting=-1, display_errors=On
+
 
 jobs:
 
@@ -22,8 +26,9 @@ jobs:
       fail-fast: true
       matrix:
         php-version:
-          - "8.1"
           - "8.2"
+          - "8.3"
+#          - "8.4"
 
     env:
       PHAN_ALLOW_XDEBUG: 0
@@ -31,18 +36,18 @@ jobs:
 
     steps:
       - name: "Checkout"
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: "Install PHP"
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-version }}
-          tools: pecl
+          extensions: ast, ${{ env.PHP_EXTENSIONS }}
+          ini-values: ${{ env.PHP_INI_VALUES }}
           coverage: none
-          extensions: ast, curl, json, simplexml, zlib
 
       - name: "Update dependencies with composer"
-        uses: ramsey/composer-install@v2
+        uses: ramsey/composer-install@v3
 
       - name: "Run phan"
         run: php vendor/bin/phan --target-php-version=${{ matrix.php-version }}
@@ -55,12 +60,12 @@ jobs:
 
     steps:
       - name: "Checkout sources"
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: "Install PHP"
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "7.4"
+          php-version: "8.2"
           coverage: none
           tools: phpDocumentor
           extensions: gd, imagick, json, mbstring
@@ -71,9 +76,9 @@ jobs:
       - name: "Publish Docs to gh-pages"
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          BRANCH: gh-pages
-          FOLDER: docs
-          CLEAN: true
+          branch: gh-pages
+          folder: docs
+          clean: true
 
 
   tests:
@@ -88,16 +93,14 @@ jobs:
           - ubuntu-latest
           - windows-latest
         php-version:
-          - "8.1"
           - "8.2"
+          - "8.3"
+          - "8.4"
 
     steps:
-#      - name: "Configure git to avoid issues with line endings"
-#        if: ${{ runner.os == 'Windows' }}
-#        run: git config --global core.autocrlf false
 
       - name: "Checkout"
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # pgsql is already installed on the runner, we just need to start the service
       # https://www.cybertec-postgresql.com/en/postgresql-github-actions-continuous-integration/
@@ -164,15 +167,18 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-version }}
+          extensions: ${{ env.PHP_EXTENSIONS }}
+          ini-values: ${{ env.PHP_INI_VALUES }}
           coverage: pcov
-          extensions: mbstring, odbc, pdo_odbc, mysqli, pdo_mysql, pgsql, pdo_pgsql, sqlite3, pdo_sqlite, sqlsrv, pdo_sqlsrv, pdo_firebird
-#          ini-values:
 
       - name: "Update dependencies with composer"
-        uses: ramsey/composer-install@v2
+        uses: ramsey/composer-install@v3
 
       - name: "Run tests with phpunit"
         run: php vendor/phpunit/phpunit/phpunit --configuration=phpunit.xml.dist
 
       - name: "Send code coverage report to Codecov.io"
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: .build/coverage/clover.xml
