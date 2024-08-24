@@ -167,6 +167,7 @@ final class MySQLiDrv extends DriverAbstract{
 		$this->stmtError($this->db->errno, $this->db->error);
 
 		if(count($values) > 0){
+			/** @phan-suppress-next-line PhanParamTooFewInternalUnpack, PhanTypeNonVarPassByRef */
 			$stmt->bind_param(...$this->getReferences($values));
 		}
 
@@ -190,6 +191,7 @@ final class MySQLiDrv extends DriverAbstract{
 			$refs[] = &$cols[$assoc ? $field->name : $k];
 		}
 
+		/** @phan-suppress-next-line PhanParamTooFewInternalUnpack */
 		$stmt->bind_result(...$refs);
 
 		// fetch the data
@@ -229,6 +231,7 @@ final class MySQLiDrv extends DriverAbstract{
 		$this->stmtError($this->db->errno, $this->db->error);
 
 		foreach($values as $row){
+			/** @phan-suppress-next-line PhanParamTooFewInternalUnpack, PhanTypeNonVarPassByRef */
 			$stmt->bind_param(...$this->getReferences($row));
 
 			$stmt->execute();
@@ -251,6 +254,7 @@ final class MySQLiDrv extends DriverAbstract{
 			$row = $callback($row, $k);
 
 			if(is_array($row) && !empty($row)){
+				/** @phan-suppress-next-line PhanParamTooFewInternalUnpack, PhanTypeNonVarPassByRef */
 				$stmt->bind_param(...$this->getReferences($row));
 
 				$stmt->execute();

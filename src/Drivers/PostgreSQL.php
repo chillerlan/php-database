@@ -246,6 +246,7 @@ final class PostgreSQL extends DriverAbstract{
 	private function replaceParams(string $sql):string{
 		$i = 1;
 
+		/** @phan-suppress-next-line PhanTypeMismatchArgumentInternal */
 		return preg_replace_callback('/(\?)/', function() use (&$i){
 			return '$'.$i++;
 		}, $sql);

@@ -19,6 +19,7 @@ use chillerlan\Database\Dialects\{Dialect, MSSQL};
 use function array_values, bin2hex, gettype, implode, is_bool, is_numeric, sprintf, sqlsrv_client_info,
 	sqlsrv_close, sqlsrv_connect, sqlsrv_errors, sqlsrv_free_stmt, sqlsrv_query, sqlsrv_server_info;
 
+use function sqlsrv_fetch_array;
 use const PHP_OS, SQLSRV_FETCH_ASSOC, SQLSRV_FETCH_NUMERIC;
 
 /**
@@ -231,7 +232,7 @@ final class MSSqlSrv extends DriverAbstract{
 		}
 
 		$r = parent::getResult(
-			'sqlsrv_fetch_array',
+			sqlsrv_fetch_array(...),
 			/** @phan-suppress-next-line PhanUndeclaredConstant */
 			[$result, ($assoc ?? true) ? SQLSRV_FETCH_ASSOC : SQLSRV_FETCH_NUMERIC],
 			$index,
