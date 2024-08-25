@@ -166,7 +166,7 @@ final class PostgreSQL extends DriverAbstract{
 		$p = pg_prepare($this->db, '', $this->replaceParams($sql));
 
 		if($p === false){
-			throw new DriverException(pg_last_error());
+			throw new DriverException(pg_last_error($this->db));
 		}
 
 		foreach($values as $row){
@@ -183,7 +183,7 @@ final class PostgreSQL extends DriverAbstract{
 		$p = pg_prepare($this->db, '', $this->replaceParams($sql));
 
 		if($p === false){
-			throw new DriverException(pg_last_error());
+			throw new DriverException(pg_last_error($this->db));
 		}
 
 		foreach($data as $k => $row){
@@ -199,7 +199,7 @@ final class PostgreSQL extends DriverAbstract{
 	private function get_result(PgSqlResult|false $result, string|null $index = null, bool|null $assoc = null):Result{
 
 		if($result === false){
-			throw new DriverException(pg_last_error());
+			throw new DriverException(pg_last_error($this->db));
 		}
 
 		$out = new Result(null, $this->convert_encoding_src, $this->convert_encoding_dest);
