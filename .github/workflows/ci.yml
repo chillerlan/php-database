@@ -3,6 +3,7 @@
 
 # https://github.com/ikalnytskyi/action-setup-postgres
 # https://github.com/marketplace/actions/actions-setup-mysql
+# https://github.com/potatoqualitee/mssqlsuite
 
 name: "Continuous Integration"
 
@@ -13,6 +14,7 @@ on:
   pull_request:
     branches:
       - main
+
 
 env:
   PHP_EXTENSIONS: json, mbstring, simplexml, sodium, odbc, pdo_odbc, mysqli, pdo_mysql, pgsql, pdo_pgsql, sqlite3, pdo_sqlite, sqlsrv, pdo_sqlsrv, pdo_firebird
@@ -116,7 +118,7 @@ jobs:
       - name: "Install Postgres"
         uses: ikalnytskyi/action-setup-postgres@v6
         with:
-          postgres-version: 14
+#          postgres-version: 14
           username: postgres
           password: root
           database: dbtest
@@ -130,6 +132,16 @@ jobs:
       - name: "Create MySQL test database"
         run: mysql --user="root" --host="127.0.0.1" -e "CREATE DATABASE dbtest character set UTF8mb4 collate utf8mb4_bin;"
 
+      - name: "Install MSSQL Server (Linux)"
+        uses: potatoqualitee/mssqlsuite@v1.7
+        with:
+          version: 2022
+          install: sqlengine, sqlclient, sqlpackage
+          sa-password: "DBtestytest42"
+
+      - name: "Create MSSQL test database"
+        run: sqlcmd -S 127.0.0.1 -U sa -P DBtestytest42 -Q "CREATE DATABASE dbtest;"
+
 #      - name: "Install Firebird (Linux/Docker)"
 #        if: ${{ runner.os == 'Linux' }}
 #        uses: juarezr/firebirdsql-github-action@v1.2.0
@@ -141,16 +153,6 @@ jobs:
 #      - name: "Install Firebird (Windows)"
 #        if: ${{ runner.os == 'Windows' }}
 #        run: choco install firebird --version=5.0.0 -params '/SuperClassic/ClientAndDevTools'
-
-      - name: "Install MSSQL Server (Linux)"
-        uses: potatoqualitee/mssqlsuite@v1.7
-        with:
-          version: 2022
-          install: sqlengine, sqlclient, sqlpackage
-          sa-password: "DBtestytest42"
-
-      - name: "Create MySQL test database"
-        run: sqlcmd -S 127.0.0.1 -U sa -P DBtestytest42 -Q "CREATE DATABASE dbtest;"
 
       - name: "Install PHP with extensions"
         uses: shivammathur/setup-php@v2
