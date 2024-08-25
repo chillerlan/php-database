@@ -142,17 +142,12 @@ jobs:
 #        if: ${{ runner.os == 'Windows' }}
 #        run: choco install firebird --version=5.0.0 -params '/SuperClassic/ClientAndDevTools'
 
-#      - name: "Install MSSQL Server (Linux)"
-#        if: ${{ runner.os == 'Linux' }}
-#        run: sh ./scripts/install-mssql.sh
-
-#      - name: "Start SQL LocalDB (Windows)"
-#        if: ${{ runner.os == 'Windows' }}
-#        run: |
-#          # MSSQLLocalDB is the default SQL LocalDB instance
-#          SqlLocalDB start MSSQLLocalDB
-#          SqlLocalDB info MSSQLLocalDB
-#          sqlcmd -S "(localdb)\MSSQLLocalDB" -Q "create database dbtest;"
+      - name: "Install MSSQL Server (Linux)"
+        uses: potatoqualitee/mssqlsuite@v1.7
+        with:
+          version: 2022
+          install: sqlengine, sqlclient, sqlpackage
+          sa-password: "DBtestytest42"
 
       - name: "Install PHP with extensions"
         uses: shivammathur/setup-php@v2
