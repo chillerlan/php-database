@@ -102,24 +102,21 @@ jobs:
       - name: "Checkout"
         uses: actions/checkout@v4
 
-      # pgsql is already installed on the runner, we just need to start the service
-      # https://www.cybertec-postgresql.com/en/postgresql-github-actions-continuous-integration/
-#      - name: "Start PostgreSQL (Linux)"
-#        if: ${{ runner.os == 'Linux' }}
-#        # we also need to change the password for the default user under Linux to match the one under Windows
-#        run: |
-#          sudo systemctl start postgresql.service
-#          pg_isready
-#          sudo -u postgres psql --command="ALTER USER postgres PASSWORD 'root';"
-#          sudo -u postgres createdb --echo --owner=postgres dbtest
-#
-#      - name: "Start PostgreSQL (Windows)"
-#        if: ${{ runner.os == 'Windows' }}
-#        run: |
-#          $pgService = Get-Service -Name postgresql*
-#          Set-Service -InputObject $pgService -Status running -StartupType automatic
-#          Start-Process -FilePath "$env:PGBIN\pg_isready" -Wait -PassThru
-#          & $env:PGBIN\createdb --echo --owner=postgres dbtest
+      - name: "Install SQLite (Linux)"
+        if: ${{ runner.os == 'Linux' }}
+        run: sudo apt-get -y install sqlite3 libsqlite3-dev
+
+      - name: "Install SQLite (Windows)"
+        if: ${{ runner.os == 'Windows' }}
+        run: choco install sqlite
+
+      - name: "Install Postgres"
+        uses: ikalnytskyi/action-setup-postgres@v6
+        with:
+          username: postgres
+          password: root
+          database: dbtest
+          port: 5432
 
 #      - name: "Install MySQL"
 #        uses: shogo82148/actions-setup-mysql@v1
@@ -129,14 +126,6 @@ jobs:
 #
 #      - name: "Create MySQL test database"
 #        run: mysql --user="root" --host="127.0.0.1" -e "CREATE DATABASE dbtest character set UTF8mb4 collate utf8mb4_bin;"
-
-      - name: "Install SQLite (Linux)"
-        if: ${{ runner.os == 'Linux' }}
-        run: sudo apt-get -y install sqlite3 libsqlite3-dev
-
-      - name: "Install SQLite (Windows)"
-        if: ${{ runner.os == 'Windows' }}
-        run: choco install sqlite
 
 #      - name: "Install Firebird (Linux)"
 #        if: ${{ runner.os == 'Linux' }}

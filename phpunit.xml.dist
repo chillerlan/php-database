@@ -25,7 +25,6 @@
 	<groups>
 		<exclude>
 			<group>firebird</group>
-			<group>pgsql</group>
 			<group>mssql</group>
 			<group>mysql</group>
 		</exclude>
