@@ -149,6 +149,9 @@ jobs:
           install: sqlengine, sqlclient, sqlpackage
           sa-password: "DBtestytest42"
 
+      - name: "Create MySQL test database"
+        run: sqlcmd -S 127.0.0.1 -U sa -P DBtestytest42 -Q "CREATE DATABASE dbtest;"
+
       - name: "Install PHP with extensions"
         uses: shivammathur/setup-php@v2
         with:
