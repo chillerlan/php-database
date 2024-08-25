@@ -134,12 +134,13 @@ jobs:
         if: ${{ runner.os == 'Linux' }}
         uses: juarezr/firebirdsql-github-action@v1.2.0
         with:
-          version: 'v4'
-          isc_password: 'masterkey'
+          version: "v4"
+          isc_password: "masterkey"
+          enable_legacy_client_auth: true
 
       - name: "Install Firebird (Windows)"
         if: ${{ runner.os == 'Windows' }}
-        run: choco install firebird --version=4.0.4 -params '/ClientAndDevTools'
+        run: choco install firebird --version=5.0.0 -params '/SuperClassic/ClientAndDevTools'
 
 #      - name: "Install MSSQL Server (Linux)"
 #        if: ${{ runner.os == 'Linux' }}
