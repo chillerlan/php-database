@@ -24,9 +24,9 @@
 	</coverage>
 	<groups>
 		<exclude>
-			<group>firebird</group>
 			<group>mssql</group>
 			<!--
+			<group>firebird</group>
 			<group>mysql</group>
 			<group>pgsql</group>
 			<group>sqlite</group>
