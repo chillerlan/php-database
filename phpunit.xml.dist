@@ -26,7 +26,11 @@
 		<exclude>
 			<group>firebird</group>
 			<group>mssql</group>
+			<!--
 			<group>mysql</group>
+			<group>pgsql</group>
+			<group>sqlite</group>
+			-->
 		</exclude>
 	</groups>
 	<php>

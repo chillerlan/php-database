@@ -1,6 +1,9 @@
 # https://help.github.com/en/categories/automating-your-workflow-with-github-actions
 # https://github.com/sebastianbergmann/phpunit/blob/master/.github/workflows/ci.yml
 
+# https://github.com/ikalnytskyi/action-setup-postgres
+# https://github.com/marketplace/actions/actions-setup-mysql
+
 name: "Continuous Integration"
 
 on:
@@ -113,19 +116,19 @@ jobs:
       - name: "Install Postgres"
         uses: ikalnytskyi/action-setup-postgres@v6
         with:
+          postgres-version: 14
           username: postgres
           password: root
           database: dbtest
           port: 5432
 
-#      - name: "Install MySQL"
-#        uses: shogo82148/actions-setup-mysql@v1
-#        with:
-#          mysql-version: '5.7'
-#          auto-start: true
-#
-#      - name: "Create MySQL test database"
-#        run: mysql --user="root" --host="127.0.0.1" -e "CREATE DATABASE dbtest character set UTF8mb4 collate utf8mb4_bin;"
+      - name: "Install MySQL"
+        uses: shogo82148/actions-setup-mysql@v1
+        with:
+          mysql-version: "8.0"
+
+      - name: "Create MySQL test database"
+        run: mysql --user="root" --host="127.0.0.1" -e "CREATE DATABASE dbtest character set UTF8mb4 collate utf8mb4_bin;"
 
 #      - name: "Install Firebird (Linux)"
 #        if: ${{ runner.os == 'Linux' }}
