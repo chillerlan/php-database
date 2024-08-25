@@ -130,17 +130,17 @@ jobs:
       - name: "Create MySQL test database"
         run: mysql --user="root" --host="127.0.0.1" -e "CREATE DATABASE dbtest character set UTF8mb4 collate utf8mb4_bin;"
 
-      - name: "Install Firebird (Linux/Docker)"
-        if: ${{ runner.os == 'Linux' }}
-        uses: juarezr/firebirdsql-github-action@v1.2.0
-        with:
-          version: "v4"
-          isc_password: "masterkey"
-          enable_legacy_client_auth: true
+#      - name: "Install Firebird (Linux/Docker)"
+#        if: ${{ runner.os == 'Linux' }}
+#        uses: juarezr/firebirdsql-github-action@v1.2.0
+#        with:
+#          version: "v4"
+#          isc_password: "masterkey"
+#          enable_legacy_client_auth: true
 
-      - name: "Install Firebird (Windows)"
-        if: ${{ runner.os == 'Windows' }}
-        run: choco install firebird --version=5.0.0 -params '/SuperClassic/ClientAndDevTools'
+#      - name: "Install Firebird (Windows)"
+#        if: ${{ runner.os == 'Windows' }}
+#        run: choco install firebird --version=5.0.0 -params '/SuperClassic/ClientAndDevTools'
 
 #      - name: "Install MSSQL Server (Linux)"
 #        if: ${{ runner.os == 'Linux' }}
