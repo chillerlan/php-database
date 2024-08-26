@@ -13,7 +13,6 @@ namespace chillerlan\Database\Query;
 
 class ShowDatabases extends Statement implements Query{
 
-	/** @inheritdoc */
 	protected function getSQL():array{
 		return $this->dialect->showDatabases(); // @todo? WHERE
 	}

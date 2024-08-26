@@ -25,10 +25,10 @@ use function is_scalar, strtoupper, trim;
  */
 class CreateTable extends Statement implements Query, IfNotExists{
 
-	protected bool $temp = false;
-	protected string|null  $primaryKey = null;
-	protected array $cols = [];
-	protected string|null  $dir = null;
+	protected bool        $temp       = false;
+	protected string|null $primaryKey = null;
+	protected array       $cols       = [];
+	protected string|null $dir        = null;
 
 	public function name(string $name):static{
 		return $this->setName($name);
@@ -42,7 +42,6 @@ class CreateTable extends Statement implements Query, IfNotExists{
 		return $this->setIfNotExists();
 	}
 
-	/** @inheritdoc */
 	protected function getSQL():array{
 		return $this->dialect->createTable($this->name, $this->cols, $this->primaryKey, $this->ifNotExists, $this->temp, $this->dir);
 	}
@@ -60,7 +59,17 @@ class CreateTable extends Statement implements Query, IfNotExists{
 		return $this;
 	}
 
-	public function field(string $name, string $type, mixed $length = null, string|null $attribute = null, string|null $collation = null, bool|null $isNull = null, string|null $defaultType = null, mixed $defaultValue = null, string|null $extra = null):static{
+	public function field(
+		string      $name,
+		string      $type,
+		mixed       $length = null,
+		string|null $attribute = null,
+		string|null $collation = null,
+		bool|null   $isNull = null,
+		string|null $defaultType = null,
+		mixed       $defaultValue = null,
+		string|null $extra = null,
+	):static{
 
 		if(is_scalar($defaultValue) && $defaultType === null){
 			$defaultType = 'USER_DEFINED';
@@ -78,39 +87,39 @@ class CreateTable extends Statement implements Query, IfNotExists{
 	}
 
 	public function tinyint(string $name, int|null $length = null, mixed $defaultValue = null, bool|null $isNull = null, string|null $attribute = null):static{
-		return $this->field($name, 'TINYINT', $length, $attribute, null, $isNull, null, $defaultValue);
+		return $this->field(name: $name, type: 'TINYINT', length: $length, attribute: $attribute, isNull: $isNull, defaultValue: $defaultValue);
 	}
 
 	public function int(string $name, int|null $length = null, mixed $defaultValue = null, bool|null $isNull = null, string|null $attribute = null):static{
-		return $this->field($name, 'INT', $length, $attribute, null, $isNull, null, $defaultValue);
+		return $this->field(name: $name, type: 'INT', length: $length, attribute: $attribute, isNull: $isNull, defaultValue: $defaultValue);
 	}
 
 	public function bigint(string $name, int|null $length = null, mixed $defaultValue = null, bool|null $isNull = null, string|null $attribute = null):static{
-		return $this->field($name, 'BIGINT', $length, $attribute, null, $isNull, null, $defaultValue);
+		return $this->field(name: $name, type: 'BIGINT', length: $length, attribute: $attribute, isNull: $isNull, defaultValue: $defaultValue);
 	}
 
 	public function varchar(string $name, int $length, mixed $defaultValue = null, bool|null $isNull = null):static{
-		return $this->field($name, 'VARCHAR', $length, null, null, $isNull, null, $defaultValue);
+		return $this->field(name: $name, type: 'VARCHAR', length: $length, isNull: $isNull, defaultValue: $defaultValue);
 	}
 
 	public function decimal(string $name, string $length, mixed $defaultValue = null, bool|null $isNull = null):static{
-		return $this->field($name, 'DECIMAL', $length, null, null, $isNull, null, $defaultValue);
+		return $this->field(name: $name, type: 'DECIMAL', length: $length, isNull: $isNull, defaultValue: $defaultValue);
 	}
 
 	public function tinytext(string $name, mixed $defaultValue = null, bool|null $isNull = null):static{
-		return $this->field($name, 'TINYTEXT', null, null, null, $isNull, null, $defaultValue);
+		return $this->field(name: $name, type: 'TINYTEXT', isNull: $isNull, defaultValue: $defaultValue);
 	}
 
 	public function text(string $name, mixed $defaultValue = null, bool|null $isNull = null):static{
-		return $this->field($name, 'TEXT', null, null, null, $isNull, null, $defaultValue);
+		return $this->field(name: $name, type: 'TEXT', isNull: $isNull, defaultValue: $defaultValue);
 	}
 
 	public function mediumtext(string $name, mixed $defaultValue = null, bool|null $isNull = null):static{
-		return $this->field($name, 'MEDIUMTEXT', null, null, null, $isNull, null, $defaultValue);
+		return $this->field(name: $name, type: 'MEDIUMTEXT', isNull: $isNull, defaultValue: $defaultValue);
 	}
 
 	public function longtext(string $name, mixed $defaultValue = null, bool|null $isNull = null):static{
-		return $this->field($name, 'LONGTEXT', null, null, null, $isNull, null, $defaultValue);
+		return $this->field(name: $name, type: 'LONGTEXT', isNull: $isNull, defaultValue: $defaultValue);
 	}
 
 }

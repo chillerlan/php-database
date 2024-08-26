@@ -42,7 +42,6 @@ class Insert extends Statement implements BindValues, MultiQuery{
 		return $this;
 	}
 
-	/** @inheritdoc */
 	protected function getSQL():array{
 
 		if(empty($this->bindValues)){

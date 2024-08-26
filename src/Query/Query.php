@@ -13,17 +13,9 @@ namespace chillerlan\Database\Query;
 
 interface Query{
 
-	/**
-	 * @param bool|null $multi
-	 *
-	 * @return string
-	 */
 	public function sql(bool|null $multi = null):string;
 
 	/**
-	 * @param string|null $index
-	 *
-	 * @return \chillerlan\Database\Result|bool
 	 * @throws \chillerlan\Database\Query\QueryException
 	 */
 	public function query(string|null $index = null);

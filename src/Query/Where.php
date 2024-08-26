@@ -18,13 +18,6 @@ namespace chillerlan\Database\Query;
  */
 interface Where{
 
-	/**
-	 * @param mixed       $val1
-	 * @param mixed       $val2
-	 * @param string|null $operator
-	 * @param bool|null   $bind
-	 * @param string|null $join
-	 */
 	public function where(mixed $val1, mixed $val2 = null, string|null $operator = null, bool|null $bind = null, string|null $join = null):static;
 
 	public function openBracket(string|null $join = null):static;

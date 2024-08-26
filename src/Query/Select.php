@@ -23,11 +23,11 @@ use function implode;
  */
 class Select extends Statement implements Where, Limit, BindValues, Query, CachedQuery{
 
-	protected bool $distinct = false;
-	protected array $cols = [];
-	protected array $from = [];
-	protected array $orderby = [];
-	protected array $groupby = [];
+	protected bool  $distinct = false;
+	protected array $cols     = [];
+	protected array $from     = [];
+	protected array $orderby  = [];
+	protected array $groupby  = [];
 
 	public function where(mixed $val1, mixed $val2 = null, string|null $operator = null, bool|null $bind = null, string|null $join = null):static{
 		return $this->setWhere($val1, $val2, $operator, $bind, $join);
@@ -53,14 +53,13 @@ class Select extends Statement implements Where, Limit, BindValues, Query, Cache
 		return $this->setCached($ttl);
 	}
 
-	/** @inheritdoc */
 	protected function getSQL():array{
 
 		if(empty($this->from)){
 			throw new QueryException('no FROM expression specified');
 		}
 
-		return $this->dialect->select($this->cols, $this->from, $this->_getWhere(), $this->limit, $this->offset, $this->distinct, $this->groupby, $this->orderby);
+		return $this->dialect->select($this->cols, $this->from, $this->getWhere(), $this->limit, $this->offset, $this->distinct, $this->groupby, $this->orderby);
 	}
 
 	public function distinct():static{
@@ -102,7 +101,7 @@ class Select extends Statement implements Where, Limit, BindValues, Query, Cache
 			throw new QueryException('no FROM expression specified');
 		}
 
-		$sql    = $this->dialect->selectCount($this->from, $this->_getWhere(), $this->distinct, $this->groupby);
+		$sql    = $this->dialect->selectCount($this->from, $this->getWhere(), $this->distinct, $this->groupby);
 		$result = $this->db->prepared(implode(' ', $sql), $this->bindValues);
 
 		if($result instanceof ResultInterface && $result->count() > 0){

@@ -60,7 +60,6 @@ abstract class Statement implements LoggerAwareInterface{
 		$this->logger  = $logger;
 	}
 
-	/** */
 	protected function setName(string $name):static{
 		$this->name = trim($name);
 
@@ -71,7 +70,6 @@ abstract class Statement implements LoggerAwareInterface{
 		return $this;
 	}
 
-	/** */
 	protected function setOnConflict(string $name, string|null $on_conflict = null, string|null $conflict_target = null):static{
 		$this->name      = trim($name);
 		$on_conflict     = trim(strtoupper($on_conflict ?? ''));
@@ -92,30 +90,24 @@ abstract class Statement implements LoggerAwareInterface{
 		return $this;
 	}
 
-	/** */
 	protected function setCharset(string $charset):static{
 		$this->charset = trim($charset);
 
 		return $this;
 	}
 
-	/** */
 	protected function setIfExists():static{
 		$this->ifExists = true;
 
 		return $this;
 	}
 
-	/** */
 	protected function setIfNotExists():static{
 		$this->ifNotExists = true;
 
 		return $this;
 	}
 
-	/**
-	 *
-	 */
 	protected function setWhere(mixed $val1, mixed $val2, string|null $operator = null, bool|null $bind = null, string|null $join = null):static{
 		$operator = $operator !== null ? strtoupper(trim($operator)) : '=';
 		$bind     ??= true;
@@ -139,7 +131,7 @@ abstract class Statement implements LoggerAwareInterface{
 						$this->bindValues = array_merge($this->bindValues, $val2);
 					}
 					else{
-						$where[] = $operator.'('.implode(',', array_map([$this->db, 'escape'], $val2)).')'; // @todo: quote
+						$where[] = $operator.'('.implode(',', array_map($this->db->escape(...), $val2)).')'; // @todo: quote
 					}
 
 				}
@@ -199,7 +191,6 @@ abstract class Statement implements LoggerAwareInterface{
 		return $this;
 	}
 
-	/** */
 	protected function setOpenBracket(string|null $join = null):static{
 		$join = strtoupper(trim($join ?? ''));
 
@@ -212,15 +203,13 @@ abstract class Statement implements LoggerAwareInterface{
 		return $this;
 	}
 
-	/** */
 	protected function setCloseBracket():static{
 		$this->where[] = ')';
 
 		return $this;
 	}
 
-	/** */
-	protected function _getWhere():string{
+	protected function getWhere():string{
 		$where    = [];
 		$joinArgs = array_merge($this->joinArgs, ['(', ')']);
 
@@ -320,26 +309,22 @@ abstract class Statement implements LoggerAwareInterface{
 		return $this->bindValues;
 	}
 
-	/** */
 	protected function addBindValue(int|string $key, mixed $value):void{
 		$this->bindValues[$key] = $value;
 	}
 
-	/** */
 	protected function setLimit(int $limit):static{
 		$this->limit = max($limit, 0);
 
 		return $this;
 	}
 
-	/** */
 	protected function setOffset(int $offset):static{
 		$this->offset = max($offset, 0);
 
 		return $this;
 	}
 
-	/** */
 	protected function setCached(int|null $ttl = null):static{
 		$this->cached = true;
 

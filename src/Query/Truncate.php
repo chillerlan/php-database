@@ -22,7 +22,6 @@ class Truncate extends Statement implements Query{
 		return $this->setName($name);
 	}
 
-	/** @inheritdoc */
 	protected function getSQL():array{
 		return $this->dialect->truncate($this->name);
 	}

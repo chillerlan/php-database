@@ -33,9 +33,8 @@ class ShowTables extends Statement implements Where, Query{
 		return $this->setCloseBracket();
 	}
 
-	/** @inheritdoc */
 	protected function getSQL():array{
-		return $this->dialect->showTables($this->name, $this->pattern, $this->_getWhere());
+		return $this->dialect->showTables($this->name, $this->pattern, $this->getWhere());
 	}
 
 	public function pattern(string $pattern):static{

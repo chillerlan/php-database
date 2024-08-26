@@ -17,7 +17,6 @@ class ShowCreateTable extends Statement implements Query{
 		return $this->setName($name);
 	}
 
-	/** @inheritdoc */
 	protected function getSQL():array{
 		return $this->dialect->showCreateTable($this->name);
 	}

@@ -48,14 +48,13 @@ class Update extends Statement implements Where, Limit, BindValues, MultiQuery{
 		return $this->setOffset($offset);
 	}
 
-	/** @inheritdoc */
 	protected function getSQL():array{
 
 		if(empty($this->set)){
 			throw new QueryException('no fields to update specified');
 		}
 
-		return $this->dialect->update($this->name, $this->set, $this->_getWhere());
+		return $this->dialect->update($this->name, $this->set, $this->getWhere());
 	}
 
 	public function set(array $set, bool|null $bind = null):static{

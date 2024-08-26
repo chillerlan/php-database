@@ -24,7 +24,7 @@ class Delete extends Statement implements Where, Limit, BindValues, Query{
 		return $this->setName($name);
 	}
 
-	public function where($val1, $val2 = null, string|null $operator = null, bool|null $bind = null, string|null $join = null):static{
+	public function where(mixed $val1, mixed $val2 = null, string|null $operator = null, bool|null $bind = null, string|null $join = null):static{
 		return $this->setWhere($val1, $val2, $operator, $bind, $join);
 	}
 
@@ -44,9 +44,8 @@ class Delete extends Statement implements Where, Limit, BindValues, Query{
 		return $this->setOffset($offset);
 	}
 
-	/** @inheritdoc */
 	protected function getSQL():array{
-		return $this->dialect->delete($this->name, $this->_getWhere());
+		return $this->dialect->delete($this->name, $this->getWhere());
 	}
 
 }
