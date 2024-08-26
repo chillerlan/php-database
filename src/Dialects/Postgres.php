@@ -9,6 +9,7 @@
  * @copyright    2018 Smiley
  * @license      MIT
  */
+declare(strict_types=1);
 
 namespace chillerlan\Database\Dialects;
 

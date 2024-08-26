@@ -7,6 +7,7 @@
  * @copyright    2017 Smiley
  * @license      MIT
  */
+declare(strict_types=1);
 
 namespace chillerlan\Database\Query;
 
@@ -169,7 +170,7 @@ abstract class Statement implements LoggerAwareInterface{
 				elseif(is_bool($val2)){
 					$where[] = $val2 ? 'TRUE' : 'FALSE';
 				}
-				elseif(in_array(strtolower($val2), ['null', 'false', 'true', 'unknown'], true)){
+				elseif(in_array(strtolower((string)$val2), ['null', 'false', 'true', 'unknown'], true)){
 					$where[] = strtoupper($val2);
 				}
 				else {
@@ -320,7 +321,7 @@ abstract class Statement implements LoggerAwareInterface{
 	}
 
 	/** */
-	protected function addBindValue(string $key, mixed $value):void{
+	protected function addBindValue(int|string $key, mixed $value):void{
 		$this->bindValues[$key] = $value;
 	}
 

@@ -7,6 +7,7 @@
  * @copyright    2021 smiley
  * @license      MIT
  */
+declare(strict_types=1);
 
 namespace chillerlan\DatabaseTest\Query;
 
@@ -76,9 +77,9 @@ final class SQLiteTest extends QueryTestAbstract{
 
 		$this::assertSame(2, $r->count());
 		$this::assertSame(2, (int)$r[0]['id']);
-		$this::assertSame(md5(2), $r[0]['hash']);
-		$this::assertSame(md5(3), $r[1]->id(md5(...)));
-		$this::assertSame(md5(3), $r[1]->hash);
+		$this::assertSame(md5('2'), $r[0]['hash']);
+		$this::assertSame(md5('3'), $r[1]->id(fn(int $v):string => md5((string)$v)));
+		$this::assertSame(md5('3'), $r[1]->hash);
 
 		$r = $this->db->select
 			->cols(['hash', 'value'])

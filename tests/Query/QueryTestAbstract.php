@@ -7,6 +7,7 @@
  * @copyright    2021 smiley
  * @license      MIT
  */
+declare(strict_types=1);
 
 namespace chillerlan\DatabaseTest\Query;
 
@@ -76,9 +77,9 @@ abstract class QueryTestAbstract extends DBTestAbstract{
 
 	protected function data():array{
 		return [
-			['id' => 1, 'hash' => md5(1), 'data' => 'foo', 'value' => 123.456, 'active' => 0],
-			['id' => 2, 'hash' => md5(2), 'data' => 'bar', 'value' => 123.456789, 'active' => 1],
-			['id' => 3, 'hash' => md5(3), 'data' => 'baz', 'value' => 123.456, 'active' => 0],
+			['id' => 1, 'hash' => md5('1'), 'data' => 'foo', 'value' => 123.456, 'active' => 0],
+			['id' => 2, 'hash' => md5('2'), 'data' => 'bar', 'value' => 123.456789, 'active' => 1],
+			['id' => 3, 'hash' => md5('3'), 'data' => 'baz', 'value' => 123.456, 'active' => 0],
 		];
 	}
 
@@ -86,7 +87,7 @@ abstract class QueryTestAbstract extends DBTestAbstract{
 
 		$insert = $this->db->insert
 			->into($this::TABLE)
-			->values(['id' => 0, 'hash' => md5(0), 'data' => 'foo', 'value' => 123.456, 'active' => 1])
+			->values(['id' => 0, 'hash' => md5('0'), 'data' => 'foo', 'value' => 123.456, 'active' => 1])
 			->query();
 
 		$this::assertTrue($insert->isSuccess());
@@ -126,9 +127,9 @@ abstract class QueryTestAbstract extends DBTestAbstract{
 
 		$this::assertSame(2, $r->count());
 		$this::assertSame(2, (int)$r[0]['id']);
-		$this::assertSame(md5(2), $r[0]['hash']);
-		$this::assertSame(md5(3), $r[1]->id(md5(...)));
-		$this::assertSame(md5(3), $r[1]->hash);
+		$this::assertSame(md5('2'), $r[0]['hash']);
+		$this::assertSame(md5('3'), $r[1]->id(fn(int $v):string => md5((string)$v)));
+		$this::assertSame(md5('3'), $r[1]->hash);
 
 		$r = $this->db->select
 			->cols(['hash', 'value'])
@@ -225,7 +226,7 @@ abstract class QueryTestAbstract extends DBTestAbstract{
 		$this->db->insert
 			->into($this::TABLE)
 			->values([['id' => '?', 'hash' => '?']])
-			->callback(range(1, 10), fn($k) => [$k, md5($k)])
+			->callback(range(1, 10), fn($k) => [$k, md5((string)$k)])
 		;
 
 		$r           = $this->db->select->from([$this::TABLE])->cached(2);

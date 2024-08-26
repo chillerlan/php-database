@@ -9,13 +9,12 @@
  *
  * @noinspection PhpComposerExtensionStubsInspection
  */
+declare(strict_types=1);
 
 namespace chillerlan\Database\Drivers;
 
 use chillerlan\Database\Result;
-use Closure;
-use PDO, PDOStatement, Throwable;
-
+use Closure, PDO, PDOStatement, Throwable;
 use function gettype, is_bool;
 
 /**

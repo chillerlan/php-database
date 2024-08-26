@@ -7,6 +7,7 @@
  * @copyright    2017 Smiley
  * @license      MIT
  */
+declare(strict_types=1);
 
 namespace chillerlan\DatabaseTest;
 
@@ -27,7 +28,7 @@ final class ResultTest extends TestCase{
 		$this->result = new Result;
 
 		foreach(range(0, 9) as $k){
-			$this->result[] = ['id' => $k, 'hash' => md5($k)];
+			$this->result[] = ['id' => $k, 'hash' => md5((string)$k)];
 		}
 
 		$this->result->rewind();
@@ -42,7 +43,7 @@ final class ResultTest extends TestCase{
 
 	public function testRow():void{
 		$this::assertSame(10, $this->result->count());
-		$this::assertSame(md5(0), $this->result[0]->hash);
+		$this::assertSame(md5('0'), $this->result[0]->hash);
 		$this::assertSame(range(0, 9), $this->result->column('id'));
 
 
@@ -53,13 +54,11 @@ final class ResultTest extends TestCase{
 			$this::assertNull($row->foo);
 			$this::assertNull($row->foo());
 			$this::assertTrue(isset($row['hash'], $row['id']));
-			$this::assertSame($row->id(md5(...)), $row->hash());
+			$this::assertSame($row->id(fn(int $v):string => md5((string)$v)), $row->hash());
 			$this::assertSame(['id' => $row->id, 'hash' => $row->hash], $row->toArray());
 			$this::assertSame(['hash' => $row->hash], $row->chunk(1)[1]);
 			$this::assertSame($row->id, $this->result->key());
-			$this::assertSame($row->hash, $row->id(function($v){
-				return md5($v);
-			}));
+			$this::assertSame($row->hash, $row->id(fn(int $v):string => md5((string)$v)));
 
 			$this::assertTrue($this->result->valid());
 			unset($this->result[$row->id]);
@@ -72,14 +71,13 @@ final class ResultTest extends TestCase{
 	}
 
 	public function testEach():void{
-		$this->result->each(function($row, $i){
-			/** @var \chillerlan\Database\ResultRow|mixed $row */
+		$this->result->each(function(ResultRow $row, int $i):void{
 			$this::assertSame($row->id, $i);
-			$this::assertSame(md5($row->id), $row->hash());
+			$this::assertSame(md5((string)$row->id), $row->hash());
 
-			$row->each(function($v, $j) use ($row){
-				$this::assertSame($row->{$j}, $v);
-				$this::assertSame($row[$j], $v);
+			$row->each(function(mixed $value, string $col) use ($row){
+				$this::assertSame($row->{$col}, $value);
+				$this::assertSame($row[$col], $value);
 			});
 		});
 	}

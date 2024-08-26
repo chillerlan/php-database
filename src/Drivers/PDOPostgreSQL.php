@@ -9,11 +9,11 @@
  *
  * @noinspection PhpComposerExtensionStubsInspection
  */
+declare(strict_types=1);
 
 namespace chillerlan\Database\Drivers;
 
 use chillerlan\Database\Dialects\{Dialect, Postgres};
-
 use function is_numeric, sodium_bin2hex;
 
 /**
