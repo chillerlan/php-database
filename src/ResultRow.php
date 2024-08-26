@@ -14,14 +14,11 @@ use Closure;
 use function is_string, mb_convert_encoding;
 
 /**
- * @property mixed[] $array
+ *
  */
 class ResultRow extends Result{
 
-	/**
-	 * @return mixed|null
-	 */
-	public function __call(string $name, array $arguments){
+	public function __call(string $name, array $arguments):mixed{
 		$value = $this->array[$name] ?? null;
 
 		if($value !== null){
@@ -36,23 +33,14 @@ class ResultRow extends Result{
 		return $value;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	public function __get(string $name):mixed{
 		return $this->array[$name] ?? null;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	public function toArray():array{
 		return $this->array;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	public function offsetSet($offset, $value):void{
 
 		if($this->sourceEncoding !== null && is_string($value)){

@@ -13,11 +13,32 @@
 namespace chillerlan\Database\Dialects;
 
 use chillerlan\Database\Query\QueryException;
+use function count, explode, implode, in_array, intval, is_int, is_string,
+	preg_match, preg_replace, strtolower, strtoupper, trim;
 
 final class Postgres extends DialectAbstract{
 
-	/** @inheritdoc */
-	public function select(array $cols, array $from, string|null $where = null, mixed $limit = null, mixed $offset = null, bool|null $distinct = null, array|null $groupby = null, array|null $orderby = null):array{
+	private const TYPE_TRANSLATION = [
+		'TINYINT'    => 'SMALLINT',
+		'MEDIUMINT'  => 'INT',
+		'DOUBLE'     => 'DOUBLE PRECISION',
+		'TINYTEXT'   => 'TEXT',
+		'DATETIME'   => 'TIMESTAMP',
+		'IMAGE'      => 'BLOB',
+		'MEDIUMTEXT' => 'TEXT',
+		'LONGTEXT'   => 'TEXT',
+	];
+
+	public function select(
+		array       $cols,
+		array       $from,
+		string|null $where = null,
+		mixed       $limit = null,
+		mixed       $offset = null,
+		bool|null   $distinct = null,
+		array|null  $groupby = null,
+		array|null  $orderby = null,
+	):array{
 		$sql = ['SELECT'];
 
 		if($distinct){
@@ -56,9 +77,14 @@ final class Postgres extends DialectAbstract{
 	/**
 	 * @link https://www.postgresql.org/docs/9.5/static/sql-insert.html#SQL-ON-CONFLICT
 	 *
-	 * @inheritdoc
+	 * @throws \chillerlan\Database\Query\QueryException
 	 */
-	public function insert(string $table, array $fields, string|null $onConflict = null, string|null $conflictTarget = null):array{
+	public function insert(
+		string      $table,
+		array       $fields,
+		string|null $onConflict = null,
+		string|null $conflictTarget = null,
+	):array{
 		$sql = parent::insert($table, $fields);
 
 		if(in_array($onConflict, ['IGNORE', 'REPLACE'], true)){
@@ -83,12 +109,7 @@ final class Postgres extends DialectAbstract{
 		return $sql;
 	}
 
-	/**
-	 * @param array $fields
-	 *
-	 * @return string
-	 */
-	protected function onConflictUpdate(array $fields):string {
+	protected function onConflictUpdate(array $fields):string{
 		$onConflictUpdate = [];
 
 		foreach($fields as $f){
@@ -98,7 +119,6 @@ final class Postgres extends DialectAbstract{
 		return 'UPDATE SET '.implode(', ', $onConflictUpdate);
 	}
 
-	/** @inheritdoc */
 	public function createDatabase(string $dbname, bool|null $ifNotExists = null, string|null $collate = null):array{
 		$sql = ['CREATE DATABASE'];
 		$sql[] = $this->quote($dbname);
@@ -126,26 +146,23 @@ final class Postgres extends DialectAbstract{
 	}
 
 	/**
-	 * @inheritdoc
-	 *
 	 * @see https://www.postgresql.org/docs/9.5/datatype.html
 	 */
-	public function fieldspec(string $name, string $type, mixed $length = null, string|null $attribute = null, string|null $collation = null, bool|null $isNull = null, string|null $defaultType = null, mixed $defaultValue = null, string|null $extra = null):string{
-		$name = trim($name);
-		$type = strtoupper(trim($type));
-
-		$field = [$this->quote($name)];
-
-		$type_translation = [
-			'TINYINT'    => 'SMALLINT',
-			'MEDIUMINT'  => 'INT',
-			'DOUBLE'     => 'DOUBLE PRECISION',
-			'TINYTEXT'   => 'TEXT',
-			'DATETIME'   => 'TIMESTAMP',
-			'IMAGE'      => 'BLOB',
-			'MEDIUMTEXT' => 'TEXT',
-			'LONGTEXT'   => 'TEXT',
-		][$type] ?? $type;
+	public function fieldspec(
+		string      $name,
+		string      $type,
+		mixed       $length = null,
+		string|null $attribute = null,
+		string|null $collation = null,
+		bool|null   $isNull = null,
+		string|null $defaultType = null,
+		mixed       $defaultValue = null,
+		string|null $extra = null,
+	):string{
+		$name             = trim($name);
+		$type             = strtoupper(trim($type));
+		$field            = [$this->quote($name)];
+		$type_translation = self::TYPE_TRANSLATION[$type] ?? $type;
 
 		if((is_int($length) || is_string($length) && count(explode(',', $length)) === 2)
 		   && in_array($type, ['BIT', 'VARBIT', 'CHAR', 'VARCHAR', 'DECIMAL', 'NUMERIC', 'TIME', 'TIMESTAMP', 'INTERVAL'], true)){
@@ -172,22 +189,13 @@ final class Postgres extends DialectAbstract{
 
 		if($defaultType === 'USER_DEFINED'){
 
-			switch(true){
-				case $type === 'TIMESTAMP' && intval($defaultValue) === 0:
-					$field[] = 'DEFAULT 0';
-					break;
-				case $type === 'BIT' || $type === 'VARBIT':
-					$field[] = 'DEFAULT b\''.preg_replace('/[^01]/', '0', $defaultValue).'\'';
-					break;
-				case $type === 'BOOLEAN':
-					$field[] = 'DEFAULT '.(preg_match('/^1|T|TRUE|YES$/i', $defaultValue) ? 'TRUE' : 'FALSE');
-					break;
-				case strtoupper($defaultValue) === 'NULL' && $isNull === true:
-					$field[] = 'DEFAULT NULL';
-					break;
-				default:
-					$field[] = 'DEFAULT \''.$defaultValue.'\'';
-			}
+			$field[] = match (true) {
+				$type === 'TIMESTAMP' && intval($defaultValue) === 0     => 'DEFAULT 0',
+				$type === 'BIT' || $type === 'VARBIT'                    => 'DEFAULT b\''.preg_replace('/[^01]/', '0', $defaultValue).'\'',
+				$type === 'BOOLEAN'                                      => 'DEFAULT '.(preg_match('/^1|T|TRUE|YES$/i', $defaultValue) ? 'TRUE' : 'FALSE'),
+				strtoupper($defaultValue) === 'NULL' && $isNull === true => 'DEFAULT NULL',
+				default                                                  => 'DEFAULT \''.$defaultValue.'\'',
+			};
 
 		}
 		elseif($defaultType === 'CURRENT_TIMESTAMP'){
@@ -204,8 +212,14 @@ final class Postgres extends DialectAbstract{
 		return implode(' ', $field);
 	}
 
-	/** @inheritdoc */
-	public function createTable(string $table, array $cols, string|null $primaryKey = null, bool|null $ifNotExists = null, bool|null $temp = null, string|null $dir = null):array{
+	public function createTable(
+		string      $table,
+		array       $cols,
+		string|null $primaryKey = null,
+		bool|null   $ifNotExists = null,
+		bool|null   $temp = null,
+		string|null $dir = null,
+	):array{
 		$sql = ['CREATE'];
 
 		if($temp){
@@ -236,111 +250,14 @@ final class Postgres extends DialectAbstract{
 		return $sql;
 	}
 
-	/** @inheritdoc */
 	public function showDatabases():array{
-		/** @noinspection SqlResolve */
+		/** @noinspection SqlResolve, SqlDialectInspection */
 		return ['SELECT datname AS "Database" FROM pg_database'];
 	}
 
-	/** @inheritdoc */
 	public function showTables(string|null $database = null, string|null $pattern = null, string|null $where = null):array{
-		/** @noinspection SqlResolve */
+		/** @noinspection SqlResolve, SqlDialectInspection */
 		return ['SELECT tablename FROM pg_catalog.pg_tables WHERE schemaname != \'pg_catalog\'AND schemaname != \'information_schema\' '];
 	}
 
-	/**
-	 * @link https://stackoverflow.com/a/16154183
-	 *
-	 * @param string $table
-	 *
-	 * @return array
-	 * @noinspection SqlResolve
-	 */
-/*	public function showCreateTable(string $table):array{
-
-		$def = $this->db->prepared('SELECT
-				a.attnum AS "id",
-				a.attname AS "name",
-				pg_catalog.format_type(a.atttypid, a.atttypmod) AS "type",
-				CASE WHEN a.attnotnull = TRUE
-					THEN \'NOT NULL\'
-				ELSE \'\' END AS "isnull",
-				CASE WHEN (
-					SELECT substring(pg_catalog.pg_get_expr(d.adbin, d.adrelid) FOR 128)
-					FROM pg_catalog.pg_attrdef d
-					WHERE
-						d.adrelid = a.attrelid
-						AND d.adnum = a.attnum
-						AND a.atthasdef
-				) IS NOT NULL
-					THEN \'DEFAULT \' || (
-						SELECT substring(pg_catalog.pg_get_expr(d.adbin, d.adrelid) FOR 128)
-						FROM pg_catalog.pg_attrdef d
-						WHERE
-							d.adrelid = a.attrelid
-							AND d.adnum = a.attnum
-							AND a.atthasdef
-					)
-				ELSE \'\' END AS "default",
-				(
-					SELECT collation_name
-					FROM information_schema.columns
-					WHERE
-						columns.table_name = b.relname
-						AND columns.column_name = a.attname
-				) AS "collation",
-				(
-					SELECT c.relname
-					FROM pg_catalog.pg_class AS c, pg_attribute AS at, pg_catalog.pg_index AS i, pg_catalog.pg_class c2
-					WHERE
-						c.relkind = \'i\'
-						AND at.attrelid = c.oid
-						AND i.indexrelid = c.oid
-						AND i.indrelid = c2.oid
-						AND c2.relname = b.relname
-						AND at.attnum = a.attnum
-				) AS "index"
-			FROM
-				pg_catalog.pg_attribute AS a
-				INNER JOIN
-				(
-					SELECT
-						c.oid,
-						n.nspname,
-						c.relname
-					FROM pg_catalog.pg_class AS c, pg_catalog.pg_namespace AS n
-					WHERE
-						pg_catalog.pg_table_is_visible(c.oid)
-						AND n.oid = c.relnamespace
-						AND c.relname = ?
-					ORDER BY 2, 3) b
-					ON a.attrelid = b.oid
-				INNER JOIN
-				(
-					SELECT a.attrelid
-					FROM pg_catalog.pg_attribute a
-					WHERE
-						a.attnum > 0
-						AND NOT a.attisdropped
-					GROUP BY a.attrelid
-				) AS e
-					ON a.attrelid = e.attrelid
-			WHERE a.attnum > 0
-			      AND NOT a.attisdropped
-			ORDER BY a.attnum', [$table]);
-
-		foreach($def as $field){
-			// @todo primary key/indices
-			$fields[] = $this->fieldspec(trim($field->name), trim($field->type), null, null, null, $field->isnull !== 'NOT NULL', null, null, trim($field->default));
-		}
-
-		$create = sprintf('CREATE TABLE %1$s (%2$s)', $this->quote($table), PHP_EOL.implode(','.PHP_EOL, $fields).PHP_EOL);
-
-		$this->db->prepared('CREATE TEMPORARY TABLE IF NOT EXISTS TEMP$SQL_CREATE ("name" TEXT, "create" TEXT) ON COMMIT PRESERVE ROWS');
-		$this->db->prepared('TRUNCATE TEMP$SQL_CREATE');
-		$this->db->prepared('INSERT INTO TEMP$SQL_CREATE ("name", "create") VALUES (?, ?)', [$table, $create]);
-
-		return ['SELECT "name" AS "Table", "create" AS "Create Table" FROM TEMP$SQL_CREATE'];
-	}
-*/
 }

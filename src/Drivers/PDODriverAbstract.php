@@ -48,9 +48,6 @@ abstract class PDODriverAbstract extends DriverAbstract{
 	 */
 	abstract protected function getDSN():string;
 
-	/**
-	 * @inheritdoc
-	 */
 	public function connect():DriverInterface{
 
 		if($this->db instanceof PDO){
@@ -68,25 +65,16 @@ abstract class PDODriverAbstract extends DriverAbstract{
 
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	public function disconnect():bool{
 		$this->db = null;
 
 		return true;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	public function getDBResource():PDO|null{
 		return $this->db;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	public function getClientInfo():string{
 
 		if(!$this->db instanceof PDO){
@@ -96,9 +84,6 @@ abstract class PDODriverAbstract extends DriverAbstract{
 		return $this->db->getAttribute(PDO::ATTR_CLIENT_VERSION);
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	public function getServerInfo():string{
 
 		if(!$this->db instanceof PDO){
@@ -108,9 +93,6 @@ abstract class PDODriverAbstract extends DriverAbstract{
 		return (string)$this->db->getAttribute(PDO::ATTR_SERVER_INFO);
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	protected function get_result($stmt, string|null $index = null, bool|null $assoc = null):Result{
 		$assoc = $assoc ?? true;
 
@@ -121,16 +103,10 @@ abstract class PDODriverAbstract extends DriverAbstract{
 		return parent::getResult($stmt->fetch(...), [$assoc ? PDO::FETCH_ASSOC : PDO::FETCH_NUM], $index, $assoc);
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	protected function raw_query(string $sql, string|null $index = null, bool|null $assoc = null):Result{
 		return $this->get_result($this->db->query($sql), $index, $assoc);
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	protected function prepared_query(string $sql, array|null $values = null, string|null $index = null, bool|null $assoc = null):Result{
 		$stmt = $this->db->prepare($sql, $this->pdo_stmt_options);
 
@@ -143,9 +119,6 @@ abstract class PDODriverAbstract extends DriverAbstract{
 		return $this->get_result($stmt, $index, $assoc);
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	protected function multi_query(string $sql, array $values):bool{
 		$stmt = $this->db->prepare($sql, $this->pdo_stmt_options);
 
@@ -159,9 +132,6 @@ abstract class PDODriverAbstract extends DriverAbstract{
 		return true;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	protected function multi_callback_query(string $sql, array $data, Closure $callback):bool{
 		$stmt = $this->db->prepare($sql, $this->pdo_stmt_options);
 
@@ -183,25 +153,17 @@ abstract class PDODriverAbstract extends DriverAbstract{
 		return $this->db->lastInsertId();
 	}
 
-	/**
-	 *
-	 */
 	protected function bindParams(PDOStatement $stmt, array $values):void{
 		$param_no = 1;
 
 		foreach($values as $v){
-			$t    = gettype($v);
-			$type = PDO::PARAM_STR;
-
-			if($t === 'boolean'){
-				$type = PDO::PARAM_BOOL;
-			}
-			elseif($t === 'integer'){
-				$type = PDO::PARAM_INT;
-			}
-			elseif($t === 'NULL'){
-				$type = PDO::PARAM_NULL;
-			}
+			// https://wiki.php.net/rfc/pdo_float_type ???
+			$type = match(gettype($v)){
+				'boolean' => PDO::PARAM_BOOL,
+				'integer' => PDO::PARAM_INT,
+				'NULL'    => PDO::PARAM_NULL,
+				default   => PDO::PARAM_STR,
+			};
 
 			$stmt->bindValue($param_no, $v, $type);
 			$param_no++;

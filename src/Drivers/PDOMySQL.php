@@ -14,7 +14,6 @@ namespace chillerlan\Database\Drivers;
 
 use chillerlan\Database\Dialects\{Dialect, MySQL};
 use PDO;
-
 use function is_numeric;
 
 /**
@@ -22,16 +21,11 @@ use function is_numeric;
  */
 final class PDOMySQL extends PDODriverAbstract{
 
-	/**
-	 * @inheritdoc
-	 */
 	public function getDialect():Dialect{
 		return new MySQL;
 	}
 
 	/**
-	 * @inheritdoc
-	 *
 	 * @see https://www.php.net/manual/ref.pdo-mysql.connection.php
 	 *
 	 * @throws \chillerlan\Database\Drivers\DriverException
@@ -71,9 +65,6 @@ final class PDOMySQL extends PDODriverAbstract{
 		return $dsn;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	public function connect():DriverInterface{
 
 		if($this->options->use_ssl){

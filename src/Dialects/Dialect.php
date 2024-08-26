@@ -20,18 +20,18 @@ interface Dialect{
 	public function quote(string $str):string;
 
 	/**
-	 * @param array       $cols
-	 * @param array       $from
-	 * @param string|null $where
-	 * @param mixed       $limit
-	 * @param mixed       $offset
-	 * @param bool|null   $distinct
-	 * @param array|null  $groupby
-	 * @param array|null  $orderby
 	 *
-	 * @return array
 	 */
-	public function select(array $cols, array $from, string|null $where = null, mixed $limit = null, mixed $offset = null, bool|null $distinct = null, array|null $groupby = null, array|null $orderby = null):array;
+	public function select(
+		array       $cols,
+		array       $from,
+		string|null $where = null,
+		mixed       $limit = null,
+		mixed       $offset = null,
+		bool|null   $distinct = null,
+		array|null  $groupby = null,
+		array|null  $orderby = null,
+	):array;
 
 	/**
 	 *
@@ -49,14 +49,24 @@ interface Dialect{
 	public function orderby(array $expressions):array;
 
 	/**
-	 *
+	 * @todo: offset?
 	 */
-	public function selectCount(array $from, string|null $where = null, bool|null $distinct = null, array|null $groupby = null):array; // @todo: offset?
+	public function selectCount(
+		array       $from,
+		string|null $where = null,
+		bool|null   $distinct = null,
+		array|null  $groupby = null,
+	):array;
 
 	/**
 	 *
 	 */
-	public function insert(string $table, array $fields, string|null $onConflict = null, string|null $conflictTarget = null):array;
+	public function insert(
+		string      $table,
+		array       $fields,
+		string|null $onConflict = null,
+		string|null $conflictTarget = null,
+	):array;
 
 	/**
 	 *
@@ -76,7 +86,14 @@ interface Dialect{
 	/**
 	 *
 	 */
-	public function createTable(string $table, array $cols, string|null $primaryKey = null, bool|null $ifNotExists = null, bool|null $temp = null, string|null $dir = null):array;
+	public function createTable(
+		string      $table,
+		array       $cols,
+		string|null $primaryKey = null,
+		bool|null   $ifNotExists = null,
+		bool|null   $temp = null,
+		string|null $dir = null,
+	):array;
 
 	/**
 	 *
@@ -96,15 +113,20 @@ interface Dialect{
 	/**
 	 *
 	 */
-	public function fieldspec(string $name, string $type, mixed $length = null, string|null $attribute = null, string|null $collation = null, bool|null $isNull = null, string|null $defaultType = null, mixed $defaultValue = null, string|null $extra = null):string;
+	public function fieldspec(
+		string      $name,
+		string      $type,
+		mixed       $length = null,
+		string|null $attribute = null,
+		string|null $collation = null,
+		bool|null   $isNull = null,
+		string|null $defaultType = null,
+		mixed       $defaultValue = null,
+		string|null $extra = null,
+	):string;
 
 	/**
-	 * @param string    $name
-	 * @param array     $values
-	 * @param mixed     $defaultValue
-	 * @param bool|null $isNull
 	 *
-	 * @return string
 	 */
 	public function enum(string $name, array $values, mixed $defaultValue = null, bool|null $isNull = null):string;
 

@@ -24,7 +24,7 @@ interface ResultInterface extends SeekableIterator, ArrayAccess, Countable, Json
 	/** */
 	public function toArray():array;
 
-	/** @return mixed */
+	/** */
 	public function each(Closure $callback);
 
 	/** */
@@ -33,10 +33,10 @@ interface ResultInterface extends SeekableIterator, ArrayAccess, Countable, Json
 	/** */
 	public function reverse():ResultInterface;
 
-	/** @return mixed */
+	/** */
 	public function first():mixed;
 
-	/** @return mixed */
+	/** */
 	public function last():mixed;
 
 	/** */

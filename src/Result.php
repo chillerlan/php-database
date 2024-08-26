@@ -19,22 +19,22 @@ use function array_chunk, array_column, array_key_exists, array_keys, array_merg
 class Result implements ResultInterface{
 
 	protected string|null $sourceEncoding = null;
-	protected string  $destEncoding;
-	protected bool    $isBool;
-	protected bool    $isSuccess;
-	/** @var  \chillerlan\Database\ResultRow[]  */
-	protected array   $array          = [];
-	protected int     $offset         = 0;
+	protected string      $destEncoding;
+	protected bool        $isBool;
+	protected bool        $isSuccess;
+	/** @var  \chillerlan\Database\ResultRow[] */
+	protected array       $array  = [];
+	protected int         $offset = 0;
 
 	/** @todo */
 #	protected array $metadata = [];
 
 	public function __construct(
 		iterable|null $data = null,
-		string|null $sourceEncoding = null,
-		string|null $destEncoding = null,
-		bool|null $isBool = null,
-		bool|null $isSuccess = null
+		string|null   $sourceEncoding = null,
+		string|null   $destEncoding = null,
+		bool|null     $isBool = null,
+		bool|null     $isSuccess = null
 	){
 		$this->sourceEncoding = $sourceEncoding;
 		$this->destEncoding   = $destEncoding ?? 'UTF-8';
@@ -95,17 +95,14 @@ class Result implements ResultInterface{
 		return $this;
 	}
 
-	/** @inheritDoc */
 	public function first():mixed{
 		return $this->array[0] ?? null;
 	}
 
-	/** @inheritDoc */
 	public function last():mixed{
 		return $this->array[count($this->array) - 1] ?? null;
 	}
 
-	/** @inheritDoc */
 	public function clear():ResultInterface{
 		$this->array = [];
 
@@ -158,24 +155,21 @@ class Result implements ResultInterface{
 	}
 
 	/**
-	 * @link  http://php.net/manual/arrayaccess.offsetexists.php
-	 * @inheritdoc
+	 * @link https://www.php.netmanual/arrayaccess.offsetexists.php
 	 */
 	public function offsetExists($offset):bool{
 		return array_key_exists($offset, $this->array);
 	}
 
 	/**
-	 * @link  http://php.net/manual/arrayaccess.offsetget.php
-	 * @inheritdoc
+	 * @link https://www.php.netmanual/arrayaccess.offsetget.php
 	 */
 	public function offsetGet($offset):mixed{
 		return $this->array[$offset] ?? null;
 	}
 
 	/**
-	 * @link  http://php.net/manual/arrayaccess.offsetunset.php
-	 * @inheritdoc
+	 * @link https://www.php.netmanual/arrayaccess.offsetunset.php
 	 */
 	public function offsetUnset($offset):void{
 		unset($this->array[$offset]);
@@ -183,56 +177,49 @@ class Result implements ResultInterface{
 
 
 	/**
-	 * @link http://php.net/manual/countable.count.php
-	 * @inheritdoc
+	 * @link https://www.php.netmanual/countable.count.php
 	 */
 	public function count():int{
 		return count($this->array);
 	}
 
 	/**
-	 * @link  http://php.net/manual/iterator.current.php
-	 * @inheritdoc
+	 * @link https://www.php.netmanual/iterator.current.php
 	 */
 	public function current():mixed{
 		return $this->array[$this->offset] ?? null;
 	}
 
 	/**
-	 * @link  http://php.net/manual/iterator.next.php
-	 * @inheritdoc
+	 * @link https://www.php.netmanual/iterator.next.php
 	 */
 	public function next():void{
 		$this->offset++;
 	}
 
 	/**
-	 * @link  http://php.net/manual/iterator.key.php
-	 * @inheritdoc
+	 * @link https://www.php.netmanual/iterator.key.php
 	 */
 	public function key():int{
 		return $this->offset;
 	}
 
 	/**
-	 * @link  http://php.net/manual/iterator.valid.php
-	 * @inheritdoc
+	 * @link https://www.php.netmanual/iterator.valid.php
 	 */
 	public function valid():bool{
 		return array_key_exists($this->offset, $this->array);
 	}
 
 	/**
-	 * @link  http://php.net/manual/iterator.rewind.php
-	 * @inheritdoc
+	 * @link https://www.php.netmanual/iterator.rewind.php
 	 */
 	public function rewind():void{
 		$this->offset = 0;
 	}
 
 	/**
-	 * @link  http://php.net/manual/seekableiterator.seek.php
-	 * @inheritdoc
+	 * @link https://www.php.netmanual/seekableiterator.seek.php
 	 */
 	public function seek($offset):void{
 		$this->rewind();
@@ -248,7 +235,6 @@ class Result implements ResultInterface{
 
 	}
 
-	/** @inheritdoc */
 	public function merge(ResultInterface $Result):ResultInterface{
 		/** @phan-suppress-next-line PhanUndeclaredProperty */
 		$this->array = array_merge($this->array, $Result->array);
@@ -256,12 +242,10 @@ class Result implements ResultInterface{
 		return $this;
 	}
 
-	/** @inheritdoc */
 	public function chunk(int $size):array{
 		return array_chunk($this->toArray(), $size, true);
 	}
 
-	/** @inheritdoc */
 	public function toArray():array{
 		$arr = [];
 
@@ -272,17 +256,14 @@ class Result implements ResultInterface{
 		return $arr;
 	}
 
-	/** @inheritdoc */
 	public function fields():array{
 		return array_keys($this->array);
 	}
 
-	/** @inheritdoc */
 	public function values(bool|null $to_array = null):array{
 		return array_values($to_array === true ? $this->toArray() : $this->array);
 	}
 
-	/** @inheritdoc */
 	public function column(string $column, string|null $index_key = null):array{
 		return array_column($this->toArray(), $column, $index_key);
 	}
@@ -291,7 +272,6 @@ class Result implements ResultInterface{
 	 * ArrayAccess *
 	 ***************/
 
-	/** @inheritdoc */
 	public function offsetSet($offset, $value):void{
 
 		$row = new ResultRow($value, $this->sourceEncoding, $this->destEncoding);
@@ -305,8 +285,7 @@ class Result implements ResultInterface{
 	 * JsonSerializable *
 	 ********************/
 
-	/** @inheritdoc */
-	public function jsonSerialize():mixed{
+	public function jsonSerialize():array{
 		return $this->toArray();
 	}
 

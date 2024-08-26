@@ -12,11 +12,23 @@
 
 namespace chillerlan\Database\Dialects;
 
+use function count, explode, implode, in_array, is_int, is_string, preg_match, strtolower, strtoupper, trim;
+
 final class MSSQL extends DialectAbstract{
+
+	private const TYPE_TRANSLATION = [
+		'boolean'    => 'bit',
+		'bool   '    => 'bit',
+		'mediumint'  => 'int',
+		'double'     => 'float',
+		'tinytext'   => 'text',
+		'mediumtext' => 'text',
+		'longtext'   => 'text',
+		'timestamp'  => 'datetime2',
+	];
 
 	protected array $quotes = ['[', ']'];
 
-	/** @inheritdoc */
 	public function dropTable(string $table, bool $ifExists):array{
 		// @todo: if exists
 		$sql = ['DROP TABLE'];
@@ -26,8 +38,16 @@ final class MSSQL extends DialectAbstract{
 		return $sql;
 	}
 
-	/** @inheritdoc */
-	public function select(array $cols, array $from, string|null $where = null, mixed $limit = null, mixed $offset = null, bool|null $distinct = null, array|null $groupby = null, array|null $orderby = null):array{
+	public function select(
+		array       $cols,
+		array       $from,
+		string|null $where = null,
+		mixed       $limit = null,
+		mixed       $offset = null,
+		bool|null   $distinct = null,
+		array|null  $groupby = null,
+		array|null  $orderby = null,
+	):array{
 		$sql = ['SELECT'];
 
 		if($distinct){
@@ -64,7 +84,6 @@ final class MSSQL extends DialectAbstract{
 		return $sql;
 	}
 
-	/** @inheritdoc */
 	public function createDatabase(string $dbname, bool|null $ifNotExists = null, string|null $collate = null):array{
 		$sql = ['CREATE DATABASE'];
 		$sql[] = $this->quote($dbname);
@@ -77,8 +96,14 @@ final class MSSQL extends DialectAbstract{
 		return $sql;
 	}
 
-	/** @inheritdoc */
-	public function createTable(string $table, array $cols, string|null $primaryKey = null, bool|null $ifNotExists = null, bool|null $temp = null, string|null $dir = null):array{
+	public function createTable(
+		string      $table,
+		array       $cols,
+		string|null $primaryKey = null,
+		bool|null   $ifNotExists = null,
+		bool|null   $temp = null,
+		string|null $dir = null,
+	):array{
 		$sql = [];
 		// @todo
 #		if($ifNotExists){
@@ -103,27 +128,23 @@ final class MSSQL extends DialectAbstract{
 	}
 
 	/**
-	 * @inheritdoc
-	 *
 	 * @see https://docs.microsoft.com/sql/t-sql/data-types/numeric-types
 	 * @see https://docs.microsoft.com/sql/t-sql/data-types/string-and-binary-types
-	 * [...]
 	 */
-	public function fieldspec(string $name, string $type, mixed $length = null, string|null $attribute = null, string|null $collation = null, bool|null $isNull = null, string|null $defaultType = null, mixed $defaultValue = null, string|null $extra = null):string{
-		$type = strtolower(trim($type));
-
-		$field = [$this->quote(trim($name))];
-
-		$type_translation = [
-			'boolean'    => 'bit',
-			'bool   '    => 'bit',
-			'mediumint'  => 'int',
-			'double'     => 'float',
-			'tinytext'   => 'text',
-			'mediumtext' => 'text',
-			'longtext'   => 'text',
-			'timestamp'  => 'datetime2',
-		][$type] ?? $type;
+	public function fieldspec(
+		string      $name,
+		string      $type,
+		mixed       $length = null,
+		string|null $attribute = null,
+		string|null $collation = null,
+		bool|null   $isNull = null,
+		string|null $defaultType = null,
+		mixed       $defaultValue = null,
+		string|null $extra = null,
+	):string{
+		$type             = strtolower(trim($type));
+		$field            = [$this->quote(trim($name))];
+		$type_translation = self::TYPE_TRANSLATION[$type] ?? $type;
 
 		if((is_int($length) || is_string($length) && (count(explode(',', $length)) === 2 || $length === 'max'))
 		   && in_array($type, ['char', 'varchar', 'nchar', 'nvarchar', 'decimal', 'numeric', 'datetime2', 'time'], true)){
@@ -142,13 +163,10 @@ final class MSSQL extends DialectAbstract{
 		if($defaultType === 'USER_DEFINED'){
 
 			// @todo
-			switch(true){
-				case $type_translation === 'bit':
-					$field[] = 'DEFAULT '.(preg_match('/^1|T|TRUE|YES$/i', $defaultValue) ? '1' : '0');
-					break;
-				default:
-					$field[] = 'DEFAULT \''.$defaultValue.'\'';
-			}
+			$field[] = match (true) {
+				$type_translation === 'bit' => 'DEFAULT '.(preg_match('/^1|T|TRUE|YES$/i', $defaultValue) ? '1' : '0'),
+				default                     => 'DEFAULT \''.$defaultValue.'\'',
+			};
 
 		}
 		elseif($defaultType === 'CURRENT_TIMESTAMP'){
@@ -165,15 +183,15 @@ final class MSSQL extends DialectAbstract{
 		return implode(' ', $field);
 	}
 
-	/** @inheritdoc */
 	public function showDatabases():array{
 		// https://stackoverflow.com/questions/147659/get-list-of-databases-from-sql-server
 		// EXEC sp_databases
+		/** @noinspection SqlResolve, SqlDialectInspection */
 		return ['SELECT name AS [Database] FROM master.dbo.sysdatabases WHERE name NOT IN (\'master\', \'tempdb\', \'model\', \'msdb\')'];
 	}
 
-	/** @inheritdoc */
 	public function showTables(string|null $database = null, string|null $pattern = null, string|null $where = null):array{
+		/** @noinspection SqlResolve, SqlDialectInspection */
 		return ['SELECT Distinct TABLE_NAME FROM information_schema.TABLES'];
 	}
 

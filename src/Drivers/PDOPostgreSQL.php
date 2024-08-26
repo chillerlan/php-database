@@ -14,16 +14,13 @@ namespace chillerlan\Database\Drivers;
 
 use chillerlan\Database\Dialects\{Dialect, Postgres};
 
-use function bin2hex, is_numeric;
+use function is_numeric, sodium_bin2hex;
 
 /**
  *
  */
 final class PDOPostgreSQL extends PDODriverAbstract{
 
-	/**
-	 * @inheritdoc
-	 */
 	public function getDialect():Dialect{
 		return new Postgres;
 	}
@@ -66,8 +63,6 @@ final class PDOPostgreSQL extends PDODriverAbstract{
 	}
 
 	/**
-	 * @inheritdoc
-	 *
 	 * @see https://stackoverflow.com/a/44814220
 	 */
 	protected function escape_string(string $string):string{
@@ -77,7 +72,7 @@ final class PDOPostgreSQL extends PDODriverAbstract{
 		}
 
 		// convert to hex literal, emulating mysql's UNHEX() (seriously pgsql??)
-		return "encode(decode('".bin2hex($string)."', 'hex'), 'escape')";
+		return "encode(decode('".sodium_bin2hex($string)."', 'hex'), 'escape')";
 	}
 
 }

@@ -14,9 +14,8 @@ use chillerlan\Database\Dialects\Dialect;
 use chillerlan\Database\Drivers\DriverInterface;
 use chillerlan\Database\Query\{Alter, Create, Delete, Drop, Insert, QueryException, Select, Show, Statement, Truncate, Update};
 use chillerlan\Settings\SettingsContainerInterface;
-use Psr\Log\{LoggerAwareInterface, LoggerAwareTrait, LoggerInterface, NullLogger};
+use Psr\Log\{LoggerInterface, NullLogger};
 use Psr\SimpleCache\CacheInterface;
-
 use function strtolower;
 
 /**
@@ -30,8 +29,7 @@ use function strtolower;
  * @property \chillerlan\Database\Query\Truncate $truncate
  * @property \chillerlan\Database\Query\Update   $update
  */
-abstract class DatabaseAbstract implements LoggerAwareInterface{
-	use LoggerAwareTrait;
+abstract class DatabaseAbstract{
 
 	protected const STATEMENTS = [
 		'alter'    => Alter::class,
@@ -44,26 +42,28 @@ abstract class DatabaseAbstract implements LoggerAwareInterface{
 		'truncate' => Truncate::class,
 		'update'   => Update::class,
 	];
-	/** @var \chillerlan\Database\DatabaseOptions */
-	protected SettingsContainerInterface $options;
-	protected CacheInterface|null $cache = null;
-	protected DriverInterface $driver;
-	protected Dialect $dialect;
+
+	protected SettingsContainerInterface|DatabaseOptions $options;
+	protected CacheInterface|null                        $cache = null;
+	protected LoggerInterface                            $logger;
+	protected DriverInterface                            $driver;
+	protected Dialect                                    $dialect;
 
 	/**
 	 * Database constructor.
 	 *
 	 * @throws \chillerlan\Database\DatabaseException
 	 */
-	public function __construct(SettingsContainerInterface $options, CacheInterface|null $cache = null, LoggerInterface|null $logger = null){
+	public function __construct(
+		SettingsContainerInterface|DatabaseOptions $options,
+		CacheInterface|null                        $cache = null,
+		LoggerInterface                            $logger = new NullLogger,
+	){
 		$this->options = $options;
 		$this->cache   = $cache;
+		$this->logger  = $logger;
 
-		// set a default logger
-		$this->logger  = $logger ?? new NullLogger;
-		/** @phan-suppress-next-line PhanTypeExpectedObjectOrClassName */
-		$this->driver  = new $this->options->driver($this->options, $this->cache, $this->logger);
-
+		$this->driver  = new ($this->options->driver)($this->options, $this->cache, $this->logger);
 		$this->dialect = $this->driver->getDialect();
 	}
 
@@ -74,34 +74,25 @@ abstract class DatabaseAbstract implements LoggerAwareInterface{
 		$name = strtolower($name);
 
 		if(isset($this::STATEMENTS[$name])){
-			$statement = $this::STATEMENTS[$name];
-
-			return new $statement($this->driver, $this->dialect, $this->logger);
+			return new ($this::STATEMENTS[$name])($this->driver, $this->dialect, $this->logger);
 		}
 
 		throw new QueryException('invalid statement');
 	}
 
-	/**
-	 * @codeCoverageIgnore
-	 */
 	public function __destruct(){
 		$this->driver->disconnect();
 	}
 
-	/**
-	 * @return \chillerlan\Database\Drivers\DriverInterface
-	 */
 	public function getDriver():DriverInterface{
 		return $this->driver;
 	}
 
-	/**
-	 *
-	 */
-	public function setLogger(LoggerInterface $logger):void{
+	public function setLogger(LoggerInterface $logger):static{
 		$this->logger = $logger;
 		$this->driver->setLogger($logger);
+
+		return $this;
 	}
 
 }

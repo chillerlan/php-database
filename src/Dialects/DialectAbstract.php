@@ -13,6 +13,8 @@
 namespace chillerlan\Database\Dialects;
 
 use chillerlan\Database\Query\QueryException;
+use function array_fill, count, explode, implode, in_array, is_array, is_float,
+	is_int, is_string, sprintf, strtolower, strtoupper;
 
 /**
  * please don't look at it
@@ -32,8 +34,16 @@ abstract class DialectAbstract implements Dialect{
 	 */
 	protected string $charset = 'utf8';
 
-	/** @inheritdoc */
-	public function select(array $cols, array $from, string|null $where = null, mixed $limit = null, mixed $offset = null, bool|null $distinct = null, array|null $groupby = null, array|null $orderby = null):array{
+	public function select(
+		array       $cols,
+		array       $from,
+		string|null $where = null,
+		mixed       $limit = null,
+		mixed       $offset = null,
+		bool|null   $distinct = null,
+		array|null  $groupby = null,
+		array|null  $orderby = null,
+	):array{
 		$sql = ['SELECT'];
 
 		if($distinct){
@@ -66,8 +76,12 @@ abstract class DialectAbstract implements Dialect{
 		return $sql;
 	}
 
-	/** @inheritdoc */
-	public function insert(string $table, array $fields, string|null $onConflict = null, string|null $conflictTarget = null):array{
+	public function insert(
+		string      $table,
+		array       $fields,
+		string|null $onConflict = null,
+		string|null $conflictTarget = null,
+	):array{
 		$sql = ['INSERT INTO'];
 		$sql[] = $this->quote($table);
 		$sql[] = '('.$this->quotes[0].implode($this->quotes[1].', '.$this->quotes[0], $fields).$this->quotes[1].')';
@@ -77,7 +91,6 @@ abstract class DialectAbstract implements Dialect{
 		return $sql;
 	}
 
-	/** @inheritdoc */
 	public function update(string $table, array $set, string $where):array{
 		$sql = ['UPDATE'];
 		$sql[] = $this->quote($table);
@@ -88,7 +101,6 @@ abstract class DialectAbstract implements Dialect{
 		return $sql;
 	}
 
-	/** @inheritdoc */
 	public function delete(string $table, string $where):array{
 		$sql = ['DELETE FROM'];
 		$sql[] = $this->quote($table);
@@ -97,17 +109,14 @@ abstract class DialectAbstract implements Dialect{
 		return $sql;
 	}
 
-	/** @inheritdoc */
 	public function createDatabase(string $dbname, bool|null $ifNotExists = null, string|null $collate = null):array{
 		throw new QueryException('not supported');
 	}
 
-	/** @inheritdoc */
 	public function quote(string $str):string{ // @todo: fixme
 		return $this->quotes[0].implode($this->quotes[1].'.'.$this->quotes[0], explode('.', $str)).$this->quotes[1];
 	}
 
-	/** @inheritdoc */
 	public function dropDatabase(string $dbname, bool $ifExists):array{
 		$sql = ['DROP DATABASE'];
 
@@ -120,7 +129,6 @@ abstract class DialectAbstract implements Dialect{
 		return $sql;
 	}
 
-	/** @inheritdoc */
 	public function dropTable(string $table, bool $ifExists):array{
 		$sql = ['DROP TABLE'];
 
@@ -133,7 +141,12 @@ abstract class DialectAbstract implements Dialect{
 		return $sql;
 	}
 
-	public function selectCount(array $from, string|null $where = null, bool|null $distinct = null, array|null $groupby = null):array{
+	public function selectCount(
+		array       $from,
+		string|null $where = null,
+		bool|null   $distinct = null,
+		array|null  $groupby = null,
+	):array{
 		$sql = ['SELECT'];
 
 		if($distinct){
@@ -187,42 +200,19 @@ abstract class DialectAbstract implements Dialect{
 		return $orderby;
 	}
 
-	/** @inheritdoc */
 	public function cols(array $expressions):array {
-
-		// @todo: fixme, cleanup
-		// errors on [alias => col, alias, alias => col...]
-		$_col = function ($expr1, $expr2 = null, $func = null):string {
-			switch(true){
-				case  $expr2 && $func:
-					$col = sprintf('%s(%s) AS %s', strtoupper($func), $expr1, $this->quote($expr2));
-					break;
-				case  $expr2 && !$func:
-					$col = sprintf('%s AS %s', $this->quote($expr1), $this->quote($expr2));
-					break;
-				case !$expr2 && $func:
-					$col = sprintf('%s(%s)', strtoupper($func), $expr1);
-					break;
-				case !$expr2 && !$func:
-				default:
-					$col = $this->quote($expr1);
-			}
-
-			return $col;
-		};
-
 		$r = [];
 
 		foreach($expressions as $k => $ref){
 			if(is_string($k)){
 				$r[$ref[0] ?? $k] = is_array($ref)
-					? $_col($ref[0], $k, $ref[1] ?? null)
-					: $_col($ref, $k);
+					? $this->col_ref($ref[0], $k, $ref[1] ?? null)
+					: $this->col_ref($ref, $k);
 			}
 			else{
 				$r[$ref] = is_array($ref)
-					? $_col($ref[0], null, $ref[1] ?? null)
-					: $_col($ref);
+					? $this->col_ref($ref[0], null, $ref[1] ?? null)
+					: $this->col_ref($ref);
 			}
 
 		}
@@ -230,36 +220,34 @@ abstract class DialectAbstract implements Dialect{
 		return $r;
 	}
 
-
-	/** @inheritdoc */
-	public function from(array $expressions):array {
-
-		$_from = function (string $table, string|null $ref = null):string {
-			// @todo: quotes
-			$from = $this->quote($table);
-
-			if($ref){
-				$from = sprintf('%s AS %s', $this->quote($ref), $this->quote($table));// @todo: index hint
-			}
-
-			return $from;
+	protected function col_ref(string $expr1, string|null $expr2 = null, string|null $func = null):string{
+		// @todo: fixme, cleanup
+		// errors on [alias => col, alias, alias => col...]
+		return match(true){
+			$expr2 !== null && $func !== null => sprintf('%s(%s) AS %s', strtoupper($func), $expr1, $this->quote($expr2)),
+			$expr2 !== null && $func === null => sprintf('%s AS %s', $this->quote($expr1), $this->quote($expr2)),
+			$expr2 === null && $func !== null => sprintf('%s(%s)', strtoupper($func), $expr1),
+			default                           => $this->quote($expr1),
 		};
+	}
 
+
+	public function from(array $expressions):array {
 		$r = [];
 
 		foreach($expressions as $k => $ref){
 
 			if(is_string($k)){
-				$r[$ref ?? $k] = $_from($k, $ref);
+				$r[$ref ?? $k] = $this->from_ref($k, $ref);
 			}
 			else{
 				$x = explode(' ', $ref);
 
 				if(count($x) === 2){
-					$r[$ref ?? $k] = $_from($x[0], $x[1]);
+					$r[$ref ?? $k] = $this->from_ref($x[0], $x[1]);
 				}
 				else{
-					$r[$ref] = $_from($ref);
+					$r[$ref] = $this->from_ref($ref);
 				}
 			}
 
@@ -268,14 +256,23 @@ abstract class DialectAbstract implements Dialect{
 		return $r;
 	}
 
-	/** @inheritdoc */
-	public function enum(string $name, array $values, mixed $defaultValue = null, bool|null $isNull = null):string{
+	protected function from_ref(string $table, string|null $ref = null):string{
+		// @todo: quotes
+		$from = $this->quote($table);
 
+		if($ref !== null){
+			$from = sprintf('%s AS %s', $this->quote($ref), $this->quote($table)); // @todo: index hint
+		}
+
+		return $from;
+	}
+
+	public function enum(string $name, array $values, mixed $defaultValue = null, bool|null $isNull = null):string{
 		$field = $this->quote($name);
 		$field .= 'ENUM (\''.implode('\', \'', $values).'\')';
 
-		if(is_bool($isNull)){
-			$field .= $isNull ? 'NULL' : 'NOT NULL';
+		if($isNull !== null){
+			$field .= $isNull === true ? 'NULL' : 'NOT NULL';
 		}
 
 		if(in_array($defaultValue, $values, true)){
@@ -288,7 +285,6 @@ abstract class DialectAbstract implements Dialect{
 		return $field;
 	}
 
-	/** @inheritdoc */
 	public function truncate(string $table):array{
 		$sql = ['TRUNCATE TABLE'];
 		$sql[] = $this->quote($table);
@@ -296,17 +292,14 @@ abstract class DialectAbstract implements Dialect{
 		return $sql;
 	}
 
-	/** @inheritdoc */
 	public function showDatabases():array{
 		throw new QueryException('not supported');
 	}
 
-	/** @inheritdoc */
 	public function showTables(string|null $database = null, string|null $pattern = null, string|null $where = null):array{
 		throw new QueryException('not supported');
 	}
 
-	/** @inheritdoc */
 	public function showCreateTable(string $table):array{
 		throw new QueryException('not supported');
 	}

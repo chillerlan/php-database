@@ -14,16 +14,21 @@ use chillerlan\Database\Dialects\Dialect;
 use chillerlan\Database\Result;
 use chillerlan\Settings\SettingsContainerInterface;
 use Closure;
-use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Psr\SimpleCache\CacheInterface;
 
-interface DriverInterface extends LoggerAwareInterface{
+interface DriverInterface{
 
 	/**
 	 * Constructor.
 	 */
-	public function __construct(SettingsContainerInterface $options, CacheInterface|null $cache = null, LoggerInterface|null $logger = null);
+	public function __construct(SettingsContainerInterface $options, CacheInterface|null $cache = null, LoggerInterface $logger = new NullLogger);
+
+	/**
+	 * Sets a PSR-3 logger instance
+	 */
+	public function setLogger(LoggerInterface $logger):static;
 
 	/**
 	 * Establishes a database connection
@@ -62,14 +67,14 @@ interface DriverInterface extends LoggerAwareInterface{
 	/**
 	 * Sanitizer.
 	 *
-	 * @param mixed $data string to escape
+	 * @param bool|float|int|string|null $data string to escape
 	 *
-	 * @return mixed escaped. obviously. (hopefully)
+	 * @return float|int|string escaped. obviously. (hopefully)
 	 */
-	public function escape(mixed $data = null):mixed;
+	public function escape(bool|float|int|string|null $data = null):float|int|string;
 
 	/**
-	 * Basic SQL query for non prepared statements
+	 * Basic SQL query for non-repared statements
 	 *
 	 * There is no escaping in here, so make sure, your SQL is clean/escaped.
 	 * Also, your SQL should NEVER contain user input, use prepared statements in this case.

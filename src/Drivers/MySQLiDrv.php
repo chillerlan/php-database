@@ -12,13 +12,10 @@
 
 namespace chillerlan\Database\Drivers;
 
-use Closure;
 use chillerlan\Database\Dialects\{Dialect, MySQL};
 use chillerlan\Database\Result;
-use Throwable, mysqli;
-
+use Closure, Throwable, mysqli;
 use function array_unshift, count, gettype, implode, is_array, is_bool, mysqli_init;
-
 use const MYSQLI_OPT_CONNECT_TIMEOUT;
 
 /**
@@ -31,11 +28,8 @@ final class MySQLiDrv extends DriverAbstract{
 	 *
 	 * @var mysqli|null
 	 */
-	private ?mysqli $db = null;
+	private mysqli|null $db = null;
 
-	/**
-	 * @inheritdoc
-	 */
 	public function connect():DriverInterface{
 
 		if($this->db instanceof mysqli){
@@ -81,9 +75,6 @@ final class MySQLiDrv extends DriverAbstract{
 
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	public function disconnect():bool{
 
 		if($this->db instanceof mysqli){
@@ -95,23 +86,14 @@ final class MySQLiDrv extends DriverAbstract{
 		return true;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	public function getDBResource():mysqli|null{
 		return $this->db;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	public function getDialect():Dialect{
 		return new MySQL;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	public function getClientInfo():string{
 
 		if(!$this->db instanceof mysqli){
@@ -121,9 +103,6 @@ final class MySQLiDrv extends DriverAbstract{
 		return $this->db->client_info;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	public function getServerInfo():string{
 
 		if(!$this->db instanceof mysqli){
@@ -133,9 +112,6 @@ final class MySQLiDrv extends DriverAbstract{
 		return $this->db->server_info;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	protected function raw_query(string $sql, string|null $index = null, bool|null $assoc = null):Result{
 		$result = $this->db->query($sql);
 
@@ -155,9 +131,6 @@ final class MySQLiDrv extends DriverAbstract{
 		return $r;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	protected function prepared_query(string $sql, array|null $values = null, string|null $index = null, bool|null $assoc = null):Result{
 		$values ??= [];
 		$assoc  ??= true;
@@ -222,9 +195,6 @@ final class MySQLiDrv extends DriverAbstract{
 		return $output;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	protected function multi_query(string $sql, array $values):bool{
 		$stmt = $this->db->stmt_init();
 		$stmt->prepare($sql);
@@ -242,9 +212,6 @@ final class MySQLiDrv extends DriverAbstract{
 		return true;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	protected function multi_callback_query(string $sql, array $data, Closure $callback):bool{
 		$stmt = $this->db->stmt_init();
 		$stmt->prepare($sql);

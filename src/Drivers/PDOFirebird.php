@@ -14,7 +14,6 @@ namespace chillerlan\Database\Drivers;
 
 use chillerlan\Database\Dialects\{Dialect, Firebird};
 use Exception, Throwable, PDO;
-
 use function is_file, is_numeric, is_readable, is_writable;
 
 /**
@@ -22,14 +21,11 @@ use function is_file, is_numeric, is_readable, is_writable;
  */
 final class PDOFirebird extends PDODriverAbstract{
 
-	/** @inheritdoc */
 	public function getDialect():Dialect{
 		return new Firebird;
 	}
 
 	/**
-	 * @inheritdoc
-	 *
 	 * @see https://www.php.net/manual/ref.pdo-firebird.connection.php
 	 *
 	 * @throws \chillerlan\Database\Drivers\DriverException
@@ -62,9 +58,6 @@ final class PDOFirebird extends PDODriverAbstract{
 		return $dsn;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	public function connect():DriverInterface{
 
 		if($this->db instanceof PDO){
@@ -90,15 +83,12 @@ final class PDOFirebird extends PDODriverAbstract{
 	}
 
 	/**
-	 * @inheritdoc
-	 *
 	 * @codeCoverageIgnore Firebird -> SQLSTATE[IM001]: driver does not support lastInsertId()
 	 */
 	protected function insertID():string{
 		return '';
 	}
 
-	/** @inheritdoc */
 	public function getServerInfo():string{
 
 		if(!$this->db instanceof PDO){

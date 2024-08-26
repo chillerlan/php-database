@@ -12,17 +12,13 @@
 
 namespace chillerlan\Database\Drivers;
 
-use Closure;
 use chillerlan\Database\Dialects\{Dialect, Postgres};
 use chillerlan\Database\Result;
-use Throwable;
 use PgSql\Connection as PgSqlConnection;
 use PgSql\Result as PgSqlResult;
-
-use function bin2hex, implode, in_array, pg_close, pg_connect, pg_execute, pg_field_type,
-	pg_free_result, pg_last_error, pg_prepare, pg_query, pg_version, preg_replace_callback;
-use function pg_fetch_assoc;
-use function pg_fetch_row;
+use Closure, Throwable;
+use function implode, in_array, pg_close, pg_connect, pg_execute, pg_fetch_assoc, pg_fetch_row, pg_field_type,
+	pg_free_result, pg_last_error, pg_prepare, pg_query, pg_version, preg_replace_callback, sodium_bin2hex;
 
 /**
  *
@@ -32,11 +28,8 @@ final class PostgreSQL extends DriverAbstract{
 	/**
 	 * Holds the database resource object
 	 */
-	private ?PgSqlConnection $db = null;
+	private PgSqlConnection|null $db = null;
 
-	/**
-	 * @inheritdoc
-	 */
 	public function connect():DriverInterface{
 
 		if($this->db !== null){
@@ -67,9 +60,6 @@ final class PostgreSQL extends DriverAbstract{
 
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	public function disconnect():bool{
 
 		if($this->db !== null){
@@ -85,23 +75,14 @@ final class PostgreSQL extends DriverAbstract{
 		return true;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	public function getDBResource():PgSqlConnection|null{
 		return $this->db;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	public function getDialect():Dialect{
 		return new Postgres;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	public function getClientInfo():string{
 
 		if($this->db === null){
@@ -113,9 +94,6 @@ final class PostgreSQL extends DriverAbstract{
 		return 'PostgreSQL '.$ver['client'].' ('.$ver['client_encoding'].')';
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	public function getServerInfo():string{
 
 		if($this->db === null){
@@ -129,8 +107,6 @@ final class PostgreSQL extends DriverAbstract{
 	}
 
 	/**
-	 * @inheritdoc
-	 *
 	 * @see https://stackoverflow.com/a/44814220
 	 */
 	protected function escape_string(string $string):string{
@@ -140,28 +116,19 @@ final class PostgreSQL extends DriverAbstract{
 		}
 
 		// convert to hex literal, emulating mysql's UNHEX() (seriously pgsql??)
-		return "encode(decode('".bin2hex($string)."', 'hex'), 'escape')";
+		return "encode(decode('".sodium_bin2hex($string)."', 'hex'), 'escape')";
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	protected function raw_query(string $sql, string|null $index = null, bool|null $assoc = null):Result{
 		return $this->get_result(pg_query($this->db, $sql), $index, $assoc);
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	protected function prepared_query(string $sql, array|null $values = null, string|null $index = null, bool|null $assoc = null):Result{
 		pg_prepare($this->db, '', $this->replaceParams($sql));
 
 		return $this->get_result(pg_execute($this->db, '', $values ?? []), $index, $assoc);
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	protected function multi_query(string $sql, array $values):bool{
 		$p = pg_prepare($this->db, '', $this->replaceParams($sql));
 
@@ -176,9 +143,6 @@ final class PostgreSQL extends DriverAbstract{
 		return true;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	protected function multi_callback_query(string $sql, array $data, Closure $callback):bool{
 		$p = pg_prepare($this->db, '', $this->replaceParams($sql));
 
@@ -193,9 +157,6 @@ final class PostgreSQL extends DriverAbstract{
 		return true;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	private function get_result(PgSqlResult|false $result, string|null $index = null, bool|null $assoc = null):Result{
 
 		if($result === false){
@@ -240,16 +201,13 @@ final class PostgreSQL extends DriverAbstract{
 		return $out;
 	}
 
-	/**
-	 *
-	 */
 	private function replaceParams(string $sql):string{
 		$i = 1;
 
 		/** @phan-suppress-next-line PhanTypeMismatchArgumentInternal */
-		return preg_replace_callback('/(\?)/', function() use (&$i){
+		return preg_replace_callback(pattern: '/(\?)/', callback: function() use (&$i){
 			return '$'.$i++;
-		}, $sql);
+		}, subject: $sql);
 	}
 
 }

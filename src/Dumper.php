@@ -12,6 +12,7 @@ namespace chillerlan\Database;
 
 use chillerlan\Settings\SettingsContainerInterface;
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Psr\SimpleCache\CacheInterface;
 
 /**
@@ -21,13 +22,17 @@ class Dumper extends DatabaseAbstract{
 
 	const PAGESIZE = 100;
 
-	public function __construct(SettingsContainerInterface $options, CacheInterface|null $cache = null, LoggerInterface|null $logger = null){
+	public function __construct(
+		SettingsContainerInterface|DatabaseOptions $options,
+		CacheInterface|null                        $cache = null,
+		LoggerInterface                            $logger = new NullLogger,
+	){
 		parent::__construct($options, $cache, $logger);
 
 		$this->driver->connect();
 	}
 
-	public function dump(array|null $selection = null, array|null $not = null){
+	public function dump(array|null $selection = null, array|null $not = null):void{
 		$tables = $this->parseTables($selection, $not);
 
 		$fh = fopen($this->options->storage_path.'/dump.sql', 'w');

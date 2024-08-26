@@ -15,12 +15,10 @@ namespace chillerlan\Database\Drivers;
 use chillerlan\Database\Result;
 use chillerlan\Database\Dialects\{Dialect, MSSQL};
 use chillerlan\Settings\SettingsContainerInterface;
-use Psr\Log\LoggerInterface;
+use Psr\Log\{LoggerInterface, NullLogger};
 use Psr\SimpleCache\CacheInterface;
 use PDO, Throwable;
-
-use function bin2hex, explode, is_array, is_numeric, strpos, strtolower, trim;
-
+use function explode, is_array, is_numeric, sodium_bin2hex, strpos, strtolower, trim;
 use const PHP_OS;
 
 /**
@@ -33,7 +31,7 @@ final class PDOMSSqlSrv extends PDODriverAbstract{
 	 *
 	 * @phan-suppress PhanUndeclaredConstantOfClass
 	 */
-	public function __construct(SettingsContainerInterface $options, CacheInterface|null $cache = null, LoggerInterface|null $logger = null){
+	public function __construct(SettingsContainerInterface $options, CacheInterface|null $cache = null, LoggerInterface $logger = new NullLogger){
 		// setting this with any value breaks
 		unset($this->pdo_options[PDO::ATTR_EMULATE_PREPARES]);
 
@@ -44,16 +42,11 @@ final class PDOMSSqlSrv extends PDODriverAbstract{
 		parent::__construct($options, $cache, $logger);
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	public function getDialect():Dialect{
 		return new MSSQL;
 	}
 
 	/**
-	 * @inheritdoc
-	 *
 	 * @throws \chillerlan\Database\Drivers\DriverException
 	 */
 	public function getClientInfo():string{
@@ -72,8 +65,6 @@ final class PDOMSSqlSrv extends PDODriverAbstract{
 	}
 
 	/**
-	 * @inheritdoc
-	 *
 	 * @throws \chillerlan\Database\Drivers\DriverException
 	 */
 	public function getServerInfo():string{
@@ -92,8 +83,6 @@ final class PDOMSSqlSrv extends PDODriverAbstract{
 	}
 
 	/**
-	 * @inheritdoc
-	 *
 	 * @see https://www.php.net/manual/ref.pdo-sqlsrv.connection.php
 	 *
 	 * @throws \chillerlan\Database\Drivers\DriverException
@@ -132,9 +121,6 @@ final class PDOMSSqlSrv extends PDODriverAbstract{
 		return $dsn;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	public function connect():DriverInterface{
 
 		if($this->db instanceof PDO){
@@ -159,8 +145,6 @@ final class PDOMSSqlSrv extends PDODriverAbstract{
 
 
 	/**
-	 * @inheritdoc
-	 *
 	 * @see https://docs.microsoft.com/sql/t-sql/data-types/constants-transact-sql?view=sql-server-ver15
 	 */
 	protected function escape_string(string $string):string{
@@ -170,12 +154,9 @@ final class PDOMSSqlSrv extends PDODriverAbstract{
 		}
 
 		// convert to hex literal, sql server only accepts the 0x... format
-		return '0x'.bin2hex($string);
+		return '0x'.sodium_bin2hex($string);
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	protected function raw_query(string $sql, string|null $index = null, bool|null $assoc = null):Result{
 
 		try{
@@ -207,9 +188,6 @@ final class PDOMSSqlSrv extends PDODriverAbstract{
 		throw new DriverException('sql error: ['.static::class.'::raw()]'.$message);
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	protected function prepared_query(string $sql, array|null $values = null, string|null $index = null, bool|null $assoc = null):Result{
 
 		try{

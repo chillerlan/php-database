@@ -10,41 +10,37 @@
 
 namespace chillerlan\Database\Drivers;
 
-use chillerlan\Database\Result;
+use chillerlan\Database\{DatabaseOptions, Result};
 use chillerlan\Settings\SettingsContainerInterface;
-use Closure;
-use Throwable;
 use Psr\Log\{LoggerInterface, NullLogger};
 use Psr\SimpleCache\CacheInterface;
-
-use function bin2hex, count, floatval, hash, intval, is_array, is_bool,
-	is_callable, is_float, is_int, is_numeric, serialize, trim;
+use Closure, Throwable;
+use function count, hash, is_array, is_bool, is_callable, is_float, is_int, is_numeric, serialize, sodium_bin2hex, trim;
 
 /**
- *
+ * The abstract database driver
  */
 abstract class DriverAbstract implements DriverInterface{
 
-	/** @var \chillerlan\Database\DatabaseOptions */
-	protected SettingsContainerInterface $options;
-	protected LoggerInterface $logger;
-	protected CacheInterface|null $cache = null;
-	protected string $cachekey_hash_algo;
-	protected string|null $convert_encoding_src;
-	protected string|null $convert_encoding_dest;
+	protected SettingsContainerInterface|DatabaseOptions $options;
+	protected LoggerInterface                            $logger;
+	protected CacheInterface|null                        $cache = null;
+	protected string                                     $cachekey_hash_algo;
+	protected string|null                                $convert_encoding_src;
+	protected string|null                                $convert_encoding_dest;
 
 	/**
 	 * Constructor.
-	 *
-	 * @param \chillerlan\Settings\SettingsContainerInterface $options
-	 * @param \Psr\SimpleCache\CacheInterface|null $cache
-	 * @param \Psr\Log\LoggerInterface|null        $logger
 	 */
-	public function __construct(SettingsContainerInterface $options, CacheInterface|null $cache = null, LoggerInterface|null $logger = null){
+	public function __construct(
+		SettingsContainerInterface|DatabaseOptions $options,
+		CacheInterface|null                        $cache = null,
+		LoggerInterface                            $logger = new NullLogger,
+	){
 		$this->options = $options;
 		$this->cache   = $cache;
 
-		$this->setLogger($logger ?? new NullLogger);
+		$this->setLogger($logger);
 
 		// avoid unnecessary getter calls in long loops
 		$this->cachekey_hash_algo    = $this->options->cachekey_hash_algo;
@@ -53,58 +49,61 @@ abstract class DriverAbstract implements DriverInterface{
 	}
 
 	/**
-	 * disconnect
+	 * disconnect on exit
 	 */
 	public function __destruct(){
 		$this->disconnect();
 	}
 
 	/**
-	 *
+	 * Executes a raw sql query.
 	 */
 	abstract protected function raw_query(string $sql, string|null $index = null, bool|null $assoc = null):Result;
 
 	/**
-	 *
+	 * Prepares and executes a query.
 	 */
 	abstract protected function prepared_query(string $sql, array|null $values = null, string|null $index = null, bool|null $assoc = null):Result;
 
 	/**
-	 *
+	 * Prepares a query and executes it for each row in the given array.
 	 */
 	abstract protected function multi_query(string $sql, array $values):bool;
 
 	/**
+	 * Prepares a query and executes it for each row in the given array, using the value returned from the given callback.
+	 * The given closure is called with 2 parameters:
 	 *
+	 *   - `$row`: the content of the current row (`mixed`, depends on the input)
+	 *   - `$i`: the current row index (`int|string`)
+	 *
+	 * The callback must return an array that matches the placeholders in the given SQL query.
+	 *
+	 * e.g.: `$callback = function(array $row, int $i){ return [$i, $row['value0'], ...] }`
 	 */
 	abstract protected function multi_callback_query(string $sql, array $data, Closure $callback):bool;
 
-	/**
-	 * Sets a logger.
-	 */
-	public function setLogger(LoggerInterface $logger):void{
+	public function setLogger(LoggerInterface $logger):static{
 		$this->logger = $logger;
+
+		return $this;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
-	public function escape(mixed $data = null):mixed{
+	public function escape(bool|float|int|string|null $data = null):float|int|string{
 
 		if($data === null){
 			return 'null';
 		}
-		elseif(is_bool($data)){
+
+		if(is_bool($data)){
 			return (int)$data;
 		}
-		elseif(is_numeric($data)){
-			$data = $data + 0;
 
-			if(is_int($data)){
-				return intval($data);
-			}
-			elseif(is_float($data)){
-				return floatval($data);
+		if(is_numeric($data)){
+			$data = ($data + 0);
+
+			if(is_int($data) || is_float($data)){
+				return $data;
 			}
 		}
 
@@ -126,7 +125,7 @@ abstract class DriverAbstract implements DriverInterface{
 		}
 
 		// convert to hex literal
-		return "x'".bin2hex($string)."'";
+		return "x'".sodium_bin2hex($string)."'";
 	}
 
 	/**

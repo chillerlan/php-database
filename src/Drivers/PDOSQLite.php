@@ -14,17 +14,13 @@ namespace chillerlan\Database\Drivers;
 
 use chillerlan\Database\Dialects\{Dialect, SQLite};
 use Throwable, PDO;
-
-use function is_file, is_readable, is_writable, trigger_error;
+use function is_file, is_readable, is_writable;
 
 /**
  *
  */
 final class PDOSQLite extends PDODriverAbstract{
 
-	/**
-	 * @inheritdoc
-	 */
 	public function connect():DriverInterface{
 
 		if($this->db instanceof PDO){
@@ -33,11 +29,11 @@ final class PDOSQLite extends PDODriverAbstract{
 
 		$db = $this->options->database;
 
-		try{
+		if($db !== ':memory:' && (!is_file($db) || !is_readable($db) || !is_writable($db))){
+			throw new DriverException('database file not found');
+		}
 
-			if($db !== ':memory:' && (!is_file($db) || !is_readable($db) || !is_writable($db))){
-				trigger_error('file not found');
-			}
+		try{
 
 			if($db === ':memory:'){
 				$this->pdo_options += [PDO::ATTR_PERSISTENT => true];
@@ -52,16 +48,10 @@ final class PDOSQLite extends PDODriverAbstract{
 		}
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	public function getDialect():Dialect{
 		return new SQLite;
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	public function getServerInfo():string{
 
 		if(!$this->db instanceof PDO){
@@ -72,8 +62,6 @@ final class PDOSQLite extends PDODriverAbstract{
 	}
 
 	/**
-	 * @inheritdoc
-	 *
 	 * @see https://www.php.net/manual/ref.pdo-sqlite.connection.php
 	 *
 	 * @throws \chillerlan\Database\Drivers\DriverException

@@ -12,26 +12,36 @@
 
 namespace chillerlan\Database\Dialects;
 
+use function array_fill, count, explode, implode, in_array, intval, is_int, is_string,
+	preg_match, preg_replace, sodium_bin2hex, strtoupper, trim;
+
 final class MySQL extends DialectAbstract{
+
+	private const nolengthtypes = [
+		'DATE', 'TINYBLOB', 'TINYTEXT', 'BLOB', 'TEXT', 'MEDIUMBLOB',
+		'MEDIUMTEXT', 'LONGBLOB', 'LONGTEXT', 'SERIAL', 'BOOLEAN', 'UUID',
+	];
+
+	private const collationtypes = [
+		'TINYTEXT', 'TEXT', 'MEDIUMTEXT', 'LONGTEXT', 'VARCHAR', 'CHAR', 'ENUM', 'SET',
+	];
 
 	protected array $quotes = ['`', '`'];
 	// https://dev.mysql.com/doc/refman/8.0/en/charset-unicode-sets.html
 	protected string $charset = 'utf8mb4_bin'; // utf8mb4_0900_bin
 
-	/** @inheritdoc */
-	public function insert(string $table, array $fields, string|null $onConflict = null, string|null $conflictTarget = null):array{
-		$onConflict = strtoupper($onConflict ?? '');
+	public function insert(
+		string      $table,
+		array       $fields,
+		string|null $onConflict = null,
+		string|null $conflictTarget = null,
+	):array{
 
-		switch($onConflict){
-			case 'IGNORE':
-				$sql = ['INSERT IGNORE'];
-				break;
-			case 'REPLACE':
-				$sql = ['REPLACE'];
-				break;
-			default:
-				$sql = ['INSERT'];
-		}
+		$sql = match(strtoupper($onConflict ?? '')){
+			'IGNORE'  => ['INSERT IGNORE'],
+			'REPLACE' => ['REPLACE'],
+			default   => ['INSERT'],
+		};
 
 		$sql[] = 'INTO';
 		$sql[] = $this->quote($table);
@@ -42,7 +52,6 @@ final class MySQL extends DialectAbstract{
 		return $sql;
 	}
 
-	/** @inheritdoc */
 	public function createDatabase(string $dbname, bool|null $ifNotExists = null, string|null $collate = null):array{
 		$collate = $collate ?? $this->charset;
 
@@ -70,8 +79,14 @@ final class MySQL extends DialectAbstract{
 		return $sql;
 	}
 
-	/** @inheritdoc */
-	public function createTable(string $table, array $cols, string|null $primaryKey = null, bool|null $ifNotExists = null, bool|null $temp = null, string|null $dir = null):array{
+	public function createTable(
+		string      $table,
+		array       $cols,
+		string|null $primaryKey = null,
+		bool|null   $ifNotExists = null,
+		bool|null   $temp = null,
+		string|null $dir = null,
+	):array{
 		$sql = ['CREATE'];
 
 		if($temp){
@@ -114,20 +129,24 @@ final class MySQL extends DialectAbstract{
 	}
 
 	/**
-	 * @inheritdoc
-	 *
 	 * @see https://dev.mysql.com/doc/refman/8.0/en/data-types.html
 	 */
-	public function fieldspec(string $name, string $type, mixed $length = null, string|null $attribute = null, string|null $collation = null, bool|null $isNull = null, string|null $defaultType = null, mixed $defaultValue = null, string|null $extra = null):string{
-		$type          = strtoupper(trim($type));
-		$defaultType   = strtoupper($defaultType ?? '');
-		$field         = [$this->quote(trim($name))];
-		$nolengthtypes = [
-			'DATE', 'TINYBLOB', 'TINYTEXT', 'BLOB', 'TEXT', 'MEDIUMBLOB',
-			'MEDIUMTEXT', 'LONGBLOB', 'LONGTEXT', 'SERIAL', 'BOOLEAN', 'UUID'
-		];
+	public function fieldspec(
+		string      $name,
+		string      $type,
+		mixed       $length = null,
+		string|null $attribute = null,
+		string|null $collation = null,
+		bool|null   $isNull = null,
+		string|null $defaultType = null,
+		mixed       $defaultValue = null,
+		string|null $extra = null,
+	):string{
+		$type        = strtoupper(trim($type));
+		$defaultType = strtoupper($defaultType ?? '');
+		$field       = [$this->quote(trim($name))];
 
-		$field[] = (is_int($length) || (is_string($length) && count(explode(',', $length)) === 2)) && !in_array($type, $nolengthtypes, true)
+		$field[] = (is_int($length) || (is_string($length) && count(explode(',', $length)) === 2)) && !in_array($type, self::nolengthtypes, true)
 			? $type.'('. $length . ')'
 			: $type;
 
@@ -135,8 +154,7 @@ final class MySQL extends DialectAbstract{
 			$field[] = strtoupper($attribute);
 		}
 
-		$collationtypes = ['TINYTEXT', 'TEXT', 'MEDIUMTEXT', 'LONGTEXT', 'VARCHAR', 'CHAR', 'ENUM', 'SET'];
-		if($collation && in_array($type, $collationtypes, true)){
+		if($collation !== null && in_array($type, self::collationtypes, true)){
 			[$charset] = explode('_', $collation);
 
 			$field[] = 'CHARACTER SET '.$charset;
@@ -153,25 +171,14 @@ final class MySQL extends DialectAbstract{
 
 		if($defaultType === 'USER_DEFINED'){
 
-			switch(true){
-				case $type === 'TIMESTAMP' && intval($defaultValue) === 0:
-					$field[] = 'DEFAULT 0';
-					break;
-				case $type === 'BIT':
-					$field[] = 'DEFAULT b\''.preg_replace('/[^01]/', '0', $defaultValue).'\'';
-					break;
-				case $type === 'BOOLEAN':
-					$field[] = 'DEFAULT '.(preg_match('/^1|T|TRUE|YES$/i', $defaultValue) ? 'TRUE' : 'FALSE');
-					break;
-				case $type === 'BINARY' || $type === 'VARBINARY':
-					$field[] = 'DEFAULT 0x'.$defaultValue;
-					break;
-				case strtoupper($defaultValue) === 'NULL' && $isNull === true:
-					$field[] = 'DEFAULT NULL';
-					break;
-				default:
-					$field[] = 'DEFAULT \''.$defaultValue.'\'';
-			}
+			$field[] = match(true){
+				$type === 'TIMESTAMP' && intval($defaultValue) === 0     => 'DEFAULT 0',
+				$type === 'BIT'                                          => 'DEFAULT b\''.preg_replace('/[^01]/', '0', $defaultValue).'\'',
+				$type === 'BOOLEAN'                                      => 'DEFAULT '.(preg_match('/^1|T|TRUE|YES$/i', $defaultValue) ? 'TRUE' : 'FALSE'),
+				$type === 'BINARY' || $type === 'VARBINARY'              => 'DEFAULT 0x'.sodium_bin2hex($defaultValue),
+				strtoupper($defaultValue) === 'NULL' && $isNull === true => 'DEFAULT NULL',
+				default                                                  => 'DEFAULT \''.$defaultValue.'\'',
+			};
 
 		}
 		else if($defaultType === 'CURRENT_TIMESTAMP'){
@@ -189,17 +196,14 @@ final class MySQL extends DialectAbstract{
 		return implode(' ', $field);
 	}
 
-	/** @inheritdoc */
 	public function showDatabases():array{
 		return ['SHOW DATABASES'];
 	}
 
-	/** @inheritdoc */
 	public function showTables(string|null $database = null, string|null $pattern = null, string|null $where = null):array{
 		return ['SHOW TABLES'];
 	}
 
-	/** @inheritdoc */
 	public function showCreateTable(string $table):array{
 		$sql = ['SHOW CREATE TABLE'];
 		$sql[] = $this->quote($table);
