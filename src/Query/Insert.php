@@ -21,7 +21,7 @@ use function array_keys;
  * @link https://www.firebirdsql.org/file/documentation/reference_manuals/fblangref25-en/html/fblangref25-dml-insert.html
  * @link https://www.sqlite.org/lang_insert.html
  */
-class Insert extends Statement implements BindValues, MultiQuery{
+class Insert extends StatementAbstract implements BindValues, MultiQuery{
 
 	public function into(string $table, string|null $on_conflict = null, string|null $conflict_target = null):static{
 		return $this->setOnConflict($table, $on_conflict, $conflict_target);

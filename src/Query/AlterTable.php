@@ -18,7 +18,7 @@ namespace chillerlan\Database\Query;
  * @link https://www.firebirdsql.org/file/documentation/reference_manuals/fblangref25-en/html/fblangref25-ddl-tbl.html#fblangref25-ddl-tbl-alter
  * @link https://www.sqlite.org/lang_altertable.html
  */
-class AlterTable extends Statement implements Query{
+class AlterTable extends StatementAbstract implements Query{
 
 	public function name(string $tablename):static{
 		return $this->setName($tablename);

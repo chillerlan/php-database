@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace chillerlan\Database\Query;
 
-class ShowCreateTable extends Statement implements Query{
+class ShowCreateTable extends StatementAbstract implements Query{
 
 	public function name(string $name):static{
 		return $this->setName($name);

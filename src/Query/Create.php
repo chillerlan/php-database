@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace chillerlan\Database\Query;
 
-class Create extends Statement{
+class Create extends StatementAbstract{
 
 #	public function index():CreateIndex;
 #	public function view():CreateView;

@@ -23,7 +23,7 @@ use function is_scalar, strtoupper, trim;
  * @link https://www.postgresql.org/docs/current/static/datatype.html
  * @link https://docs.microsoft.com/sql/t-sql/data-types/data-types-transact-sql
  */
-class CreateTable extends Statement implements Query, IfNotExists{
+class CreateTable extends StatementAbstract implements Query, IfNotExists{
 
 	protected bool        $temp       = false;
 	protected string|null $primaryKey = null;

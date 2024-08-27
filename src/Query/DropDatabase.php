@@ -17,7 +17,7 @@ namespace chillerlan\Database\Query;
  * @link https://docs.microsoft.com/en-gb/sql/t-sql/statements/drop-database-transact-sql
  * @link https://www.firebirdsql.org/file/documentation/reference_manuals/fblangref25-en/html/fblangref25-ddl-db.html#fblangref25-ddl-db-drop
  */
-class DropDatabase extends Statement implements Query, IfExists{
+class DropDatabase extends StatementAbstract implements Query, IfExists{
 
 	public function name(string $dbname):static{
 		return $this->setName($dbname);

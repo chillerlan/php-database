@@ -20,7 +20,7 @@ use function array_merge, is_bool, is_int, is_scalar;
  * @link https://www.firebirdsql.org/file/documentation/reference_manuals/fblangref25-en/html/fblangref25-dml-update.html
  * @link https://www.sqlite.org/lang_update.html
  */
-class Update extends Statement implements Where, Limit, BindValues, MultiQuery{
+class Update extends StatementAbstract implements Where, Limit, BindValues, MultiQuery{
 
 	protected array $set = [];
 

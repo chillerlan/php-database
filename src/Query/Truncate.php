@@ -16,7 +16,7 @@ namespace chillerlan\Database\Query;
  * @link https://www.postgresql.org/docs/current/static/sql-truncate.html
  * @link https://docs.microsoft.com/en-us/sql/t-sql/statements/truncate-table-transact-sql
  */
-class Truncate extends Statement implements Query{
+class Truncate extends StatementAbstract implements Query{
 
 	public function table(string $name):static{
 		return $this->setName($name);

@@ -13,7 +13,7 @@ namespace chillerlan\Database\Query;
 
 use function trim;
 
-class ShowTables extends Statement implements Where, Query{
+class ShowTables extends StatementAbstract implements Where, Query{
 
 	protected string|null $pattern = null;
 

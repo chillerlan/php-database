@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace chillerlan\Database\Query;
 
-class Alter extends Statement{
+class Alter extends StatementAbstract{
 
 	public function table(string $tablename):AlterTable{
 		return (new AlterTable($this->db, $this->dialect, $this->logger))->name($tablename);

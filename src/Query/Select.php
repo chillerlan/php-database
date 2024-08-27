@@ -21,7 +21,7 @@ use function implode;
  * @link https://www.firebirdsql.org/file/documentation/reference_manuals/fblangref25-en/html/fblangref25-dml-select.html
  * @link https://www.sqlite.org/lang_select.html
  */
-class Select extends Statement implements Where, Limit, BindValues, Query, CachedQuery{
+class Select extends StatementAbstract implements Where, Limit, BindValues, Query, CachedQuery{
 
 	protected bool  $distinct = false;
 	protected array $cols     = [];

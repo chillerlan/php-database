@@ -18,7 +18,7 @@ namespace chillerlan\Database\Query;
  * @link https://www.firebirdsql.org/file/documentation/reference_manuals/fblangref25-en/html/fblangref25-ddl-tbl.html#fblangref25-ddl-tbl-drop
  * @link https://www.sqlite.org/lang_droptable.html
  */
-class DropTable extends Statement implements Query, IfExists{
+class DropTable extends StatementAbstract implements Query, IfExists{
 
 	public function name(string $name):static{
 		return $this->setName($name);

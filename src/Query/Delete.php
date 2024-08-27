@@ -18,7 +18,7 @@ namespace chillerlan\Database\Query;
  * @link https://www.firebirdsql.org/file/documentation/reference_manuals/fblangref25-en/html/fblangref25-dml-delete.html
  * @link https://www.sqlite.org/lang_delete.html
  */
-class Delete extends Statement implements Where, Limit, BindValues, Query{
+class Delete extends StatementAbstract implements Where, Limit, BindValues, Query{
 
 	public function from(string $name):static{
 		return $this->setName($name);

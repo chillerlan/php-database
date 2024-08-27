@@ -14,7 +14,7 @@ namespace chillerlan\Database\Query;
 /**
  * @link https://dev.mysql.com/doc/refman/5.7/en/show.html
  */
-class Show extends Statement{
+class Show extends StatementAbstract{
 
 	public function createTable(string $tablename):ShowCreateTable{
 		return (new ShowCreateTable($this->db, $this->dialect, $this->logger))->name($tablename);

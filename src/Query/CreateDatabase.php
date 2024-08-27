@@ -17,7 +17,7 @@ namespace chillerlan\Database\Query;
  * @link https://docs.microsoft.com/en-gb/sql/t-sql/statements/create-database-sql-server-transact-sql
  * @link https://www.firebirdsql.org/file/documentation/reference_manuals/fblangref25-en/html/fblangref25-ddl-db.html#fblangref25-ddl-db-create
  */
-class CreateDatabase extends Statement implements Query, IfNotExists{
+class CreateDatabase extends StatementAbstract implements Query, IfNotExists{
 
 	public function name(string $dbname):static{
 		return $this->setName($dbname);

@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace chillerlan\Database\Query;
 
-class Drop extends Statement{
+class Drop extends StatementAbstract{
 
 	public function database(string $dbname):DropDatabase{
 		return (new DropDatabase($this->db, $this->dialect, $this->logger))->name($dbname);

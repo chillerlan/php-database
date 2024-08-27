@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace chillerlan\Database\Query;
 
-class ShowDatabases extends Statement implements Query{
+class ShowDatabases extends StatementAbstract implements Query{
 
 	protected function getSQL():array{
 		return $this->dialect->showDatabases(); // @todo? WHERE
