@@ -191,11 +191,11 @@ final class Postgres extends DialectAbstract{
 		if($defaultType === 'USER_DEFINED'){
 
 			$field[] = match (true) {
-				$type === 'TIMESTAMP' && intval($defaultValue) === 0     => 'DEFAULT 0',
-				$type === 'BIT' || $type === 'VARBIT'                    => 'DEFAULT b\''.preg_replace('/[^01]/', '0', $defaultValue).'\'',
-				$type === 'BOOLEAN'                                      => 'DEFAULT '.(preg_match('/^1|T|TRUE|YES$/i', $defaultValue) ? 'TRUE' : 'FALSE'),
-				strtoupper($defaultValue) === 'NULL' && $isNull === true => 'DEFAULT NULL',
-				default                                                  => 'DEFAULT \''.$defaultValue.'\'',
+				$type === 'TIMESTAMP' && intval($defaultValue) === 0             => 'DEFAULT 0',
+				$type === 'BIT' || $type === 'VARBIT'                            => 'DEFAULT b\''.preg_replace('/[^01]/', '0', $defaultValue).'\'',
+				$type === 'BOOLEAN'                                              => 'DEFAULT '.(preg_match('/^1|T|TRUE|YES$/i', $defaultValue) ? 'TRUE' : 'FALSE'),
+				strtoupper((string)$defaultValue) === 'NULL' && $isNull === true => 'DEFAULT NULL',
+				default                                                          => 'DEFAULT \''.$defaultValue.'\'',
 			};
 
 		}

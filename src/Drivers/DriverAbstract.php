@@ -71,6 +71,7 @@ abstract class DriverAbstract implements DriverInterface{
 	){
 		$this->options = $options;
 		$this->cache   = $cache;
+		/** @phan-suppress-next-line PhanEmptyFQSENInClasslike, PhanTypeExpectedObjectOrClassName */
 		$this->dialect = new (static::DIALECT);
 
 		$this->setLogger($logger);

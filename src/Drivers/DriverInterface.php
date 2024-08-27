@@ -11,7 +11,6 @@ declare(strict_types=1);
 
 namespace chillerlan\Database\Drivers;
 
-use chillerlan\Database\Dialects\Dialect;
 use chillerlan\Database\Result;
 use chillerlan\Settings\SettingsContainerInterface;
 use Closure;
