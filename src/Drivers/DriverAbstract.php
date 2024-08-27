@@ -12,20 +12,51 @@ declare(strict_types=1);
 namespace chillerlan\Database\Drivers;
 
 use chillerlan\Database\{DatabaseOptions, Result};
+use chillerlan\Database\Dialects\Dialect;
+use chillerlan\Database\Query\{Alter, Create, Delete, Drop, Insert, QueryException, Select, Show, Statement, Truncate, Update};
 use chillerlan\Settings\SettingsContainerInterface;
 use Psr\Log\{LoggerInterface, NullLogger};
 use Psr\SimpleCache\CacheInterface;
 use Closure, Throwable;
-use function count, hash, is_array, is_bool, is_callable, is_float, is_int, is_numeric, serialize, sodium_bin2hex, trim;
+use function count, hash, is_array, is_bool, is_callable, is_float, is_int,
+	is_numeric, serialize, sodium_bin2hex, strtolower, trim;
 
 /**
  * The abstract database driver
+ *
+ * @property \chillerlan\Database\Query\Alter    $alter
+ * @property \chillerlan\Database\Query\Create   $create
+ * @property \chillerlan\Database\Query\Delete   $delete
+ * @property \chillerlan\Database\Query\Drop     $drop
+ * @property \chillerlan\Database\Query\Insert   $insert
+ * @property \chillerlan\Database\Query\Select   $select
+ * @property \chillerlan\Database\Query\Show     $show
+ * @property \chillerlan\Database\Query\Truncate $truncate
+ * @property \chillerlan\Database\Query\Update   $update
  */
 abstract class DriverAbstract implements DriverInterface{
+
+	protected const STATEMENTS = [
+		'alter'    => Alter::class,
+		'create'   => Create::class,
+		'delete'   => Delete::class,
+		'drop'     => Drop::class,
+		'insert'   => Insert::class,
+		'select'   => Select::class,
+		'show'     => Show::class,
+		'truncate' => Truncate::class,
+		'update'   => Update::class,
+	];
+
+	/**
+	 * The SQL dialect class for the current driver (FQCN)
+	 */
+	protected const DIALECT = '';
 
 	protected SettingsContainerInterface|DatabaseOptions $options;
 	protected LoggerInterface                            $logger;
 	protected CacheInterface|null                        $cache = null;
+	protected Dialect                                    $dialect;
 	protected string                                     $cachekey_hash_algo;
 	protected string|null                                $convert_encoding_src;
 	protected string|null                                $convert_encoding_dest;
@@ -40,6 +71,7 @@ abstract class DriverAbstract implements DriverInterface{
 	){
 		$this->options = $options;
 		$this->cache   = $cache;
+		$this->dialect = new (static::DIALECT);
 
 		$this->setLogger($logger);
 
@@ -54,6 +86,19 @@ abstract class DriverAbstract implements DriverInterface{
 	 */
 	public function __destruct(){
 		$this->disconnect();
+	}
+
+	/**
+	 * @throws \chillerlan\Database\Query\QueryException
+	 */
+	public function __get(string $name):Statement{
+		$name = strtolower($name);
+
+		if(isset(static::STATEMENTS[$name])){
+			return new (static::STATEMENTS[$name])($this, $this->dialect, $this->logger);
+		}
+
+		throw new QueryException('invalid statement');
 	}
 
 	/**

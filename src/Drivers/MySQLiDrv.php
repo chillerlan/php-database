@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace chillerlan\Database\Drivers;
 
-use chillerlan\Database\Dialects\{Dialect, MySQL};
+use chillerlan\Database\Dialects\MySQL;
 use chillerlan\Database\Result;
 use Closure, Throwable, mysqli;
 use function array_unshift, count, gettype, implode, is_array, is_bool, mysqli_init;
@@ -23,6 +23,8 @@ use const MYSQLI_OPT_CONNECT_TIMEOUT;
  *
  */
 final class MySQLiDrv extends DriverAbstract{
+
+	protected const DIALECT = MySQL::class;
 
 	/**
 	 * Holds the database resource object
@@ -89,10 +91,6 @@ final class MySQLiDrv extends DriverAbstract{
 
 	public function getDBResource():mysqli|null{
 		return $this->db;
-	}
-
-	public function getDialect():Dialect{
-		return new MySQL;
 	}
 
 	public function getClientInfo():string{

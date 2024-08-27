@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace chillerlan\Database\Drivers;
 
-use chillerlan\Database\Dialects\{Dialect, MySQL};
+use chillerlan\Database\Dialects\MySQL;
 use PDO;
 use function is_numeric;
 
@@ -22,9 +22,7 @@ use function is_numeric;
  */
 final class PDOMySQL extends PDODriverAbstract{
 
-	public function getDialect():Dialect{
-		return new MySQL;
-	}
+	protected const DIALECT = MySQL::class;
 
 	/**
 	 * @see https://www.php.net/manual/ref.pdo-mysql.connection.php

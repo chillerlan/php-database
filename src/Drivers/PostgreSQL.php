@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace chillerlan\Database\Drivers;
 
-use chillerlan\Database\Dialects\{Dialect, Postgres};
+use chillerlan\Database\Dialects\Postgres;
 use chillerlan\Database\Result;
 use PgSql\Connection as PgSqlConnection;
 use PgSql\Result as PgSqlResult;
@@ -26,6 +26,7 @@ use function implode, in_array, pg_close, pg_connect, pg_execute, pg_fetch_assoc
  */
 final class PostgreSQL extends DriverAbstract{
 
+	protected const DIALECT = Postgres::class;
 	/**
 	 * Holds the database resource object
 	 */
@@ -78,10 +79,6 @@ final class PostgreSQL extends DriverAbstract{
 
 	public function getDBResource():PgSqlConnection|null{
 		return $this->db;
-	}
-
-	public function getDialect():Dialect{
-		return new Postgres;
 	}
 
 	public function getClientInfo():string{

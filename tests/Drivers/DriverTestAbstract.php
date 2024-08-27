@@ -14,130 +14,115 @@ namespace chillerlan\DatabaseTest\Drivers;
 use chillerlan\Database\Drivers\{DriverException, DriverInterface};
 use chillerlan\DatabaseTest\DBTestAbstract;
 use ReflectionClass;
-use Throwable;
 
 abstract class DriverTestAbstract extends DBTestAbstract{
-
-	protected function setUp():void{
-		parent::setUp();
-
-		try{
-			$this->driver = new $this->driverFQCN($this->options, $this->cache, $this->logger);
-			$this->driver->connect();
-		}
-		catch(Throwable $e){
-			$this::markTestSkipped($e->getMessage());
-		}
-
-		$this->reflection = new ReflectionClass($this->driverFQCN);
-	}
 
 	abstract public function testGetDBResource():void;
 
 	public function testInstance():void{
 		// make sure we're disconnected
-		$this->driver->disconnect();
+		$this->db->disconnect();
 
 		// try to disconnect from a disconnected DB (should not throw any errors -> mysqli)
-		$this::assertTrue($this->driver->disconnect());
+		$this::assertTrue($this->db->disconnect());
 
 		// reconnect
-		$this->driver->connect();
+		$this->db->connect();
 
 		// connect while already connected (coverage)
-		$this::assertSame($this->driver, $this->driver->connect());
+		$this::assertSame($this->db, $this->db->connect());
 
-		$this::assertInstanceOf(DriverInterface::class, $this->driver);
-		$this::assertInstanceOf($this->driverFQCN, $this->driver);
+		$this::assertInstanceOf(DriverInterface::class, $this->db);
+		$this::assertInstanceOf($this->driverFQCN, $this->db);
 
 		$info = [
-			'driver' => (new ReflectionClass($this->driver))->getName(),
-			'client' => $this->driver->getClientInfo(),
-			'server' => $this->driver->getServerInfo(),
+			'driver' => (new ReflectionClass($this->db))->getName(),
+			'client' => $this->db->getClientInfo(),
+			'server' => $this->db->getServerInfo(),
 		];
 
 		$this->logger->info('driver info', $info);
 
 		// trigger the destructor (coverage)
-		unset($this->driver);
+		unset($this->db);
 	}
 
 	public function testEscapeString():void{
 		// https://xkcd.com/327/
 		$this::assertSame(
 			"x'526f6265727427293b2044524f50205441424c452053747564656e74733b202d2d'",
-			$this->driver->escape("Robert'); DROP TABLE Students; --")
+			$this->db->escape("Robert'); DROP TABLE Students; --")
 		);
 	}
 
 	public function testEscapeEmptyString():void{
-		$this::assertSame("''", $this->driver->escape(''));
+		$this::assertSame("''", $this->db->escape(''));
 	}
 
 	public function testEscapeNull():void{
-		$this::assertSame('null', $this->driver->escape(null));
+		$this::assertSame('null', $this->db->escape(null));
 	}
 
 	public function testEscapeBool():void{
-		$this::assertSame(1, $this->driver->escape(true));
-		$this::assertSame(0, $this->driver->escape(false));
+		$this::assertSame(1, $this->db->escape(true));
+		$this::assertSame(0, $this->db->escape(false));
 	}
 
 	public function testEscapeNumeric():void{
-		$this::assertSame(1337, $this->driver->escape('1337'));
-		$this::assertSame(13.37, $this->driver->escape('13.37'));
-		$this::assertSame(1330000000.0, $this->driver->escape('133e7'));
+		$this::assertSame(1337, $this->db->escape('1337'));
+		$this::assertSame(13.37, $this->db->escape('13.37'));
+		$this::assertSame(1330000000.0, $this->db->escape('133e7'));
 	}
 
 	public function testGetInfoDisconnectedMessage():void{
-		$this::assertTrue($this->driver->disconnect());
+		$this::assertTrue($this->db->disconnect());
 
 		$msg = 'disconnected, no info available';
 
-		$this::assertSame($msg, $this->driver->getClientInfo());
-		$this::assertSame($msg, $this->driver->getServerInfo());
+		$this::assertSame($msg, $this->db->getClientInfo());
+		$this::assertSame($msg, $this->db->getServerInfo());
 	}
 
 	public function testRawEmptySQLException():void{
 		$this->expectException(DriverException::class);
 		$this->expectExceptionMessage('sql error: empty sql');
 
-		$this->driver->raw('');
+		$this->db->raw('');
 	}
 
 	public function testRawSQLErrorException():void{
 		$this->expectException(DriverException::class);
 		$this->expectExceptionMessage('sql error:');
 
-		$this->driver->raw('SELECT foo bar');
+		$this->db->raw('SELECT foo bar');
 	}
 
 	public function testPreparedEmptySQLException():void{
 		$this->expectException(DriverException::class);
 		$this->expectExceptionMessage('sql error: empty sql');
 
-		$this->driver->prepared('');
+		$this->db->prepared('');
 	}
 
 	public function testPreparedSQLErrorException():void{
 		$this->expectException(DriverException::class);
 		$this->expectExceptionMessage('sql error:');
 
-		$this->driver->prepared('SELECT foo bar ???');
+		$this->db->prepared('SELECT foo bar ???');
 	}
 
 	public function testMultiEmptySQLException():void{
 		$this->expectException(DriverException::class);
 		$this->expectExceptionMessage('sql error: empty sql');
 
-		$this->driver->multi('', []);
+		$this->db->multi('', []);
 	}
 
 	public function testMultiSQLErrorException():void{
 		$this->expectException(DriverException::class);
 		$this->expectExceptionMessage('sql error:');
 
-		$this->driver->multi('UPDATE foo bar ???', [[0]]);
+		$this->db->multi('UPDATE foo bar ???', [[0]]);
 	}
 
 	public function testMultiInvalidDataException():void{
@@ -145,28 +130,28 @@ abstract class DriverTestAbstract extends DBTestAbstract{
 		$this->expectExceptionMessage('invalid data');
 
 
-		$this->driver->multi('UPDATE foo bar ???', []);
+		$this->db->multi('UPDATE foo bar ???', []);
 	}
 
 	public function testMultiCallbackEmptySQLException():void{
 		$this->expectException(DriverException::class);
 		$this->expectExceptionMessage('sql error: empty sql');
 
-		$this->driver->multiCallback('', [], function(){});
+		$this->db->multiCallback('', [], function(){});
 	}
 
 	public function testMultiCallbackSQLErrorException():void{
 		$this->expectException(DriverException::class);
 		$this->expectExceptionMessage('sql error:');
 
-		$this->driver->multiCallback('UPDATE foo bar ???', [[0]], function($r){ return $r; });
+		$this->db->multiCallback('UPDATE foo bar ???', [[0]], function($r){ return $r; });
 	}
 
 	public function testMultiCallbackInvalidDataException():void{
 		$this->expectException(DriverException::class);
 		$this->expectExceptionMessage('invalid data');
 
-		$this->driver->multiCallback('UPDATE foo bar ???', [], function($r){ return $r; });
+		$this->db->multiCallback('UPDATE foo bar ???', [], function($r){ return $r; });
 	}
 
 }

@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace chillerlan\Database\Drivers;
 
-use chillerlan\Database\Dialects\{Dialect, Firebird};
+use chillerlan\Database\Dialects\Firebird;
 use Exception, Throwable, PDO;
 use function is_file, is_numeric, is_readable, is_writable;
 
@@ -22,9 +22,7 @@ use function is_file, is_numeric, is_readable, is_writable;
  */
 final class PDOFirebird extends PDODriverAbstract{
 
-	public function getDialect():Dialect{
-		return new Firebird;
-	}
+	protected const DIALECT = Firebird::class;
 
 	/**
 	 * @see https://www.php.net/manual/ref.pdo-firebird.connection.php

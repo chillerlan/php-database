@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace chillerlan\Database\Drivers;
 
-use chillerlan\Database\Dialects\{Dialect, SQLite};
+use chillerlan\Database\Dialects\SQLite;
 use Throwable, PDO;
 use function is_file, is_readable, is_writable;
 
@@ -21,6 +21,8 @@ use function is_file, is_readable, is_writable;
  *
  */
 final class PDOSQLite extends PDODriverAbstract{
+
+	protected const DIALECT = SQLite::class;
 
 	public function connect():DriverInterface{
 
@@ -47,10 +49,6 @@ final class PDOSQLite extends PDODriverAbstract{
 		catch(Throwable $e){
 			throw new DriverException('db error: [PDOSQLite]: '.$e->getMessage());
 		}
-	}
-
-	public function getDialect():Dialect{
-		return new SQLite;
 	}
 
 	public function getServerInfo():string{

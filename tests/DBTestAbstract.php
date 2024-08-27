@@ -24,6 +24,7 @@ use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
 use Exception, ReflectionClass, ReflectionMethod;
 
+use Throwable;
 use function constant, defined, realpath, str_replace;
 
 use const DIRECTORY_SEPARATOR, JSON_UNESCAPED_SLASHES, PHP_OS_FAMILY;
@@ -31,12 +32,12 @@ use const DIRECTORY_SEPARATOR, JSON_UNESCAPED_SLASHES, PHP_OS_FAMILY;
 abstract class DBTestAbstract extends TestCase{
 
 	protected SettingsContainerInterface $options;
-	protected DriverInterface $driver;
-	protected CacheInterface $cache;
-	protected LoggerInterface $logger;
-	protected DotEnv $env;
-	protected ReflectionClass $reflection;
-	protected string $driverFQCN;
+	protected DriverInterface            $db;
+	protected CacheInterface             $cache;
+	protected LoggerInterface            $logger;
+	protected DotEnv                     $env;
+	protected ReflectionClass            $reflection;
+	protected string                     $driverFQCN;
 
 	/**
 	 * determines whether the tests run on Travis CI or GitHub Actions -> phpunit.xml TEST_IS_CI=TRUE
@@ -103,6 +104,15 @@ abstract class DBTestAbstract extends TestCase{
 			$this->options->socket = $socket;
 		}
 
+		try{
+			$this->db = new $this->driverFQCN($this->options, $this->cache, $this->logger);
+			$this->db->connect();
+		}
+		catch(Throwable $e){
+			$this::markTestSkipped($e->getMessage());
+		}
+
+		$this->reflection = new ReflectionClass($this->driverFQCN);
 	}
 
 	/**
@@ -110,8 +120,8 @@ abstract class DBTestAbstract extends TestCase{
 	 */
 	protected function tearDown():void{
 
-		if(isset($this->driver) && $this->driver instanceof DriverInterface){
-			$this->driver->disconnect();
+		if(isset($this->db) && $this->db instanceof DriverInterface){
+			$this->db->disconnect();
 		}
 
 	}

@@ -34,7 +34,7 @@ final class MySQLiTest extends DriverTestAbstract{
 	}
 
 	public function testGetDBResource():void{
-		$this::assertInstanceOf(mysqli::class, $this->driver->getDBResource());
+		$this::assertInstanceOf(mysqli::class, $this->db->getDBResource());
 	}
 
 }

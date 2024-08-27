@@ -19,7 +19,7 @@ use PDO;
 abstract class PDODriverTestAbstract extends DriverTestAbstract{
 
 	public function testGetDBResource():void{
-		$this::assertInstanceOf(PDO::class, $this->driver->getDBResource());
+		$this::assertInstanceOf(PDO::class, $this->db->getDBResource());
 	}
 
 	public function testGetDsnNoDatabaseException():void{
@@ -28,9 +28,9 @@ abstract class PDODriverTestAbstract extends DriverTestAbstract{
 
 		$this->options->database = null;
 
-		$this->driver = new $this->driverFQCN($this->options);
+		$this->db = new $this->driverFQCN($this->options);
 
-		$this->getMethod('getDSN')->invoke($this->driver);
+		$this->getMethod('getDSN')->invoke($this->db);
 	}
 
 }

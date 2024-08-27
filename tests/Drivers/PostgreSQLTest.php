@@ -32,14 +32,14 @@ final class PostgreSQLTest extends DriverTestAbstract{
 	}
 
 	public function testGetDBResource():void{
-		$this::assertInstanceOf(Connection::class, $this->driver->getDBResource());
+		$this::assertInstanceOf(Connection::class, $this->db->getDBResource());
 	}
 
 	public function testEscapeString():void{
 		// https://xkcd.com/327/
 		$this::assertSame(
 			"encode(decode('526f6265727427293b2044524f50205441424c452053747564656e74733b202d2d', 'hex'), 'escape')",
-			$this->driver->escape( "Robert'); DROP TABLE Students; --")
+			$this->db->escape("Robert'); DROP TABLE Students; --")
 		);
 	}
 

@@ -31,7 +31,7 @@ final class MSSqlSrvTest extends DriverTestAbstract{
 	}
 
 	public function testGetDBResource():void{
-		$r = $this->driver->getDBResource();
+		$r = $this->db->getDBResource();
 
 		$this::assertIsResource($r);
 		$this::assertSame('SQL Server Connection', get_resource_type($r));
@@ -41,7 +41,7 @@ final class MSSqlSrvTest extends DriverTestAbstract{
 		// https://xkcd.com/327/
 		$this::assertSame(
 			'0x526f6265727427293b2044524f50205441424c452053747564656e74733b202d2d',
-			$this->driver->escape("Robert'); DROP TABLE Students; --")
+			$this->db->escape("Robert'); DROP TABLE Students; --")
 		);
 	}
 

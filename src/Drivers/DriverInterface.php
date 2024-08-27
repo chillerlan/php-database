@@ -51,11 +51,6 @@ interface DriverInterface{
 	public function getDBResource():mixed;
 
 	/**
-	 * Returns an SQL dialect object for the current driver
-	 */
-	public function getDialect():Dialect;
-
-	/**
 	 * Returns info about the used php client
 	 */
 	public function getClientInfo():string;

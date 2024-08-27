@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace chillerlan\Database;
 
 /**
- * @property string $driver
  * @property string $host
  * @property int    $port
  * @property string $socket
@@ -39,11 +38,6 @@ namespace chillerlan\Database;
  * @property string $storage_path
  */
 trait DatabaseOptionsTrait{
-
-	/**
-	 * The database driver to use (FQCN)
-	 */
-	protected string|null $driver = null;
 
 	/**
 	 * The host to connect to

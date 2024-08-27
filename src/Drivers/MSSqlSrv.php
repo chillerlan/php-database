@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace chillerlan\Database\Drivers;
 
-use chillerlan\Database\Dialects\{Dialect, MSSQL};
+use chillerlan\Database\Dialects\MSSQL;
 use chillerlan\Database\Result;
 use Closure;
 use function array_values, gettype, implode, is_bool, is_numeric, sprintf, sodium_bin2hex, sqlsrv_client_info,
@@ -26,6 +26,8 @@ use const PHP_OS, SQLSRV_FETCH_ASSOC, SQLSRV_FETCH_NUMERIC;
  * @link https://github.com/Microsoft/msphpsql
  */
 final class MSSqlSrv extends DriverAbstract{
+
+	protected const DIALECT = MSSQL::class;
 
 	/**
 	 * Holds the database resource object
@@ -91,10 +93,6 @@ final class MSSqlSrv extends DriverAbstract{
 
 	public function getDBResource():mixed{
 		return $this->db;
-	}
-
-	public function getDialect():Dialect{
-		return new MSSQL;
 	}
 
 	public function getClientInfo():string{

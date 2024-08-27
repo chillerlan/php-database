@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace chillerlan\Database\Drivers;
 
 use chillerlan\Database\Result;
-use chillerlan\Database\Dialects\{Dialect, MSSQL};
+use chillerlan\Database\Dialects\MSSQL;
 use chillerlan\Settings\SettingsContainerInterface;
 use Psr\Log\{LoggerInterface, NullLogger};
 use Psr\SimpleCache\CacheInterface;
@@ -26,6 +26,8 @@ use const PHP_OS;
  *
  */
 final class PDOMSSqlSrv extends PDODriverAbstract{
+
+	protected const DIALECT = MSSQL::class;
 
 	/**
 	 * PDOMSSqlSrv constructor.
@@ -41,10 +43,6 @@ final class PDOMSSqlSrv extends PDODriverAbstract{
 		$this->pdo_options[PDO::SQLSRV_ATTR_ENCODING]             = PDO::SQLSRV_ENCODING_UTF8;
 
 		parent::__construct($options, $cache, $logger);
-	}
-
-	public function getDialect():Dialect{
-		return new MSSQL;
 	}
 
 	/**

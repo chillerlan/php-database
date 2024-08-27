@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace chillerlan\Database\Drivers;
 
-use chillerlan\Database\Dialects\{Dialect, Postgres};
+use chillerlan\Database\Dialects\Postgres;
 use function is_numeric, sodium_bin2hex;
 
 /**
@@ -21,9 +21,7 @@ use function is_numeric, sodium_bin2hex;
  */
 final class PDOPostgreSQL extends PDODriverAbstract{
 
-	public function getDialect():Dialect{
-		return new Postgres;
-	}
+	protected const DIALECT = Postgres::class;
 
 	/**
 	 * Returns a DSN string using the given options
