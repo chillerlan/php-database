@@ -42,7 +42,7 @@ class CreateTable extends StatementAbstract implements Query, IfNotExists{
 		return $this->setIfNotExists();
 	}
 
-	protected function getSQL():array{
+	protected function sql():array{
 		return $this->dialect->createTable($this->name, $this->cols, $this->primaryKey, $this->ifNotExists, $this->temp, $this->dir);
 	}
 

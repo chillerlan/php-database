@@ -24,7 +24,7 @@ class AlterTable extends StatementAbstract implements Query{
 		return $this->setName($tablename);
 	}
 
-	protected function getSQL():array{
+	protected function sql():array{
 		return []; // @todo
 	}
 

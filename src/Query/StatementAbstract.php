@@ -143,7 +143,7 @@ abstract class StatementAbstract implements Statement{
 
 				}
 				else if($val2 instanceof Query){
-					$where[] = $operator.'('.$val2->sql().')';
+					$where[] = $operator.'('.$val2->getSQL().')';
 
 					if($val2 instanceof BindValues){
 						$this->bindValues = array_merge($this->bindValues, $val2->getBindValues());
@@ -157,7 +157,7 @@ abstract class StatementAbstract implements Statement{
 				$where[] = $operator;
 
 				if($val2 instanceof Query){
-					$where[] = '('.$val2->sql().')';
+					$where[] = '('.$val2->getSQL().')';
 
 					if($val2 instanceof BindValues){
 						$this->bindValues = array_merge($this->bindValues, $val2->getBindValues());
@@ -246,14 +246,14 @@ abstract class StatementAbstract implements Statement{
 	/**
 	 * @throws \chillerlan\Database\Query\QueryException
 	 */
-	protected function getSQL():array{
-		throw new QueryException('getSQL() not supported/implemented');
+	protected function sql():array{
+		throw new QueryException('sql() not supported/implemented');
 	}
 
 	/**
 	 * @throws \chillerlan\Database\Query\QueryException
 	 */
-	public function sql(bool|null $multi = null):string{
+	public function getSQL(bool|null $multi = null):string{
 
 		if(!$this instanceof Query){
 			throw new QueryException('Query not supported');
@@ -261,7 +261,7 @@ abstract class StatementAbstract implements Statement{
 
 		$this->multi = $multi ?? false;
 
-		$sql = trim(implode(' ', $this->getSQL()));
+		$sql = trim(implode(' ', $this->sql()));
 
 		// this should only happen on a corrupt dialect implementation
 		if(empty($sql)){
@@ -351,7 +351,7 @@ abstract class StatementAbstract implements Statement{
 			throw new QueryException('Query not supported');
 		}
 
-		$sql    = $this->sql(false);
+		$sql    = $this->getSQL(false);
 		$values = $this instanceof BindValues ? $this->getBindValues() : null;
 
 		$this->logger->debug('QueryTrait::executeQuery()', ['method' => __METHOD__, 'sql' => $sql, 'val' => $values, 'index' => $index]);
@@ -372,7 +372,7 @@ abstract class StatementAbstract implements Statement{
 			throw new QueryException('MultiQuery not supported');
 		}
 
-		$sql = $this->sql(true);
+		$sql = $this->getSQL(true);
 
 		if($values !== null && $callback !== null){
 			$this->logger->debug('MultiQueryTrait::executeMultiQuery()', ['method' => __METHOD__, 'sql' => $sql, 'val' => $values]);

@@ -53,7 +53,7 @@ class Select extends StatementAbstract implements Where, Limit, BindValues, Quer
 		return $this->setCached($ttl);
 	}
 
-	protected function getSQL():array{
+	protected function sql():array{
 
 		if(empty($this->from)){
 			throw new QueryException('no FROM expression specified');

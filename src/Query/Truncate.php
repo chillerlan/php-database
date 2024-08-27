@@ -22,7 +22,7 @@ class Truncate extends StatementAbstract implements Query{
 		return $this->setName($name);
 	}
 
-	protected function getSQL():array{
+	protected function sql():array{
 		return $this->dialect->truncate($this->name);
 	}
 

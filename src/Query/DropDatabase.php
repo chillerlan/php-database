@@ -28,7 +28,7 @@ class DropDatabase extends StatementAbstract implements Query, IfExists{
 	}
 
 	/** @inheritdoc */
-	protected function getSQL():array{
+	protected function sql():array{
 		return $this->dialect->dropDatabase($this->name, $this->ifExists);
 	}
 

@@ -32,7 +32,7 @@ class CreateDatabase extends StatementAbstract implements Query, IfNotExists{
 	}
 
 	/** @inheritdoc */
-	protected function getSQL():array{
+	protected function sql():array{
 		return $this->dialect->createDatabase($this->name, $this->ifNotExists, $this->charset);
 	}
 

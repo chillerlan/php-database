@@ -44,7 +44,7 @@ class Delete extends StatementAbstract implements Where, Limit, BindValues, Quer
 		return $this->setOffset($offset);
 	}
 
-	protected function getSQL():array{
+	protected function sql():array{
 		return $this->dialect->delete($this->name, $this->getWhere());
 	}
 

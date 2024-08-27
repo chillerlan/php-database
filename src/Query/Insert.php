@@ -42,7 +42,7 @@ class Insert extends StatementAbstract implements BindValues, MultiQuery{
 		return $this;
 	}
 
-	protected function getSQL():array{
+	protected function sql():array{
 
 		if(empty($this->bindValues)){
 			throw new QueryException('no values given');

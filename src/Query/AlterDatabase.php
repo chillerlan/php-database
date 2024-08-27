@@ -23,7 +23,7 @@ class AlterDatabase extends StatementAbstract implements Query{
 		return $this->setName($dbname);
 	}
 
-	protected function getSQL():array{
+	protected function sql():array{
 		return []; // @todo
 	}
 

@@ -213,7 +213,7 @@ abstract class QueryTestAbstract extends DBTestAbstract{
 
 		$r           = $this->db->select->from([$this::TABLE])->cached(2);
 		$getCacheKey = $this->getMethod('cacheKey');
-		$cacheKey    = $getCacheKey->invokeArgs($this->db, [$r->sql(), [], 'hash']);
+		$cacheKey    = $getCacheKey->invokeArgs($this->db, [$r->getSQL(), [], 'hash']);
 
 		// uncached
 		$this::assertFalse($this->cache->has($cacheKey));
@@ -228,22 +228,22 @@ abstract class QueryTestAbstract extends DBTestAbstract{
 
 		// raw uncached
 		$this::assertFalse($this->cache->has($cacheKey));
-		$this->db->rawCached($r->sql(), 'hash', true, 1);
+		$this->db->rawCached($r->getSQL(), 'hash', true, 1);
 
 		// cached
 		$this::assertTrue($this->cache->has($cacheKey));
-		$this->db->rawCached($r->sql(), 'hash', true, 1);
+		$this->db->rawCached($r->getSQL(), 'hash', true, 1);
 
 		sleep(2);
 #		$this->cache->clear();
 
 		// prepared uncached
 		$this::assertFalse($this->cache->has($cacheKey));
-		$this->db->preparedCached($r->sql(), [], 'hash', true, 1);
+		$this->db->preparedCached($r->getSQL(), [], 'hash', true, 1);
 
 		// cached
 		$this::assertTrue($this->cache->has($cacheKey));
-		$this->db->preparedCached($r->sql(), [], 'hash', true, 1);
+		$this->db->preparedCached($r->getSQL(), [], 'hash', true, 1);
 	}
 
 	public function testShowDatabases():void{
@@ -294,70 +294,70 @@ abstract class QueryTestAbstract extends DBTestAbstract{
 		$this->expectException(QueryException::class);
 		$this->expectExceptionMessage('no name specified');
 
-		$this->db->create->database('')->sql();
+		$this->db->create->database('')->getSQL();
 	}
 
 	public function testCreateTableNoNameException():void{
 		$this->expectException(QueryException::class);
 		$this->expectExceptionMessage('no name specified');
 
-		$this->db->create->table('')->sql();
+		$this->db->create->table('')->getSQL();
 	}
 
 	public function testDropDatabaseNoNameException():void{
 		$this->expectException(QueryException::class);
 		$this->expectExceptionMessage('no name specified');
 
-		$this->db->drop->database('')->sql();
+		$this->db->drop->database('')->getSQL();
 	}
 
 	public function testDropTableNoNameException():void{
 		$this->expectException(QueryException::class);
 		$this->expectExceptionMessage('no name specified');
 
-		$this->db->drop->table('')->sql();
+		$this->db->drop->table('')->getSQL();
 	}
 
 	public function testInsertTableNoNameException():void{
 		$this->expectException(QueryException::class);
 		$this->expectExceptionMessage('no name specified');
 
-		$this->db->insert->into('')->sql();
+		$this->db->insert->into('')->getSQL();
 	}
 
 	public function testInsertInvalidDataException():void{
 		$this->expectException(QueryException::class);
 		$this->expectExceptionMessage('no values given');
 
-		$this->db->insert->into('foo')->values([])->sql();
+		$this->db->insert->into('foo')->values([])->getSQL();
 	}
 
 	public function testSelectEmptyFromException():void{
 		$this->expectException(QueryException::class);
 		$this->expectExceptionMessage('no FROM expression specified');
 
-		$this->db->select->from([])->sql();
+		$this->db->select->from([])->getSQL();
 	}
 
 	public function testUpdateNoTableException():void{
 		$this->expectException(QueryException::class);
 		$this->expectExceptionMessage('no name specified');
 
-		$this->db->update->table('')->sql();
+		$this->db->update->table('')->getSQL();
 	}
 
 	public function testUpdateNoSetException():void{
 		$this->expectException(QueryException::class);
 		$this->expectExceptionMessage('no fields to update specified');
 
-		$this->db->update->table('foo')->set([])->sql();
+		$this->db->update->table('foo')->set([])->getSQL();
 	}
 
 	public function testDeleteNoTableException():void{
 		$this->expectException(QueryException::class);
 		$this->expectExceptionMessage('no name specified');
 
-		$this->db->delete->from('')->sql();
+		$this->db->delete->from('')->getSQL();
 	}
 
 }

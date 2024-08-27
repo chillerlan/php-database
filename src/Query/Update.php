@@ -48,7 +48,7 @@ class Update extends StatementAbstract implements Where, Limit, BindValues, Mult
 		return $this->setOffset($offset);
 	}
 
-	protected function getSQL():array{
+	protected function sql():array{
 
 		if(empty($this->set)){
 			throw new QueryException('no fields to update specified');
@@ -62,7 +62,7 @@ class Update extends StatementAbstract implements Where, Limit, BindValues, Mult
 		foreach($set as $k => $v){
 
 			if($v instanceof Statement){
-				$this->set[] = $this->dialect->quote($k).' = ('.$v->sql().')';
+				$this->set[] = $this->dialect->quote($k).' = ('.$v->getSQL().')';
 
 				if($v instanceof BindValues){
 					$this->bindValues = array_merge($this->bindValues, $v->getBindValues());

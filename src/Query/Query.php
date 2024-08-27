@@ -13,7 +13,7 @@ namespace chillerlan\Database\Query;
 
 interface Query{
 
-	public function sql(bool|null $multi = null):string;
+	public function getSQL(bool|null $multi = null):string;
 
 	/**
 	 * @throws \chillerlan\Database\Query\QueryException
