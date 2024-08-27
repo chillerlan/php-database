@@ -11,7 +11,6 @@ declare(strict_types=1);
 
 namespace chillerlan\Database\Query;
 
-use chillerlan\Database\ResultInterface;
 use function implode;
 
 /**
