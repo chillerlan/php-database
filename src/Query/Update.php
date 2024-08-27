@@ -61,7 +61,7 @@ class Update extends StatementAbstract implements Where, Limit, BindValues, Mult
 
 		foreach($set as $k => $v){
 
-			if($v instanceof Query){
+			if($v instanceof Statement){
 				$this->set[] = $this->dialect->quote($k).' = ('.$v->getSQL().')';
 
 				if($v instanceof BindValues){

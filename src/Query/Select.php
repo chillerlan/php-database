@@ -21,7 +21,7 @@ use function implode;
  * @link https://www.firebirdsql.org/file/documentation/reference_manuals/fblangref25-en/html/fblangref25-dml-select.html
  * @link https://www.sqlite.org/lang_select.html
  */
-class Select extends StatementAbstract implements Where, Limit, BindValues, Query, CachedQuery{
+class Select extends StatementAbstract implements Where, Limit, BindValues, CachedQuery{
 
 	protected bool  $distinct = false;
 	protected array $cols     = [];
@@ -104,7 +104,7 @@ class Select extends StatementAbstract implements Where, Limit, BindValues, Quer
 		$sql    = $this->dialect->selectCount($this->from, $this->getWhere(), $this->distinct, $this->groupby);
 		$result = $this->db->prepared(implode(' ', $sql), $this->bindValues);
 
-		if($result instanceof ResultInterface && $result->count() > 0){
+		if($result->count() > 0){
 			return (int)$result[0]->count;
 		}
 

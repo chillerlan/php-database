@@ -23,4 +23,6 @@ interface Statement{
 	 */
 	public function setLogger(LoggerInterface $logger):static;
 
+	public function getSQL(bool|null $multi = null):string;
+
 }

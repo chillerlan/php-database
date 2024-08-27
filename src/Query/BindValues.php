@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace chillerlan\Database\Query;
 
-interface BindValues{
+interface BindValues extends Statement{
 
 	public function getBindValues():array;
 

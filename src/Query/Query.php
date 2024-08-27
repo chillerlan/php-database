@@ -11,9 +11,7 @@ declare(strict_types=1);
 
 namespace chillerlan\Database\Query;
 
-interface Query{
-
-	public function getSQL(bool|null $multi = null):string;
+interface Query extends Statement{
 
 	/**
 	 * @throws \chillerlan\Database\Query\QueryException

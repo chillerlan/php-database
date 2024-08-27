@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace chillerlan\Database\Query;
 
-interface CachedQuery{
+interface CachedQuery extends Query{
 
 	public function cached(int|null $ttl = null):static;
 
