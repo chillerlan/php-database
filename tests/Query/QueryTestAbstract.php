@@ -38,13 +38,13 @@ abstract class QueryTestAbstract extends DBTestAbstract{
 			->field('value', 'decimal', '9,6', null, null, true)
 			->field('active', 'boolean', null, null, null, null, null, 'false')
 			->field('created', 'timestamp', null, null, null, null, 'CURRENT_TIMESTAMP')
-			->query();
+			->executeQuery();
 
 		$this::assertTrue($r->isSuccess());
 	}
 
 	protected function tearDown():void{
-		$r = $this->db->drop->table($this::TABLE)->ifExists()->query();
+		$r = $this->db->drop->table($this::TABLE)->ifExists()->executeQuery();
 
 		$this::assertTrue($r->isSuccess());
 		$this::assertTrue($this->db->disconnect());
@@ -70,11 +70,11 @@ abstract class QueryTestAbstract extends DBTestAbstract{
 		$insert = $this->db->insert
 			->into($this::TABLE)
 			->values(['id' => 0, 'hash' => md5('0'), 'data' => 'foo', 'value' => 123.456, 'active' => 1])
-			->query();
+			->executeQuery();
 
 		$this::assertTrue($insert->isSuccess());
 
-		$this::assertInsertResult($this->db->select->from([$this::TABLE])->query());
+		$this::assertInsertResult($this->db->select->from([$this::TABLE])->executeQuery());
 	}
 
 	public function testInsertMulti():void{
@@ -82,11 +82,11 @@ abstract class QueryTestAbstract extends DBTestAbstract{
 		$insert = $this->db->insert
 			->into($this::TABLE, 'IGNORE', 'id')
 			->values($this->data())
-			->multi();
+			->executeMultiQuery();
 
 		$this::assertTrue($insert);
 
-		$this::assertInsertMultiResult($this->db->select->from([$this::TABLE])->query());
+		$this::assertInsertMultiResult($this->db->select->from([$this::TABLE])->executeQuery());
 	}
 
 	public function testSelect():void{
@@ -94,7 +94,7 @@ abstract class QueryTestAbstract extends DBTestAbstract{
 		$this->db->insert
 			->into($this::TABLE)
 			->values($this->data())
-			->multi();
+			->executeMultiQuery();
 
 		$q = $this->db->select
 			->cols(['id' => 't1.id', 'hash' => ['t1.hash']])
@@ -105,7 +105,7 @@ abstract class QueryTestAbstract extends DBTestAbstract{
 
 		$this::assertSame(3, $q->count()); // ignores limit/offset
 
-		$r = $q->query();
+		$r = $q->executeQuery();
 
 		$this::assertSame(2, $r->count());
 		$this::assertSame(2, (int)$r[0]['id']);
@@ -117,7 +117,7 @@ abstract class QueryTestAbstract extends DBTestAbstract{
 			->cols(['hash', 'value'])
 			->from([$this::TABLE])
 			->where('active', 1)
-			->query('hash')
+			->executeQuery('hash')
 		;
 
 		$this::assertSame(
@@ -129,7 +129,7 @@ abstract class QueryTestAbstract extends DBTestAbstract{
 			->from([$this::TABLE])
 			->where('id', [1, 2], 'in')
 			->orderBy(['hash' => 'desc'])
-			->query()
+			->executeQuery()
 		;
 
 		$this::assertSame('bar', $r[0]->data);
@@ -143,7 +143,7 @@ abstract class QueryTestAbstract extends DBTestAbstract{
 		$this->db->insert
 			->into($this::TABLE)
 			->values($this->data())
-			->multi();
+			->executeMultiQuery();
 
 		$update = $this->db->update
 			->table($this::TABLE)
@@ -153,7 +153,7 @@ abstract class QueryTestAbstract extends DBTestAbstract{
 				'active' => 1,
 			])
 			->where('id', 1)
-			->query();
+			->executeQuery();
 
 		$this::assertTrue($update->isSuccess());
 
@@ -161,7 +161,7 @@ abstract class QueryTestAbstract extends DBTestAbstract{
 			->cols(['hash', 'data', 'value', 'active'])
 			->from([$this::TABLE])
 			->where('id', 1)
-			->query('hash');
+			->executeQuery('hash');
 
 		$this::assertTrue($result->isSuccess());
 
@@ -177,7 +177,7 @@ abstract class QueryTestAbstract extends DBTestAbstract{
 		$this->db->insert
 			->into($this::TABLE)
 			->values($this->data())
-			->multi();
+			->executeMultiQuery();
 
 		$q = $this->db->select->cols(['hash'])->from([$this::TABLE]);
 
@@ -185,16 +185,16 @@ abstract class QueryTestAbstract extends DBTestAbstract{
 			'c4ca4238a0b923820dcc509a6f75849b',
 			'c81e728d9d4c2f636f067f89cc14862c',
 			'eccbc87e4b5ce2fe28308fd9f2a7baf3',
-		], array_column($q->query()->toArray(), 'hash'));
+		], array_column($q->executeQuery()->toArray(), 'hash'));
 
 		$delete = $this->db->delete
 			->from($this::TABLE)
 			->where('id', 2)
-			->query();
+			->executeQuery();
 
 		$this::assertTrue($delete->isSuccess());
 
-		$r = $q->query();
+		$r = $q->executeQuery();
 
 		$this::assertSame(2, $r->count());
 		$this::assertSame([
@@ -208,20 +208,20 @@ abstract class QueryTestAbstract extends DBTestAbstract{
 		$this->db->insert
 			->into($this::TABLE)
 			->values([['id' => '?', 'hash' => '?']])
-			->callback(range(1, 10), fn($k) => [$k, md5((string)$k)])
+			->executeMultiQuery(range(1, 10), fn($k) => [$k, md5((string)$k)])
 		;
 
 		$r           = $this->db->select->from([$this::TABLE])->cached(2);
 		$getCacheKey = $this->getMethod('cacheKey');
-		$cacheKey    = $getCacheKey->invokeArgs($this->driver, [$r->sql(), [], 'hash']);
+		$cacheKey    = $getCacheKey->invokeArgs($this->db, [$r->sql(), [], 'hash']);
 
 		// uncached
 		$this::assertFalse($this->cache->has($cacheKey));
-		$r->query('hash');
+		$r->executeQuery('hash');
 
 		// cached
 		$this::assertTrue($this->cache->has($cacheKey));
-		$r->query('hash');
+		$r->executeQuery('hash');
 
 		sleep(2);
 #		$this->cache->clear();
@@ -250,7 +250,7 @@ abstract class QueryTestAbstract extends DBTestAbstract{
 
 		$r = $this->db->show
 			->databases()
-			->query()
+			->executeQuery()
 			->toArray();
 
 		$this->logger->debug('SHOW DATABASES:', $r);
@@ -262,7 +262,7 @@ abstract class QueryTestAbstract extends DBTestAbstract{
 
 		$r = $this->db->show
 			->tables()
-			->query()
+			->executeQuery()
 			->toArray();
 
 		$this->logger->debug('SHOW TABLES:', $r);

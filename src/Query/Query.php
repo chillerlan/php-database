@@ -18,6 +18,6 @@ interface Query{
 	/**
 	 * @throws \chillerlan\Database\Query\QueryException
 	 */
-	public function query(string|null $index = null);
+	public function executeQuery(string|null $index = null);
 
 }

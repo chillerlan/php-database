@@ -338,7 +338,7 @@ abstract class Statement implements LoggerAwareInterface{
 	/**
 	 * @throws \chillerlan\Database\Query\QueryException
 	 */
-	public function query(string|null $index = null):Result{
+	public function executeQuery(string|null $index = null):Result{
 
 		if(!$this instanceof Query){
 			throw new QueryException('Query not supported');
@@ -347,7 +347,7 @@ abstract class Statement implements LoggerAwareInterface{
 		$sql    = $this->sql(false);
 		$values = $this instanceof BindValues ? $this->getBindValues() : null;
 
-		$this->logger->debug('QueryTrait::query()', ['method' => __METHOD__, 'sql' => $sql, 'val' => $values, 'index' => $index]);
+		$this->logger->debug('QueryTrait::executeQuery()', ['method' => __METHOD__, 'sql' => $sql, 'val' => $values, 'index' => $index]);
 
 		if($this->cached && $this instanceof CachedQuery){
 			return $this->db->preparedCached($sql, $values, $index, true, $this->ttl);
@@ -359,25 +359,7 @@ abstract class Statement implements LoggerAwareInterface{
 	/**
 	 * @throws \chillerlan\Database\Query\QueryException
 	 */
-	public function multi(array|null $values = null):bool{
-
-		if(!$this instanceof MultiQuery){
-			throw new QueryException('MultiQuery not supported');
-		}
-
-		// @todo: fix values/bindvalues
-		$sql    = $this->sql(true);
-		$values = $values ?? ($this instanceof BindValues ? $this->getBindValues() : []);
-
-		$this->logger->debug('MultiQueryTrait::multi()', ['method' => __METHOD__, 'sql' => $sql, 'val' => $values]);
-
-		return $this->db->multi($sql, $values);
-	}
-
-	/**
-	 * @throws \chillerlan\Database\Query\QueryException
-	 */
-	public function callback(array $values, Closure $callback):bool{
+	public function executeMultiQuery(array|null $values = null, Closure|null $callback = null):bool{
 
 		if(!$this instanceof MultiQuery){
 			throw new QueryException('MultiQuery not supported');
@@ -385,9 +367,18 @@ abstract class Statement implements LoggerAwareInterface{
 
 		$sql = $this->sql(true);
 
-		$this->logger->debug('MultiQueryTrait::callback()', ['method' => __METHOD__, 'sql' => $sql, 'val' => $values]);
+		if($values !== null && $callback !== null){
+			$this->logger->debug('MultiQueryTrait::executeMultiQuery()', ['method' => __METHOD__, 'sql' => $sql, 'val' => $values]);
 
-		return $this->db->multiCallback($sql, $values, $callback);
+			return $this->db->multiCallback($sql, $values, $callback);
+		}
+
+		// @todo: fix values/bindvalues
+		$values = $values ?? ($this instanceof BindValues ? $this->getBindValues() : []);
+
+		$this->logger->debug('MultiQueryTrait::executeMultiQuery()', ['method' => __METHOD__, 'sql' => $sql, 'val' => $values]);
+
+		return $this->db->multi($sql, $values);
 	}
 
 }

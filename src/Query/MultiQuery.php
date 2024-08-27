@@ -18,11 +18,6 @@ interface MultiQuery extends Query{
 	/**
 	 * @throws \chillerlan\Database\Query\QueryException
 	 */
-	public function multi(array|null $values = null):bool;
-
-	/**
-	 * @throws \chillerlan\Database\Query\QueryException
-	 */
-	public function callback(array $values, Closure $callback):bool;
+	public function executeMultiQuery(array|null $values = null, Closure|null $callback = null):bool;
 
 }

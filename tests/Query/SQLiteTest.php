@@ -62,7 +62,7 @@ final class SQLiteTest extends QueryTestAbstract{
 		$this->db->insert
 			->into($this::TABLE)
 			->values($this->data())
-			->multi();
+			->executeMultiQuery();
 
 		$q = $this->db->select
 			->cols(['id' => 't1.id', 'hash' => ['t1.hash']])
@@ -73,7 +73,7 @@ final class SQLiteTest extends QueryTestAbstract{
 
 		$this::assertSame(3, $q->count()); // ignores limit/offset
 
-		$r = $q->query();
+		$r = $q->executeQuery();
 
 		$this::assertSame(2, $r->count());
 		$this::assertSame(2, (int)$r[0]['id']);
@@ -85,7 +85,7 @@ final class SQLiteTest extends QueryTestAbstract{
 			->cols(['hash', 'value'])
 			->from([$this::TABLE])
 			->where('active', 1)
-			->query('hash')
+			->executeQuery('hash')
 		;
 
 		$this::assertSame(
@@ -97,7 +97,7 @@ final class SQLiteTest extends QueryTestAbstract{
 			->from([$this::TABLE])
 			->where('id', [1, 2], 'in')
 			->orderBy(['hash' => 'desc'])
-			->query()
+			->executeQuery()
 		;
 
 		$this::assertSame('bar', $r[0]->data);
