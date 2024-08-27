@@ -11,12 +11,9 @@ declare(strict_types=1);
 
 namespace chillerlan\DatabaseTest\Query;
 
-use chillerlan\Database\Dialects\Dialect;
-use chillerlan\Database\Drivers\DriverInterface;
 use chillerlan\Database\Query\QueryException;
 use chillerlan\Database\ResultInterface;
 use chillerlan\DatabaseTest\DBTestAbstract;
-use ReflectionClass;
 
 use function array_column, array_values, in_array, json_encode, md5, range, sleep;
 
