@@ -173,12 +173,12 @@ final class MySQL extends DialectAbstract{
 		if($defaultType === 'USER_DEFINED'){
 
 			$field[] = match(true){
-				$type === 'TIMESTAMP' && intval($defaultValue) === 0     => 'DEFAULT 0',
-				$type === 'BIT'                                          => 'DEFAULT b\''.preg_replace('/[^01]/', '0', $defaultValue).'\'',
-				$type === 'BOOLEAN'                                      => 'DEFAULT '.(preg_match('/^1|T|TRUE|YES$/i', $defaultValue) ? 'TRUE' : 'FALSE'),
-				$type === 'BINARY' || $type === 'VARBINARY'              => 'DEFAULT 0x'.sodium_bin2hex($defaultValue),
-				strtoupper($defaultValue) === 'NULL' && $isNull === true => 'DEFAULT NULL',
-				default                                                  => 'DEFAULT \''.$defaultValue.'\'',
+				$type === 'TIMESTAMP' && intval($defaultValue) === 0             => 'DEFAULT 0',
+				$type === 'BIT'                                                  => 'DEFAULT b\''.preg_replace('/[^01]/', '0', $defaultValue).'\'',
+				$type === 'BOOLEAN'                                              => 'DEFAULT '.(preg_match('/^1|T|TRUE|YES$/i', $defaultValue) ? 'TRUE' : 'FALSE'),
+				$type === 'BINARY' || $type === 'VARBINARY'                      => 'DEFAULT 0x'.sodium_bin2hex($defaultValue),
+				strtoupper((string)$defaultValue) === 'NULL' && $isNull === true => 'DEFAULT NULL',
+				default                                                          => 'DEFAULT \''.$defaultValue.'\'',
 			};
 
 		}
