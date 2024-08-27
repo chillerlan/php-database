@@ -9,39 +9,50 @@
 
 namespace chillerlan\DatabaseExample;
 
-use chillerlan\Database\Database;
+use chillerlan\Database\DatabaseOptions;
+use chillerlan\Database\Drivers\MySQLiDrv;
+use chillerlan\DotEnv\DotEnv;
+use chillerlan\SimpleCache\MemoryCache;
 
-/** @var \chillerlan\Database\DatabaseOptions $options */
-$options = null;
+require_once __DIR__.'/../vendor/autoload.php';
 
-/** @var \Psr\SimpleCache\CacheInterface $cache */
-$cache   = null;
+$env = (new DotEnv(__DIR__.'/../.config', '.env'))->load();
 
-require_once __DIR__.'/common.php';
+$options = new DatabaseOptions([
+	'host'     => $env->get('DB_MYSQLI_HOST'),
+	'port'     => (int)$env->get('DB_MYSQLI_PORT'),
+	'socket'   => $env->get('DB_MYSQLI_SOCKET'),
+	'database' => $env->get('DB_MYSQLI_DATABASE'),
+	'username' => $env->get('DB_MYSQLI_USERNAME'),
+	'password' => $env->get('DB_MYSQLI_PASSWORD'),
+]);
 
-$db = new Database($options, $cache);
+$db = new MySQLiDrv($options, new MemoryCache);
 $db->connect();
 
+// named parameters for context
 $db->create
-	->table('products')
+	->table(tablename: 'products')
 	->ifNotExists()
-	->int('id',10, null, false, 'UNSIGNED AUTO_INCREMENT')
-	->tinytext('name', null, false)
-	->varchar('type', 20)
-	->decimal('price', '9,2', 0)
-	->decimal('weight', '8,3')
-	->int('added', 10, 0, null, 'UNSIGNED')
-	->primaryKey('id')
-	->query();
+	->int(name: 'id', length: 10, isNull: false, attribute: 'UNSIGNED AUTO_INCREMENT')
+	->tinytext(name: 'name', isNull:  false)
+	->varchar(name: 'type', length:  20)
+	->decimal(name: 'price', length: '9,2', defaultValue: 0)
+	->decimal(name: 'weight', length: '8,3')
+	->int(name: 'added', length: 10, defaultValue: 0, attribute: 'UNSIGNED')
+	->primaryKey(field: 'id')
+	->executeQuery();
 
-$db->truncate->table('products')->query();
+$db->truncate
+	->table('products')
+	->executeQuery();
 
 
 // single row insert
 $db->insert
 	->into('products')
 	->values(['name' => 'product1', 'type' => 'a', 'price' => 3.99, 'weight' => 0.1, 'added' => time()])
-	->query();
+	->executeQuery();
 
 
 // multi insert
@@ -53,7 +64,7 @@ $values = [
 $db->insert
 	->into('products')
 	->values($values)
-	->multi();
+	->executeMultiQuery();
 
 
 // multi insert with callback
@@ -68,7 +79,7 @@ $db->insert
 	->values([
 		['name' => '?', 'type' => '?', 'price' => '?', 'weight' => '?', 'added' => '?']
 	])
-	->callback($values, function($row){
+	->executeMultiQuery($values, function(array $row):array{
 		return [
 			$row[0],
 			$row[1],
@@ -90,7 +101,7 @@ $result = $db->select
 	->from(['t1' => 'products'])
 	->where('t1.type', 'a')
 	->orderBy(['t1.price' => 'asc'])
-	->query('uid')
+	->executeQuery('uid')
 	->toArray();
 
 var_dump($result);
